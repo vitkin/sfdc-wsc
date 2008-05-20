@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Salesforce.com PL/SOQL API verion 8.0
+
+Copyright 2006 Salesforce.com, inc. All Rights Reserved
+-->
+<definitions targetNamespace="http://soap.sforce.com/2006/08/plsoql" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.sforce.com/2006/08/plsoql">
+ <types>
+  <xsd:schema elementFormDefault="qualified" targetNamespace="http://soap.sforce.com/2006/08/plsoql">
+   <xsd:complexType name="ExecuteAnonymousResult">
+    <xsd:sequence>
+     <xsd:element name="column" type="xsd:int"/>
+     <xsd:element name="compileProblem" type="xsd:string"/>
+     <xsd:element name="compiled" type="xsd:boolean"/>
+     <xsd:element name="exceptionMessage" type="xsd:string"/>
+     <xsd:element name="exceptionStackTrace" type="xsd:string"/>
+     <xsd:element name="line" type="xsd:int"/>
+     <xsd:element name="success" type="xsd:boolean"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="CompilePackageResult">
+    <xsd:sequence>
+     <xsd:element name="bodyCrc" minOccurs="0" type="xsd:int"/>
+     <xsd:element name="column" type="xsd:int"/>
+     <xsd:element name="id" type="tns:ID" nillable="true"/>
+     <xsd:element name="line" type="xsd:int"/>
+     <xsd:element name="problem" type="xsd:string"/>
+     <xsd:element name="success" type="xsd:boolean"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="CompileTriggerResult">
+    <xsd:sequence>
+     <xsd:element name="bodyCrc" minOccurs="0" type="xsd:int"/>
+     <xsd:element name="column" type="xsd:int"/>
+     <xsd:element name="id" type="tns:ID" nillable="true"/>
+     <xsd:element name="line" type="xsd:int"/>
+     <xsd:element name="problem" type="xsd:string"/>
+     <xsd:element name="success" type="xsd:boolean"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="RunTestsResult">
+    <xsd:sequence>
+     <xsd:element name="failures" minOccurs="0" maxOccurs="unbounded" type="tns:RunTestFailure"/>
+     <xsd:element name="numFailures" type="xsd:int"/>
+     <xsd:element name="numTestsRun" type="xsd:int"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="RunTestFailure">
+    <xsd:sequence>
+     <xsd:element name="message" type="xsd:string"/>
+     <xsd:element name="methodName" type="xsd:string"/>
+     <xsd:element name="namespace" type="xsd:string"/>
+     <xsd:element name="packageName" type="xsd:string"/>
+     <xsd:element name="stackTrace" type="xsd:string"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="DebuggingInfo">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="debugLog" type="xsd:string"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:simpleType name="LogType">
+    <xsd:restriction base="xsd:string">
+     <xsd:enumeration value="None"/>
+     <xsd:enumeration value="Debugonly"/>
+     <xsd:enumeration value="Db"/>
+    </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:complexType name="RunTestsRequest">
+    <xsd:sequence>
+     <xsd:element name="allTests" type="xsd:boolean"/>
+     <xsd:element name="packagesWithPrefixes" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="SessionHeader">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="sessionId" type="xsd:string"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="CallOptions">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="client" type="xsd:string"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="DebuggingHeader">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="debugLevel" type="tns:LogType"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:simpleType name="ID">
+    <xsd:restriction base="xsd:string">
+     <xsd:length value="18"/>
+     <xsd:pattern value="[a-zA-Z0-9]{18}"/>
+    </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:element name="compilePackages">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="scripts" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="compilePackagesResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="result" minOccurs="0" maxOccurs="unbounded" type="tns:CompilePackageResult"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="compileTriggers">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="scripts" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="compileTriggersResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="result" minOccurs="0" maxOccurs="unbounded" type="tns:CompileTriggerResult"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="executeAnonymous">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="String" type="xsd:string"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="executeAnonymousResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="result" type="tns:ExecuteAnonymousResult"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="runTests">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="RunTestsRequest" type="tns:RunTestsRequest"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="runTestsResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="result" type="tns:RunTestsResult"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+  </xsd:schema>
+ </types>
+ <!-- Message for the header parts -->
+ <message name="Header">
+  <part name="DebuggingHeader" element="tns:DebuggingHeader"/>
+  <part name="DebuggingInfo" element="tns:DebuggingInfo"/>
+  <part name="SessionHeader" element="tns:SessionHeader"/>
+ </message>
+ <!-- Operation Messages -->
+ <message name="compilePackagesRequest">
+  <part element="tns:compilePackages" name="parameters"/>
+ </message>
+ <message name="compilePackagesResponse">
+  <part element="tns:compilePackagesResponse" name="parameters"/>
+ </message>
+ <message name="compileTriggersRequest">
+  <part element="tns:compileTriggers" name="parameters"/>
+ </message>
+ <message name="compileTriggersResponse">
+  <part element="tns:compileTriggersResponse" name="parameters"/>
+ </message>
+ <message name="executeAnonymousRequest">
+  <part element="tns:executeAnonymous" name="parameters"/>
+ </message>
+ <message name="executeAnonymousResponse">
+  <part element="tns:executeAnonymousResponse" name="parameters"/>
+ </message>
+ <message name="runTestsRequest">
+  <part element="tns:runTests" name="parameters"/>
+ </message>
+ <message name="runTestsResponse">
+  <part element="tns:runTestsResponse" name="parameters"/>
+ </message>
+ <portType name="PlsoqlPortType">
+  <operation name="compilePackages">
+   <documentation>Compile one or more PL/SOQL Packages.</documentation>
+   <input message="tns:compilePackagesRequest"/>
+   <output message="tns:compilePackagesResponse"/>
+  </operation>
+  <operation name="compileTriggers">
+   <documentation>Compile PL/SOQL Trigger code blocks.</documentation>
+   <input message="tns:compileTriggersRequest"/>
+   <output message="tns:compileTriggersResponse"/>
+  </operation>
+  <operation name="executeAnonymous">
+   <documentation>Execute an anonymous PL/SOQL code block</documentation>
+   <input message="tns:executeAnonymousRequest"/>
+   <output message="tns:executeAnonymousResponse"/>
+  </operation>
+  <operation name="runTests">
+   <documentation>Execute test methods</documentation>
+   <input message="tns:runTestsRequest"/>
+   <output message="tns:runTestsResponse"/>
+  </operation>
+ </portType>
+ <binding name="PlsoqlBinding" type="tns:PlsoqlPortType">
+  <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <operation name="compilePackages">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:header use="literal" part="SessionHeader" message="tns:Header"/>
+    <soap:body use="literal" parts="parameters"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="compileTriggers">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:header use="literal" part="SessionHeader" message="tns:Header"/>
+    <soap:body use="literal" parts="parameters"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="executeAnonymous">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:header use="literal" part="SessionHeader" message="tns:Header"/>
+    <soap:header use="literal" part="DebuggingHeader" message="tns:Header"/>
+    <soap:body use="literal" parts="parameters"/>
+   </input>
+   <output>
+    <soap:header use="literal" part="DebuggingInfo" message="tns:Header"/>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="runTests">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal" parts="parameters"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+ </binding>
+ <service name="PlsoqlService">
+  <documentation>Manage your Salesforce.com pl/soql packages and triggers</documentation>
+  <port binding="tns:PlsoqlBinding" name="Plsoql">
+   <soap:address location="http://localhost:80/services/Soap/s/8.0"/>
+  </port>
+ </service>
+</definitions>

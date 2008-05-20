@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" 
+             xmlns:api="https://adwords.google.com/api/adwords/v7"
+             xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" 
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+             targetNamespace="https://adwords.google.com/api/adwords/v7">
+
+  <!-- Types -->
+  <types>
+    <schema xmlns="http://www.w3.org/2001/XMLSchema" 
+            targetNamespace="https://adwords.google.com/api/adwords/v7"
+            elementFormDefault="qualified">
+
+      <!-- ApiException -->
+      <complexType name="ApiException">
+        <sequence>
+          <element name="code" type="xsd:int"/>
+          <element name="internal" type="xsd:boolean"/>
+          <element name="message" nillable="true" type="xsd:string"/>
+          <element name="trigger" nillable="true" type="xsd:string"/>
+          <element name="errors" nillable="true" maxOccurs="unbounded" type="api:ApiError"/>
+        </sequence>
+      </complexType>
+
+      <complexType name="ApiError">
+        <sequence>
+          <element name="index" type="xsd:int"/>
+          <element name="field" type="xsd:string" minOccurs="0" />
+          <element name="textIndex" type="xsd:int" minOccurs="0" />
+          <element name="textLength" type="xsd:int" minOccurs="0" />
+          <element name="trigger" type="xsd:string" minOccurs="0" />
+          <element name="code" type="xsd:int"/>
+          <element name="isExemptable" type="xsd:boolean"/>
+          <element name="detail" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- Keyword Type  -->
+      <simpleType name="KeywordType">
+        <restriction base="string">
+          <enumeration value="Broad"/>
+          <enumeration value="Phrase"/>
+          <enumeration value="Exact"/>
+        </restriction>
+      </simpleType>
+
+      <!-- Keyword Variations datatypes-->
+      <complexType name="SeedKeyword">
+        <sequence>
+          <element name="negative" nillable="true" minOccurs="0" type="xsd:boolean"/>
+          <element name="text" type="xsd:string"/>
+          <element name="type" type="api:KeywordType"/>
+        </sequence>
+      </complexType>
+
+      <complexType name="KeywordVariations">
+        <sequence>
+          <element name="additionalToConsider" nillable="true" maxOccurs="unbounded" type="api:KeywordVariation"/>
+          <element name="moreSpecific" nillable="true" maxOccurs="unbounded" type="api:KeywordVariation"/>
+        </sequence>
+      </complexType>
+
+      <complexType name="KeywordVariation">
+        <sequence>
+          <element name="advertiserCompetitionScale" type="xsd:int"/>
+          <element name="language" type="xsd:string"/>
+          <element name="searchVolumeScale" type="xsd:int"/>
+          <element name="text" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- Content Keywords datatypes -->
+      <complexType name="SiteKeywordGroups">
+        <sequence>
+          <element name="groups" maxOccurs="unbounded" type="xsd:string"/>
+          <element name="keywords" maxOccurs="unbounded" type="api:SiteKeyword"/>
+        </sequence>
+      </complexType>
+
+      <complexType name="SiteKeyword">
+        <sequence>
+          <element name="advertiserCompetitionScale" type="xsd:int"/>
+          <element name="groupId" type="xsd:int"/>
+          <element name="searchVolumeScale" type="xsd:int"/>
+          <element name="text" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <element name="fault" type="api:ApiException"/>
+
+      <element name="getKeywordVariations">
+        <complexType>
+          <sequence>
+            <element name="seedKeywords" maxOccurs="unbounded" type="api:SeedKeyword"/>
+            <element name="useSynonyms" type="xsd:boolean"/>
+            <element name="languages" maxOccurs="unbounded" type="xsd:string"/>
+            <element name="countries" maxOccurs="unbounded" type="xsd:string"/>
+          </sequence>
+        </complexType>
+      </element>
+
+      <element name="getKeywordVariationsResponse">
+        <complexType>
+          <sequence>
+            <element name="getKeywordVariationsReturn" type="api:KeywordVariations"/>
+          </sequence>
+        </complexType>
+      </element>
+
+      <element name="getKeywordsFromSite">
+        <complexType>
+          <sequence>
+            <element name="url" type="xsd:string"/>
+            <element name="includeLinkedPages" type="xsd:boolean"/>
+            <element name="languages" maxOccurs="unbounded" type="xsd:string"/>
+            <element name="countries" maxOccurs="unbounded" type="xsd:string"/>
+          </sequence>
+        </complexType>
+      </element>
+
+      <element name="getKeywordsFromSiteResponse">
+        <complexType>
+          <sequence>
+            <element name="getKeywordsFromSiteReturn" type="api:SiteKeywordGroups"/>
+          </sequence>
+        </complexType>
+      </element>
+
+      <!-- SOAP Headers -->
+
+      <element name="email">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+
+      <element name="clientEmail">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+      
+      <element name="clientCustomerId">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+
+      <element name="password">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+
+      <element name="useragent">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+
+      <element name="token">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+
+      <element name="applicationToken">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+
+      <element name="developerToken">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+
+      <element name="responseTime">
+        <simpleType>
+          <restriction base="long"/>
+        </simpleType>
+      </element>
+
+      <element name="operations">
+        <simpleType>
+          <restriction base="long"/>
+        </simpleType>
+      </element>
+
+      <element name="units">
+        <simpleType>
+          <restriction base="long"/>
+        </simpleType>
+      </element>
+
+      <element name="requestId">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+
+    </schema>
+  </types>
+
+  <!-- Messages -->
+  <message name="email">
+    <part name="email" element="api:email"/>
+  </message>
+
+  <message name="clientEmail">
+    <part name="clientEmail" element="api:clientEmail"/>
+  </message>
+  
+  <message name="clientCustomerId">
+    <part name="clientCustomerId" element="api:clientCustomerId"/>
+  </message>
+
+  <message name="password">
+    <part name="password" element="api:password"/>
+  </message>
+
+  <message name="useragent">
+    <part name="useragent" element="api:useragent"/>
+  </message>
+
+  <message name="token">
+    <part name="token" element="api:token"/>
+  </message>
+
+  <message name="applicationToken">
+    <part name="applicationToken" element="api:applicationToken"/>
+  </message>
+
+  <message name="developerToken">
+    <part name="developerToken" element="api:developerToken"/>
+  </message>
+
+  <message name="responseTime">
+    <part name="responseTime" element="api:responseTime"/>
+  </message>
+
+  <message name="operations">
+    <part name="operations" element="api:operations"/>
+  </message>
+
+  <message name="units">
+    <part name="units" element="api:units"/>
+  </message>
+
+  <message name="requestId">
+    <part name="requestId" element="api:requestId"/>
+  </message>
+
+  <message name="getKeywordVariationsRequest">
+    <part name="parameters" element="api:getKeywordVariations"/>
+  </message>
+
+  <message name="getKeywordVariationsResponse">
+    <part name="paramteters" element="api:getKeywordVariationsResponse"/>
+  </message>
+
+  <message name="getKeywordsFromSiteRequest">
+    <part name="parameters" element="api:getKeywordsFromSite"/>
+  </message>
+
+  <message name="getKeywordsFromSiteResponse">
+    <part name="parameters" element="api:getKeywordsFromSiteResponse"/>
+  </message>
+
+  <message name="ApiException">
+    <part name="fault" element="api:fault"/>
+  </message>
+
+  <!-- KeywordToolService public API -->
+  <portType name="KeywordToolInterface">
+
+    <operation name="getKeywordVariations">
+      <input message="api:getKeywordVariationsRequest" name="getKeywordVariationsRequest"/>
+      <output message="api:getKeywordVariationsResponse" name="getKeywordVariationsResponse"/>
+      <fault message="api:ApiException" name="ApiException"/>
+    </operation>
+
+    <operation name="getKeywordsFromSite">
+      <input message="api:getKeywordsFromSiteRequest" name="getKeywordsFromSiteRequest"/>
+      <output message="api:getKeywordsFromSiteResponse" name="getKeywordsFromSiteResponse"/>
+      <fault message="api:ApiException" name="ApiException"/>
+    </operation>
+
+  </portType>
+
+  <!-- KeywordToolService public API implementation -->
+  <binding name="KeywordToolServiceSoapBinding" type="api:KeywordToolInterface">
+    <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <operation name="getKeywordVariations">
+      <wsdlsoap:operation soapAction=""/>
+      <input name="getKeywordVariationsRequest">
+        <wsdlsoap:header message="api:email" part="email" use="literal"/>
+        <wsdlsoap:header message="api:clientEmail" part="clientEmail" use="literal"/>
+        <wsdlsoap:header message="api:clientCustomerId" part="clientCustomerId" use="literal"/>
+        <wsdlsoap:header message="api:password" part="password" use="literal"/>
+        <wsdlsoap:header message="api:useragent" part="useragent" use="literal"/>
+        <wsdlsoap:header message="api:token" part="token" use="literal"/>
+        <wsdlsoap:header message="api:applicationToken" part="applicationToken" use="literal"/>
+        <wsdlsoap:header message="api:developerToken" part="developerToken" use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </input>
+      <output name="getKeywordVariationsResponse">
+        <wsdlsoap:header message="api:responseTime" part="responseTime" use="literal"/>
+        <wsdlsoap:header message="api:operations" part="operations" use="literal"/>
+        <wsdlsoap:header message="api:units" part="units" use="literal"/>
+        <wsdlsoap:header message="api:requestId" part="requestId" use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </output>
+      <fault name="ApiException">
+        <wsdlsoap:fault name="ApiException" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="getKeywordsFromSite">
+      <wsdlsoap:operation soapAction=""/>
+      <input name="getKeywordsFromSiteRequest">
+        <wsdlsoap:header message="api:email" part="email" use="literal"/>
+        <wsdlsoap:header message="api:clientEmail" part="clientEmail" use="literal"/>
+        <wsdlsoap:header message="api:clientCustomerId" part="clientCustomerId" use="literal"/>
+        <wsdlsoap:header message="api:password" part="password" use="literal"/>
+        <wsdlsoap:header message="api:useragent" part="useragent" use="literal"/>
+        <wsdlsoap:header message="api:token" part="token" use="literal"/>
+        <wsdlsoap:header message="api:applicationToken" part="applicationToken" use="literal"/>
+        <wsdlsoap:header message="api:developerToken" part="developerToken" use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </input>
+      <output name="getKeywordsFromSiteResponse">
+        <wsdlsoap:header message="api:responseTime" part="responseTime" use="literal"/>
+        <wsdlsoap:header message="api:operations" part="operations" use="literal"/>
+        <wsdlsoap:header message="api:units" part="units" use="literal"/>
+        <wsdlsoap:header message="api:requestId" part="requestId" use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </output>
+      <fault name="ApiException">
+        <wsdlsoap:fault name="ApiException" use="literal"/>
+      </fault>
+    </operation>
+
+  </binding>
+
+  <!-- KeywordToolService definition -->
+  <service name="KeywordToolService">
+    <port binding="api:KeywordToolServiceSoapBinding" name="KeywordToolService">
+      <wsdlsoap:address location="https://adwords.google.com/api/adwords/v7/KeywordToolService"/>
+    </port>
+  </service>
+
+</definitions>

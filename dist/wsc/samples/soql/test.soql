@@ -1,0 +1,3 @@
+search {find \{foo\} in name fields}
+query {select name,id,fax from account}
+query {select name from account}

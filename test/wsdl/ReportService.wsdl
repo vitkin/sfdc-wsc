@@ -1,0 +1,821 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:api="https://adwords.google.com/api/adwords/v7"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"                  
+                  xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"                  
+                  targetNamespace="https://adwords.google.com/api/adwords/v7"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!-- Types -->
+  <wsdl:types>
+    <schema xmlns="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://adwords.google.com/api/adwords/v7"
+            elementFormDefault="qualified">
+      
+      <!-- ApiException -->
+      <complexType name="ApiException">
+        <sequence>
+          <element name="code" type="xsd:int"/>
+          <element name="internal" type="xsd:boolean"/>
+          <element name="message" nillable="true" type="xsd:string"/>
+          <element name="trigger" nillable="true" type="xsd:string"/>
+          <element name="errors" nillable="true" maxOccurs="unbounded" type="api:ApiError"/>
+        </sequence>
+      </complexType>
+
+      <complexType name="ApiError">
+        <sequence>
+          <element name="index" type="xsd:int"/>
+          <element name="field" type="xsd:string" minOccurs="0" />
+          <element name="textIndex" type="xsd:int" minOccurs="0" />
+          <element name="textLength" type="xsd:int" minOccurs="0" />
+          <element name="trigger" type="xsd:string" minOccurs="0" />
+          <element name="code" type="xsd:int"/>
+          <element name="isExemptable" type="xsd:boolean"/>
+          <element name="detail" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- ReportJobStatus enum -->
+      <simpleType name="ReportJobStatus">
+        <restriction base="string">
+          <enumeration value="Pending"/>
+          <enumeration value="InProgress"/>
+          <enumeration value="Completed"/>
+          <enumeration value="Failed"/>
+        </restriction>
+      </simpleType>
+
+      <!-- AggregationType enum -->
+      <simpleType name="AggregationType">
+        <restriction base="string">
+          <enumeration value="Summary"/>
+          <enumeration value="Daily"/>
+          <enumeration value="Monthly"/>
+          <enumeration value="Quarterly"/>
+          <enumeration value="Yearly"/>
+          <enumeration value="HourlyRegardlessDate"/>
+          <enumeration value="HourlyByDate"/>
+          <enumeration value="Weekly"/>
+        </restriction>
+      </simpleType>
+      
+      <!-- AdWordsType enum -->
+      <simpleType name="AdWordsType">
+        <restriction base="string">
+          <enumeration value="SearchOnly"/>
+          <enumeration value="ContentOnly"/>
+        </restriction>
+      </simpleType>
+
+      <!-- KeywordStatus enum -->
+      <simpleType name="KeywordStatus">
+        <restriction base="string">
+          <enumeration value="Normal"/>
+          <enumeration value="InTrial"/>
+          <enumeration value="OnHold"/>
+          <enumeration value="Disabled"/>
+          <enumeration value="Disapproved"/>
+          <enumeration value="Deleted"/>
+          <enumeration value="Paused"/>
+        </restriction>
+      </simpleType>
+         
+      <!-- KeywordType enum -->
+      <simpleType name="KeywordType">
+        <restriction base="string">
+          <enumeration value="Broad"/>
+          <enumeration value="Exact"/>
+          <enumeration value="Phrase"/>
+        </restriction>
+      </simpleType>
+      
+      <!-- CampaignStatus enum -->
+      <simpleType name="CampaignStatus">
+        <restriction base="string">
+          <enumeration value="Active"/>
+          <enumeration value="Pending"/>
+          <enumeration value="Ended"/>
+          <enumeration value="Paused"/>
+          <enumeration value="Deleted"/>
+          <enumeration value="Suspended"/>
+        </restriction>
+      </simpleType>
+      
+      <!-- CustomReportOption enum -->
+      <simpleType name="CustomReportOption">
+        <restriction base="string">
+          <enumeration value="Clicks"/>
+          <enumeration value="Impressions"/>
+          <enumeration value="Ctr"/>
+          <enumeration value="Cpc"/>
+          <enumeration value="Cost"/>
+          <enumeration value="MinimumCpc"/>
+          <enumeration value="MaximumCpc"/>
+          <enumeration value="DailyBudget"/>
+          <enumeration value="AveragePosition"/>
+          <enumeration value="DescriptionLine1"/>
+          <enumeration value="DescriptionLine2"/>
+          <enumeration value="DescriptionLine3"/>
+          <enumeration value="VisibleUrl"/>
+          <enumeration value="CreativeStatus"/>
+          <enumeration value="Conversions"/>
+          <enumeration value="ConversionRate"/>
+          <enumeration value="CostPerConversion"/>
+          <enumeration value="Transactions"/>
+          <enumeration value="CostPerTransaction"/>
+          <enumeration value="TotalConversionValue"/>
+          <enumeration value="AverageConversionValue"/>
+          <enumeration value="ConversionValuePerCost"/>
+          <enumeration value="ConversionValuePerClick"/>
+          <enumeration value="SaleCount"/>
+          <enumeration value="SaleValue"/>
+          <enumeration value="LeadCount"/>
+          <enumeration value="LeadValue"/>
+          <enumeration value="SignupCount"/>
+          <enumeration value="SignupValue"/>
+          <enumeration value="PageViewCount"/>
+          <enumeration value="PageViewValue"/>
+          <enumeration value="DefaultConversionCount"/>
+          <enumeration value="DefaultConversionValue"/>
+          <enumeration value="Campaign"/>
+          <enumeration value="AdGroup"/>
+          <enumeration value="Keyword"/>
+          <enumeration value="KeywordType"/>
+          <enumeration value="KeywordStatus"/>
+          <enumeration value="AdWordsType"/>
+          <enumeration value="AdGroupStatus"/>
+          <enumeration value="AccountName"/>
+          <enumeration value="CampaignStatus"/>
+          <enumeration value="CampaignEndDate"/>
+          <enumeration value="CreativeDestinationUrl"/>
+          <enumeration value="KeywordDestinationUrl"/>
+          <enumeration value="DestinationUrl"/>
+          <enumeration value="CampaignId"/>
+          <enumeration value="AdGroupId"/>
+          <enumeration value="KeywordId"/>
+          <enumeration value="CreativeId"/>
+          <enumeration value="ImageAdName"/>
+          <enumeration value="ImageHostingKey"/>
+          <enumeration value="CreativeType"/>
+          <enumeration value="BottomPosition"/>
+          <enumeration value="CPM"/>
+          <enumeration value="CustomerTimeZone"/>
+          <enumeration value="MaxContentCPC"/>
+          <enumeration value="MaximumCPM"/>
+          <enumeration value="TopPosition"/>
+          <enumeration value="Website"/>
+        </restriction>
+      </simpleType>
+
+      <!-- AdGroupStatus enum -->
+      <simpleType name="AdGroupStatus">
+        <restriction base="string">
+          <enumeration value="Enabled"/>
+          <enumeration value="Paused"/>
+          <enumeration value="Deleted"/>
+        </restriction>
+      </simpleType>
+            
+      <!-- abstract ReportJob -->
+      <complexType name="ReportJob" abstract="true">
+        <sequence>
+          <element name="aggregationType" type="api:AggregationType" minOccurs="0"/>
+          <element name="clientEmails" type="string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="crossClient" type="boolean" minOccurs="0"/>
+          <element name="endDay" type="xsd:date"/>
+          <element name="id" type="long" minOccurs="0"/>
+          <element name="name" type="string" minOccurs="0"/>
+          <element name="startDay" type="xsd:date"/>
+          <element name="status" minOccurs="0" type="api:ReportJobStatus"/>
+        </sequence>
+      </complexType>
+                  
+      <!-- KeywordReportJob extends ReportJob -->
+      <complexType name="KeywordReportJob">
+        <complexContent>
+          <extension base="api:ReportJob">
+            <sequence>
+              <element name="adWordsType" minOccurs="0" type="api:AdWordsType"/>
+              <element name="campaigns" type="int" minOccurs="0" maxOccurs="unbounded"/>
+              <element name="keywordStatuses" type="api:KeywordStatus" minOccurs="0" maxOccurs="unbounded"/>
+              <element name="keywordType" minOccurs="0" type="api:KeywordType"/>
+              <element name="includeZeroImpression" minOccurs="0" type="boolean"/>
+            </sequence>
+          </extension>
+        </complexContent>
+      </complexType>
+      
+      <!-- AdTextReportJob extends ReportJob -->
+      <complexType name="AdTextReportJob">
+        <complexContent>
+          <extension base="api:ReportJob">
+            <sequence>
+              <element name="adWordsType" minOccurs="0" type="api:AdWordsType"/>
+              <element name="campaigns" type="int" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+          </extension>
+        </complexContent>
+      </complexType>
+
+      <!-- UrlReportJob extends ReportJob -->
+      <complexType name="UrlReportJob">
+        <complexContent>
+          <extension base="api:ReportJob">
+            <sequence>
+              <element name="adWordsType" minOccurs="0" type="api:AdWordsType"/>
+              <element name="campaigns" type="int" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+          </extension>
+        </complexContent>
+      </complexType>
+      
+      <!-- CustomReportJob extends ReportJob -->
+      <complexType name="CustomReportJob">
+        <complexContent>
+          <extension base="api:ReportJob">
+            <sequence>
+              <element name="adGroupStatuses" type="api:AdGroupStatus" minOccurs="0" maxOccurs="unbounded"/>
+              <element name="adGroups" type="int" minOccurs="0" maxOccurs="unbounded"/>
+              <element name="adWordsType" type="api:AdWordsType" minOccurs="0"/>
+              <element name="campaignStatuses" type="api:CampaignStatus" minOccurs="0" maxOccurs="unbounded"/>
+              <element name="campaigns" type="int" minOccurs="0" maxOccurs="unbounded"/>
+              <element name="customOptions" type="api:CustomReportOption" minOccurs="1" maxOccurs="unbounded"/>
+              <element name="keywordStatuses" type="api:KeywordStatus" minOccurs="0" maxOccurs="unbounded"/>
+              <element name="keywordType" type="api:KeywordType" minOccurs="0"/>
+              <element name="keywords" type="string" minOccurs="0" maxOccurs="unbounded"/>
+              <element name="includeZeroImpression" minOccurs="0" type="boolean"/>
+            </sequence>
+          </extension>
+        </complexContent>
+      </complexType>
+
+      <!-- CampaignReportJob extends ReportJob -->
+      <complexType name="CampaignReportJob">
+        <complexContent>
+          <extension base="api:ReportJob">
+            <sequence>
+              <element name="adWordsType" minOccurs="0" type="api:AdWordsType"/>
+              <element name="campaigns" type="int" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+          </extension>
+        </complexContent>
+      </complexType>
+
+      <!-- AccountReportJob extends ReportJob -->
+      <complexType name="AccountReportJob">
+        <complexContent>
+          <extension base="api:ReportJob">
+            <sequence>
+              <element name="adWordsType" minOccurs="0" type="api:AdWordsType"/>
+            </sequence>
+          </extension>
+        </complexContent>
+      </complexType>
+
+
+      <!-- AdGroupReportJob extends ReportJob -->
+      <complexType name="AdGroupReportJob">
+        <complexContent>
+          <extension base="api:ReportJob">
+            <sequence>
+              <element name="adWordsType" minOccurs="0" type="api:AdWordsType"/>
+              <element name="campaigns" type="int" minOccurs="0" maxOccurs="unbounded"/>
+              <element name="adGroupStatuses" type="api:AdGroupStatus" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+          </extension>
+        </complexContent>
+      </complexType>
+
+      <!-- AdImageReportJob extends ReportJob -->
+      <complexType name="AdImageReportJob">
+        <complexContent>
+          <extension base="api:ReportJob">
+            <sequence>
+              <element name="campaigns" type="int" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+          </extension>
+        </complexContent>
+      </complexType>
+
+      <!-- Custom header elements -->
+      <element name="fault" type="api:ApiException"/>
+
+      <!-- SOAP Headers -->
+      <element name="email">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+      <element name="clientEmail">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+      <element name="clientCustomerId">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+      <element name="password">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+      <element name="useragent">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+      <element name="token">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+      <element name="applicationToken">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+      <element name="developerToken">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+      <element name="responseTime">
+        <simpleType>
+          <restriction base="long"/>
+        </simpleType>
+      </element>
+      <element name="operations">
+        <simpleType>
+          <restriction base="long"/>
+        </simpleType>
+      </element>     
+      <element name="units">
+        <simpleType>
+          <restriction base="long"/>
+        </simpleType>
+      </element>
+      <element name="requestId">
+        <simpleType>
+          <restriction base="string"/>
+        </simpleType>
+      </element>
+
+      <!-- Message param/return elements -->
+      <element name="scheduleReportJob">
+        <complexType>
+          <sequence>
+            <element name="job" type="api:ReportJob"/>
+          </sequence>
+        </complexType>
+      </element>
+      <element name="scheduleReportJobResponse">
+        <complexType>
+          <sequence>
+            <element name="scheduleReportJobReturn" type="long"/>
+          </sequence>
+        </complexType>
+      </element>
+            
+      <element name="getReportJobStatus">
+        <complexType>
+          <sequence>
+            <element name="reportJobId" type="long"/>
+          </sequence>
+        </complexType>
+      </element>
+      <element name="getReportJobStatusResponse">
+        <complexType>
+          <sequence>
+            <element name="getReportJobStatusReturn" type="api:ReportJobStatus"/>
+          </sequence>
+        </complexType>
+      </element>
+
+      <element name="getReportDownloadUrl">
+        <complexType>
+          <sequence>
+            <element name="reportJobId" type="long"/>
+          </sequence>
+        </complexType>
+      </element>
+      <element name="getReportDownloadUrlResponse">
+        <complexType>
+          <sequence>
+            <element name="getReportDownloadUrlReturn" type="string"/>
+          </sequence>
+        </complexType>
+      </element>
+
+      <element name="getGzipReportDownloadUrl">
+        <complexType>
+          <sequence>
+            <element name="reportJobId" type="long"/>
+          </sequence>
+        </complexType>
+      </element>
+      <element name="getGzipReportDownloadUrlResponse">
+        <complexType>
+          <sequence>
+            <element name="getGzipReportDownloadUrlReturn" type="string"/>
+          </sequence>
+        </complexType>
+      </element>
+
+      <element name="getAllJobs">
+        <complexType/>
+      </element>      
+      <element name="getAllJobsResponse">
+        <complexType>
+          <sequence>
+            <element name="getAllJobsReturn" type="api:ReportJob" maxOccurs="unbounded"/>
+          </sequence>
+        </complexType>
+      </element>
+
+      <element name="deleteReport">
+        <complexType>
+          <sequence>
+            <element name="reportJobId" type="long"/>
+          </sequence>
+        </complexType>
+      </element>
+      <element name="deleteReportResponse">
+        <complexType/>
+      </element>
+                  
+    </schema>
+  </wsdl:types>
+  
+  <!--
+    Messages
+  -->  
+  <wsdl:message name="ApiException">
+    <wsdl:part name="fault" element="api:fault"/>
+  </wsdl:message>
+
+  <!-- SOAP header messages -->
+  <wsdl:message name="email">
+    <wsdl:part name="email" element="api:email"/>
+  </wsdl:message>
+  <wsdl:message name="clientEmail">
+    <wsdl:part name="clientEmail" element="api:clientEmail"/>
+  </wsdl:message>
+  <wsdl:message name="clientCustomerId">
+    <wsdl:part name="clientCustomerId" element="api:clientCustomerId"/>
+  </wsdl:message>
+  <wsdl:message name="password">
+    <wsdl:part name="password" element="api:password"/>
+  </wsdl:message>
+  <wsdl:message name="useragent">
+    <wsdl:part name="useragent" element="api:useragent"/>
+  </wsdl:message>
+  <wsdl:message name="token">
+    <wsdl:part name="token" element="api:token"/>
+  </wsdl:message>
+  <wsdl:message name="applicationToken">
+    <wsdl:part name="applicationToken" element="api:applicationToken"/>
+  </wsdl:message>
+  <wsdl:message name="developerToken">
+    <wsdl:part name="developerToken" element="api:developerToken"/>
+  </wsdl:message>
+  <wsdl:message name="responseTime">
+    <wsdl:part name="responseTime" element="api:responseTime"/>
+  </wsdl:message>
+  <wsdl:message name="operations">
+    <wsdl:part name="operations" element="api:operations"/>
+  </wsdl:message>
+  <wsdl:message name="units">
+    <wsdl:part name="units" element="api:units"/>
+  </wsdl:message>
+  <wsdl:message name="requestId">
+    <wsdl:part name="requestId" element="api:requestId"/>
+  </wsdl:message>
+
+  <wsdl:message name="scheduleReportJobRequest">
+    <wsdl:part name="parameters" element="api:scheduleReportJob"/>
+  </wsdl:message>
+  <wsdl:message name="scheduleReportJobResponse">
+    <wsdl:part name="parameters"
+               element="api:scheduleReportJobResponse"/>
+  </wsdl:message>
+  
+  <wsdl:message name="getReportJobStatusRequest">
+    <wsdl:part name="parameters" element="api:getReportJobStatus"/>
+  </wsdl:message>
+  <wsdl:message name="getReportJobStatusResponse">
+    <wsdl:part name="parameters" element="api:getReportJobStatusResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="getReportDownloadUrlRequest">
+    <wsdl:part name="parameters" element="api:getReportDownloadUrl"/>
+  </wsdl:message>
+  <wsdl:message name="getReportDownloadUrlResponse">
+    <wsdl:part name="parameters" element="api:getReportDownloadUrlResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="getGzipReportDownloadUrlRequest">
+    <wsdl:part name="parameters" element="api:getGzipReportDownloadUrl"/>
+  </wsdl:message>
+  <wsdl:message name="getGzipReportDownloadUrlResponse">
+    <wsdl:part name="parameters" element="api:getGzipReportDownloadUrlResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="getAllJobsRequest">
+    <wsdl:part name="parameters" element="api:getAllJobs"/>
+  </wsdl:message>
+  <wsdl:message name="getAllJobsResponse">
+    <wsdl:part name="parameters" element="api:getAllJobsResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="deleteReportRequest">
+    <wsdl:part name="parameters" element="api:deleteReport"/>
+  </wsdl:message>
+  <wsdl:message name="deleteReportResponse">
+    <wsdl:part name="parameters" element="api:deleteReportResponse"/>
+  </wsdl:message>
+      
+  <!-- ReportService public API -->
+  <wsdl:portType name="ReportServiceInterface">
+
+    <wsdl:operation name="scheduleReportJob">
+      <wsdl:input message="api:scheduleReportJobRequest"
+                  name="scheduleReportJobRequest"/>
+      <wsdl:output message="api:scheduleReportJobResponse"
+                   name="scheduleReportJobResponse"/>
+      <wsdl:fault message="api:ApiException"
+                  name="ApiException"/>
+    </wsdl:operation>
+    
+    <wsdl:operation name="getReportJobStatus">
+      <wsdl:input message="api:getReportJobStatusRequest"
+                  name="getReportJobStatusRequest"/>
+      <wsdl:output message="api:getReportJobStatusResponse"
+                   name="getReportJobStatusResponse"/>
+      <wsdl:fault message="api:ApiException" name="ApiException"/>
+    </wsdl:operation>
+    
+    <wsdl:operation name="getReportDownloadUrl">
+      <wsdl:input message="api:getReportDownloadUrlRequest" name="getReportDownloadUrlRequest"/>
+      <wsdl:output message="api:getReportDownloadUrlResponse" name="getReportDownloadUrlResponse"/>
+      <wsdl:fault message="api:ApiException" name="ApiException"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="getGzipReportDownloadUrl">
+      <wsdl:input message="api:getGzipReportDownloadUrlRequest" name="getGzipReportDownloadUrlRequest"/>
+      <wsdl:output message="api:getGzipReportDownloadUrlResponse" name="getGzipReportDownloadUrlResponse"/>
+      <wsdl:fault message="api:ApiException" name="ApiException"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="getAllJobs">
+      <wsdl:input message="api:getAllJobsRequest" name="getAllJobsRequest"/>
+      <wsdl:output message="api:getAllJobsResponse" name="getAllJobsResponse"/>
+      <wsdl:fault message="api:ApiException" name="ApiException"/>
+    </wsdl:operation>
+    
+    <wsdl:operation name="deleteReport">
+      <wsdl:input message="api:deleteReportRequest" name="deleteReportRequest"/>
+      <wsdl:output message="api:deleteReportResponse" name="deleteReportResponse"/>
+      <wsdl:fault message="api:ApiException" name="ApiException"/>
+    </wsdl:operation>    
+  </wsdl:portType>
+  
+  <!-- ReportService public API implrementation -->
+  <wsdl:binding name="ReportServiceSoapBinding" type="api:ReportServiceInterface">
+    <wsdlsoap:binding style="document"
+                      transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <wsdl:operation name="scheduleReportJob">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="scheduleReportJobRequest">
+        <wsdlsoap:header message="api:email" part="email"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientEmail" part="clientEmail"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientCustomerId" part="clientCustomerId"
+                         use="literal"/>
+        <wsdlsoap:header message="api:password" part="password"
+                         use="literal"/>
+        <wsdlsoap:header message="api:useragent" part="useragent"
+                         use="literal"/>
+        <wsdlsoap:header message="api:token" part="token"
+                         use="literal"/>
+        <wsdlsoap:header message="api:applicationToken" part="applicationToken"
+                         use="literal"/>
+        <wsdlsoap:header message="api:developerToken" part="developerToken"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="scheduleReportJobResponse">
+        <wsdlsoap:header message="api:responseTime" part="responseTime"
+                         use="literal"/>
+        <wsdlsoap:header message="api:operations" part="operations"
+                         use="literal"/>
+        <wsdlsoap:header message="api:units" part="units"
+                         use="literal"/>
+        <wsdlsoap:header message="api:requestId" part="requestId"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ApiException">
+        <wsdlsoap:fault name="ApiException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    
+    <wsdl:operation name="getReportJobStatus">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getReportJobStatusRequest">
+        <wsdlsoap:header message="api:email" part="email"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientEmail" part="clientEmail"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientCustomerId" part="clientCustomerId"
+                         use="literal"/>
+        <wsdlsoap:header message="api:password" part="password"
+                         use="literal"/>
+        <wsdlsoap:header message="api:useragent" part="useragent"
+                         use="literal"/>
+        <wsdlsoap:header message="api:token" part="token"
+                         use="literal"/>
+        <wsdlsoap:header message="api:applicationToken" part="applicationToken"
+                         use="literal"/>
+        <wsdlsoap:header message="api:developerToken" part="developerToken"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getReportJobStatusResponse">
+        <wsdlsoap:header message="api:responseTime" part="responseTime"
+                         use="literal"/>
+        <wsdlsoap:header message="api:operations" part="operations"
+                         use="literal"/>
+        <wsdlsoap:header message="api:units" part="units"
+                         use="literal"/>
+        <wsdlsoap:header message="api:requestId" part="requestId"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ApiException">
+        <wsdlsoap:fault name="ApiException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    
+    <wsdl:operation name="getReportDownloadUrl">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getReportDownloadUrlRequest">
+        <wsdlsoap:header message="api:email" part="email"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientEmail" part="clientEmail"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientCustomerId" part="clientCustomerId"
+                         use="literal"/>
+        <wsdlsoap:header message="api:password" part="password"
+                         use="literal"/>
+        <wsdlsoap:header message="api:useragent" part="useragent"
+                         use="literal"/>
+        <wsdlsoap:header message="api:token" part="token"
+                         use="literal"/>
+        <wsdlsoap:header message="api:applicationToken" part="applicationToken"
+                         use="literal"/>
+        <wsdlsoap:header message="api:developerToken" part="developerToken"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getReportDownloadUrlResponse">
+        <wsdlsoap:header message="api:responseTime" part="responseTime"
+                         use="literal"/>
+        <wsdlsoap:header message="api:operations" part="operations"
+                         use="literal"/>
+        <wsdlsoap:header message="api:units" part="units"
+                         use="literal"/>
+        <wsdlsoap:header message="api:requestId" part="requestId"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ApiException">
+        <wsdlsoap:fault name="ApiException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getGzipReportDownloadUrl">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getGzipReportDownloadUrlRequest">
+        <wsdlsoap:header message="api:email" part="email"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientEmail" part="clientEmail"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientCustomerId" part="clientCustomerId"
+                         use="literal"/>
+        <wsdlsoap:header message="api:password" part="password"
+                         use="literal"/>
+        <wsdlsoap:header message="api:useragent" part="useragent"
+                         use="literal"/>
+        <wsdlsoap:header message="api:token" part="token"
+                         use="literal"/>
+        <wsdlsoap:header message="api:applicationToken" part="applicationToken"
+                         use="literal"/>
+        <wsdlsoap:header message="api:developerToken" part="developerToken"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getGzipReportDownloadUrlResponse">
+        <wsdlsoap:header message="api:responseTime" part="responseTime"
+                         use="literal"/>
+        <wsdlsoap:header message="api:operations" part="operations"
+                         use="literal"/>
+        <wsdlsoap:header message="api:units" part="units"
+                         use="literal"/>
+        <wsdlsoap:header message="api:requestId" part="requestId"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ApiException">
+        <wsdlsoap:fault name="ApiException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getAllJobs">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getAllJobsRequest">
+        <wsdlsoap:header message="api:email" part="email"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientEmail" part="clientEmail"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientCustomerId" part="clientCustomerId"
+                         use="literal"/>
+        <wsdlsoap:header message="api:password" part="password"
+                         use="literal"/>
+        <wsdlsoap:header message="api:useragent" part="useragent"
+                         use="literal"/>
+        <wsdlsoap:header message="api:token" part="token"
+                         use="literal"/>
+        <wsdlsoap:header message="api:applicationToken" part="applicationToken"
+                         use="literal"/>
+        <wsdlsoap:header message="api:developerToken" part="developerToken"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getAllJobsResponse">
+        <wsdlsoap:header message="api:responseTime" part="responseTime"
+                         use="literal"/>
+        <wsdlsoap:header message="api:operations" part="operations"
+                         use="literal"/>
+        <wsdlsoap:header message="api:units" part="units"
+                         use="literal"/>
+        <wsdlsoap:header message="api:requestId" part="requestId"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ApiException">
+        <wsdlsoap:fault name="ApiException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="deleteReport">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="deleteReportRequest">
+        <wsdlsoap:header message="api:email" part="email"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientEmail" part="clientEmail"
+                         use="literal"/>
+        <wsdlsoap:header message="api:clientCustomerId" part="clientCustomerId"
+                         use="literal"/>
+        <wsdlsoap:header message="api:password" part="password"
+                         use="literal"/>
+        <wsdlsoap:header message="api:useragent" part="useragent"
+                         use="literal"/>
+        <wsdlsoap:header message="api:token" part="token"
+                         use="literal"/>
+        <wsdlsoap:header message="api:applicationToken" part="applicationToken"
+                         use="literal"/>
+        <wsdlsoap:header message="api:developerToken" part="developerToken"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deleteReportResponse">
+        <wsdlsoap:header message="api:responseTime" part="responseTime"
+                         use="literal"/>
+        <wsdlsoap:header message="api:operations" part="operations"
+                         use="literal"/>
+        <wsdlsoap:header message="api:units" part="units"
+                         use="literal"/>
+        <wsdlsoap:header message="api:requestId" part="requestId"
+                         use="literal"/>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ApiException">
+        <wsdlsoap:fault name="ApiException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    
+  </wsdl:binding>
+  
+  <!-- ReportService definition -->
+  <wsdl:service name="ReportService">
+    <wsdl:port binding="api:ReportServiceSoapBinding" name="ReportService">
+      <wsdlsoap:address location="https://adwords.google.com/api/adwords/v7/ReportService"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>
