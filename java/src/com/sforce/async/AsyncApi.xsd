@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.force.com/2009/06/asyncapi/dataload"
+        xmlns:tns="http://www.force.com/2009/06/asyncapi/dataload"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="true">
+
+    <complexType name="JobInfo">
+    	<sequence>
+    		<element name="id" type="string" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Global unique ID. Present in all GET
+    					representations. Not allowed when creating new
+    					job
+    				</documentation>
+    			</annotation>
+
+    		</element>
+            <!--
+    		<element name="uri" type="anyURI" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					URI for this job, typically looking like
+    					someBaseURI/jobId. Present in all GET
+    					representations. Ignored when creating new
+    					job
+    				</documentation>
+    			</annotation>
+    		</element>
+    		-->
+    		<element name="operation" type="tns:OperationEnum"
+    			minOccurs="0" maxOccurs="1">
+
+    			<annotation>
+    				<documentation>
+    					The processing operation that will be executed
+    					for the data set. This is currently constrained
+    					by an enum to the insert, upsert and update API
+    					operations but in the future may be more
+    					open-ended, e.g. the name of an Apex class.
+    					Present in all GET representations of a job
+    					Required when creating new job.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="object" type="string" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+
+    					This is the name of the object type for the data
+    					being processed. All data must be of a single
+    					object type. Present in all GET representations
+    					of a job. Required when creating new job.
+    				</documentation>
+    			</annotation>
+    		</element>
+            <!--
+    		<element name="concurrencyMode" minOccurs="0" maxOccurs="1"
+    			type="tns:ConcurrencyModeEnum">
+    			<annotation>
+    				<documentation>
+    					Concurrency mode for this job. Default is
+    					parallel. Present in all GET representations of
+    					a job. Optional when creating new job. E.g. if
+    					the user wants to force the job to be processed
+    					serially, concurrencyMode should be set to
+    					serial when creating the job.
+    				</documentation>
+    			</annotation>
+
+    		</element>
+    		-->
+    		<element name="createdBy" type="string" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					The GUID of the user creating the job. All
+    					batches must be created by the same user as this
+    					user. Present in all GET representations of a
+    					job. Ignored when creating new job
+    				</documentation>
+    			</annotation>
+    		</element>
+
+            <!--
+            <element name="abortedBy" type="string" minOccurs="0" maxOccurs="1">
+
+    			<annotation>
+    				<documentation>
+    					The GUID of the user who aborted this job. Only
+    					present in GET representations when state is
+    					Aborted. Ignored when creating new job.
+    				</documentation>
+    			</annotation></element>
+    			-->
+            <element name="createdDate" type="dateTime" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Date and time of job creation as determined by
+    					server in UTC. Present in all GET
+    					representations. Ignored when creating new
+    					job.
+    				</documentation>
+
+    			</annotation>
+    		</element>
+
+    		<element name="systemModstamp" type="dateTime" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Date and time when job ended, either in
+    					Completed or Failed state. Present in all GET
+    					representations when state is Completed or
+    					Failed. Ignored when creating new job.
+    				</documentation>
+    			</annotation>
+    		</element>
+
+    		<element name="state" type="tns:JobStateEnum" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Present in all GET representations. Ignored
+    					when creating new job. Possible States:
+
+    					Open: The job is "open" and new batches can be
+    					added to the job. Batches already in the job are
+    					being processed.
+
+    					Closed: The job is "closed" meaning that new
+    					batches can no longer be added to the job.
+    					Batches in the job is still being processed.
+    					Completed: The job has completed and all batches
+    					have been processed. Some batches may have
+    					failed which will be indicated in the BatchInfo
+    					for the batch.
+
+    					Aborted: The job has been aborted by a user. The
+    					endTime element will indicate the time of
+    					abortion. The abortedBy element will indicate
+    					the user who aborted the job. A user must have
+    					the async API profile perm or have created the
+    					job to abort it.
+
+    					Failed: The job has failed for some reason. Some
+    					batches may have been processed and they cannot
+    					be rolled back. The BatchInfo list will contain
+    					infos for all batches and results can be
+    					retrieved for completed batches. The results
+    					will indicated which records have been
+    					processed.
+    				</documentation>
+    			</annotation>
+    		</element>
+            <!--
+    		<element name="stateMessage" type="string" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+
+    				<documentation>
+    					This message may appear in jobs when further
+    					detail about the state is available. For
+    					example, if State is Failed, this element will
+    					contain the reason for the failure. Ignored when
+    					creating new job.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="numberBatchesCompleted" type="int"
+    			minOccurs="0" maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Number of batches that have been completed.
+    					Present in all GET representations. Ignored
+    					when creating new job.
+    				</documentation>
+
+    			</annotation>
+    		</element>
+    		<element name="numberBatchesFailed" type="int" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Number of batches that failed when processed.
+    					Present in all GET representations. Ignored
+    					when creating new job.
+    				</documentation>
+    			</annotation>
+    		</element>
+
+    		<element name="numberBatchesTotal" type="int" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Number of total batches currently in the job.
+    					This number will increase as more batches are
+    					added to the job. Only when State is Closed,
+    					Completed or Failed does this number represent
+    					the final total. Present in all GET
+    					representations. Ignored when creating new
+    					job.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="numberRecordsProcessed" type="int"
+    			minOccurs="0" maxOccurs="1">
+    			<annotation>
+
+    				<documentation>
+    					Number of records processed so far. This number
+    					increases as more batches are processed. Only
+    					when state is Completed or Failed does this
+    					number represent the final total. Present in all
+    					GET representations of a job. Ignored when
+    					creating new job
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="numberRetries" type="int" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					This is the number of save operations that was
+    					retried due to some problem such as lock
+    					contention. This element may not be exposed to
+    					end users.
+    				</documentation>
+
+    			</annotation>
+    		</element>
+    		<element name="batchInfoUri" type="anyURI" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					URI for the resource containing a list of batch
+    					infos for all batches in job (See BatchInfoList
+    					type). Present in all GET representations of a
+    					job. Ignored when creating new job
+    				</documentation>
+    			</annotation>
+    		</element>
+
+    		<element name="newBatchUri" type="anyURI" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					URI to be used when POSTing a new batch,
+    					typically this will be jobURI/batch. Present
+    					in all GET representations of a job. Ignored
+    					when creating new job.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		-->
+        </sequence>
+    </complexType>
+
+    <simpleType name="OperationEnum">
+    	<restriction base="string">
+    		<enumeration value="insert"></enumeration>
+    		<enumeration value="upsert"></enumeration>
+    		<enumeration value="update"></enumeration>
+    	</restriction>
+    </simpleType>
+
+    <simpleType name="JobStateEnum">
+
+        <annotation>
+        	<documentation>
+        		See state element on Job for documentation
+        	</documentation>
+        </annotation>
+        <restriction base="string">
+    		<enumeration value="Open"></enumeration>
+    		<enumeration value="Closed"></enumeration>
+    		<enumeration value="Aborted"></enumeration>
+
+    		<!--<enumeration value="Completed"></enumeration>-->
+    		<enumeration value="Failed"></enumeration>
+    	</restriction>
+    </simpleType>
+
+    <complexType name="BatchInfo">
+    	<sequence>
+    		<element name="id" type="string" minOccurs="1">
+    			<annotation>
+
+    				<documentation>
+    					The ID of the batch. This may be a GUID, but
+    					does not have to be.
+    				</documentation>
+    			</annotation>
+    		</element>
+            <!--
+    		<element name="uri" type="anyURI" minOccurs="1"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					The URI for this batch info resource, typically
+    					something like baseURI/[jobId]/batch/[batchId]
+    				</documentation>
+
+    			</annotation>
+    		</element>
+    		-->
+    		<element name="jobId" type="string" minOccurs="1"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					The GUID of the job this batch belongs to
+    				</documentation>
+    			</annotation>
+    		</element>
+
+            <!--
+    		<element name="jobUri" type="anyURI" minOccurs="1"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					The URI of the job resource for the job this
+    					batch belongs to
+    				</documentation>
+    			</annotation>
+    		</element>
+    		-->
+    		<element name="state" type="tns:BatchStateEnum"
+    			minOccurs="1" maxOccurs="1">
+    			<annotation>
+
+    				<documentation>
+    					State of this batch. A batch can be in the
+    					following states:
+
+    					Queued: The processing of this batch has not
+    					started yet. If a job is aborted, this batch
+    					will not be processed and its state will be set
+    					to 'Not Processed'
+
+    					In Progress: This batch is currently being
+    					processed. If the job is aborted, this batch
+    					will process to completion
+
+    					Completed: This batch has been processed
+    					completely and the result resource is available.
+    					The result resource will indicate if some
+    					records have failed. A batch can be in completed
+    					state even if some records have failed.
+
+    					Failed: This batch failed to process. The
+    					stateMessage element may contain more details
+    					about the failure. TODO: Did some records get
+    					committed?
+
+    					Not Processed: This batch was not processed and
+    					will not be processed. This state happens when a
+    					job was aborted while this batch was queued.
+    				</documentation>
+    			</annotation>
+    		</element>
+    		<element name="stateMessage" type="string" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Contains detail about the state. For example, if
+    					state is Failed, this will contain the reason.
+    				</documentation>
+
+    			</annotation>
+    		</element>
+
+            <!--
+    		<element name="resultUri" type="anyURI" minOccurs="0">
+    			<annotation>
+    				<documentation>
+    					This is the URI for the result set which can be
+    					retrieved with a GET call. Typically will look
+    					like baseURI/[jobId]/batch/[batchId]/result
+    				</documentation>
+    			</annotation>
+    		</element>
+    		-->
+
+    		<element name="createdDate" type="dateTime" minOccurs="1"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Time this batch was created. This is not the
+    					time processing began, but the time the batch
+    					was added to the job.
+    				</documentation>
+    			</annotation>
+    		</element>
+            <!--
+    		<element name="startDate" type="dateTime" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+
+    				<documentation>
+    					The time processing started on this batch, i.e.
+    					when it was dequeued. This value is not present
+    					when state is Queued
+    				</documentation>
+    			</annotation>
+    		</element>
+    		-->
+    		<element name="systemModstamp" type="dateTime" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					The time processing ended. Only valid when state
+    					is Completed
+    				</documentation>
+
+    			</annotation>
+    		</element>
+    		<element name="numberRecordsProcessed" type="int"
+    			minOccurs="1" maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					The number of records processed so far in this
+    					batch. Only when state is Completed or Failed
+    					does this represent the total number of records
+    					processed for the batch.
+    				</documentation>
+    			</annotation>
+    		</element>
+
+            <!--
+    		<element name="numberErrors" type="int" minOccurs="1" maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Number of records that had errors. This number
+    					will be updated during processing.
+    				</documentation>
+    			</annotation></element>
+    			-->
+    	</sequence>
+    </complexType>
+
+    <simpleType name="BatchStateEnum">
+
+    	<restriction base="string">
+    		<enumeration value="Queued"></enumeration>
+    		<enumeration value="InProgress"></enumeration>
+    		<enumeration value="Completed"></enumeration>
+    		<!--<enumeration value="Completed with Errors"></enumeration>-->
+    		<enumeration value="Failed"></enumeration>
+    		<enumeration value="NotProcessed"></enumeration>
+    	</restriction>
+    </simpleType>
+
+    <complexType name="BatchInfoList">
+    	<sequence>
+    		<element name="batchInfo" type="tns:BatchInfo" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+
+    <simpleType name="ConcurrencyModeEnum">
+    	<restriction base="string">
+    	</restriction>
+    </simpleType>
+
+</schema>
