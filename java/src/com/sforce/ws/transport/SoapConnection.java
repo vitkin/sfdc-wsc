@@ -95,7 +95,10 @@ public class SoapConnection {
         long startTime = System.currentTimeMillis();
 
         try {
-            Transport transport = new JdkHttpTransport(config);
+        	/* 
+        	 * GAE is the Google App Engine transport class
+        	 */
+            Transport transport = new GAEHttpTransport(config);
             OutputStream out = transport.connect(url, soapAction);
             sendRequest(out, request, requestElement);
             InputStream in = transport.getContent();
