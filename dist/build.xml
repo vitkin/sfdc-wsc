@@ -3,6 +3,9 @@
   <property name="wsc.root" value=".." />
   <property name="wscsrc.dir" value="${wsc.root}/java/src" />
   <property name="wscclasses.dir" value="${wsc.root}/java/classes" />
+  
+	<!-- change the value to match the location of your SDK -->
+  <property name="appengine-api.jar" value="../../appengine-java-sdk-1.2.1/lib/impl/appengine-api.jar"/>
 
   <target name="usage">
     <echo message="Usage: ant all" /> 
@@ -11,6 +14,7 @@
   <path id="wsc.class.path">
     <pathelement location="${wsc.root}/java/ext/js-1.6R2.jar"/>
     <pathelement location="${wscclasses.dir}"/>
+  	<pathelement location="${appengine-api.jar}"/>
   </path>
 
   <target name="all" depends="clean,build,build.jar" />
@@ -22,12 +26,13 @@
   </target>
 
   <target name="build">
+  	
     <mkdir dir="${wscclasses.dir}" />
-
+  	
     <javac srcdir="${wscsrc.dir}"
            destdir="${wscclasses.dir}" 
            classpathref="wsc.class.path"
-           debug="on" >
+           debug="on" verbose="true" >
     </javac> 
 
     <antcall target="copy-template" />

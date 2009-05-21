@@ -1,0 +1,37 @@
+<project name="Web Service DL Compiler" default="generate">
+  
+    <target name="usage">
+        <echo message="Usage: "/>
+        <echo message="ant generate   -- build a single partner library JAR using wsdlc and a WSDL"/>
+    </target>
+    
+    <path id="build.classpath">
+        <pathelement location="wsc.jar"/>    
+    </path>
+
+    <target name="generate" unless="need.to.generate">
+        <wsdlc name="partner-library" wsdl="partner-library.wsdl" />
+     </target>
+
+    <macrodef name="wsdlc">
+        <attribute name="name"/>
+        <attribute name="wsdl"/>
+    	
+        <sequential>
+        	<echo message="{build.classpath}" />
+            <echo message="----------------------"/>
+            <delete file="./@{name}.jar"/>
+            <echo message="compiling **@{name}** wsdl"/>
+            <java classname="com.sforce.ws.tools.wsdlc" 
+                  classpathref="build.classpath" fork="true"
+                  failonerror="true"      	 >
+            	<sysproperty key="del-temp-dir"   value="false"   />
+            	<sysproperty key="standalone-jar"   value="false"   />
+            	
+            	<arg line="@{wsdl}"/>
+                <arg line="./@{name}.jar"/>
+            </java>
+        </sequential>
+    </macrodef>
+    
+</project>
