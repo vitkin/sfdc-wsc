@@ -54,10 +54,10 @@ public class ConnectorConfig {
     private String restEndpoint;
     private String traceFile;
     private PrintStream traceStream;
-    private String proxyUsername;
-    private String proxyPassword;
+  //  private String proxyUsername;
+  //  private String proxyPassword;
     private HashMap<String, String> headers;
-    private Proxy proxy = Proxy.NO_PROXY;
+ //   private Proxy proxy = Proxy.NO_PROXY;
     private ArrayList<MessageHandler> handlers = new ArrayList<MessageHandler>();
     private int maxRequestSize;
     private int maxResponseSize;
@@ -81,7 +81,7 @@ public class ConnectorConfig {
     public void setValidateSchema(boolean validateSchema) {
         this.validateSchema = validateSchema;
     }
-
+/*
     public void setProxy(String host, int port) {
         SocketAddress addr = new InetSocketAddress(host, port);
         proxy = new Proxy(Proxy.Type.HTTP, addr);
@@ -94,7 +94,7 @@ public class ConnectorConfig {
     public Proxy getProxy() {
         return proxy;
     }
-
+*/
     public Map<String, String> getHeaders() {
         return this.headers;
     }
@@ -114,7 +114,7 @@ public class ConnectorConfig {
         this.headers.put(key, value);
     }
 
-    public String getProxyUsername() {
+   /* public String getProxyUsername() {
         return proxyUsername;
     }
 
@@ -128,7 +128,7 @@ public class ConnectorConfig {
 
     public void setProxyPassword(String proxyPassword) {
         this.proxyPassword = proxyPassword;
-    }
+    }*/
 
     public boolean isPrettyPrintXml() {
         return prettyPrintXml;
