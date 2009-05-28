@@ -37,7 +37,7 @@ public class VersionInfo {
     public static final double VERSION = 1.0;
 
     public static String info() {
-        return "Salesforce Web Service Connector For Java/" + VERSION;
+        return "Salesforce Web Service Connector For GAE Java/" + VERSION;
     }
 
     public static void main(String[] args) {
