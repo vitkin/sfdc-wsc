@@ -20,15 +20,9 @@ public enum JobStateEnum {
    * Enumeration  : Aborted
    */
    Aborted,
-  
-  /**
-   * Enumeration  : Completed
-   */
-   //Completed,
-  
+
   /**
    * Enumeration  : Failed
    */
    Failed,
-  
 }

@@ -5,22 +5,25 @@
  */
 package com.sforce.async;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.net.URL;
-import java.net.HttpURLConnection;
-import javax.xml.namespace.QName;
-
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
-import com.sforce.ws.parser.XmlInputStream;
-import com.sforce.ws.parser.PullParserException;
-import com.sforce.ws.parser.XmlOutputStream;
 import com.sforce.ws.bind.TypeMapper;
+import com.sforce.ws.parser.PullParserException;
+import com.sforce.ws.parser.XmlInputStream;
+import com.sforce.ws.parser.XmlOutputStream;
 import com.sforce.ws.transport.JdkHttpTransport;
 import com.sforce.ws.util.FileUtil;
+
+import javax.xml.namespace.QName;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 /**
  * RestConnection
@@ -31,17 +34,18 @@ import com.sforce.ws.util.FileUtil;
 public class RestConnection {
 
     public static final String NAMESPACE = "http://www.force.com/2009/06/asyncapi/dataload";
-    private ConnectorConfig config;
-    private HashMap<String, String> headers;
     public static final String SESSION_ID = "X-SFDC-Session";
+    public static final String XML_CONTENT_TYPE = "application/xml";
+    public static final String CSV_CONTENT_TYPE = "text/csv";
+
     public static final QName JOB_QNAME = new QName(NAMESPACE, "jobInfo");
     public static final QName BATCH_QNAME = new QName(NAMESPACE, "batchInfo");
     public static final QName BATCH_LIST_QNAME = new QName(NAMESPACE, "batchInfoList");
     public static final QName ERROR_QNAME = new QName(NAMESPACE, "error");
-    public static final String CONTENT_TYPE = "application/xml";
+
+    private ConnectorConfig config;
+    private HashMap<String, String> headers = new HashMap<String, String>();
     public static final TypeMapper typeMapper = new TypeMapper();
-
-
 
     public RestConnection(ConnectorConfig config) throws AsyncApiException {
         if (config == null) {
@@ -55,45 +59,7 @@ public class RestConnection {
         this.config = config;
 
         if (config.getSessionId() == null) {
-            try {
-                login();
-            } catch (IOException e) {
-                throw new AsyncApiException("Failed to login", AsyncExceptionCode.ClientInputError, e);
-            }
-        }
-        
-        if (config.getSessionId() == null) {
-            throw new AsyncApiException("session ID not found after login", AsyncExceptionCode.ClientInputError);
-        }
-    }
-
-    private void login() throws IOException, AsyncApiException {
-        URL restUrl = new URL(getRestEndpoint());
-
-        String loginEndpoint = restUrl.getProtocol() + "://" + restUrl.getHost();
-
-        if (restUrl.getPort() != -1) {
-            loginEndpoint += ":" + restUrl.getPort();
-        }
-        
-        loginEndpoint += "/login.jsp?un=" + config.getUsername() + "&pw=" + config.getPassword();
-
-        HttpURLConnection connection = (HttpURLConnection) new URL(loginEndpoint).openConnection();
-
-        Map<String, List<String>> map = connection.getHeaderFields();
-        List<String> cookies = map.get("Set-Cookie");
-
-        if (cookies == null) {
-            throw new AsyncApiException("Failed to login to endpoint " + loginEndpoint, AsyncExceptionCode.ClientInputError);
-        }
-
-        for (String cookie : cookies) {
-            if (cookie.startsWith("sid=")) {
-                int index = cookie.indexOf(';');
-                cookie = cookie.substring(0, index);
-                cookie = cookie.substring("sid=".length());
-                config.setSessionId(cookie);
-            }
+            throw new AsyncApiException("session ID not found", AsyncExceptionCode.ClientInputError);
         }
     }
 
@@ -113,8 +79,7 @@ public class RestConnection {
     private JobInfo createOrUpdateJob(JobInfo job, String endpoint) throws AsyncApiException {
         try {
             JdkHttpTransport transport = new JdkHttpTransport(config);
-            HashMap<String, String> headers = getHeaders();
-            OutputStream out = transport.connect(endpoint, headers);
+            OutputStream out = transport.connect(endpoint, getHeaders(XML_CONTENT_TYPE));
             XmlOutputStream xout = new AsyncXmlOutputStream(out, true);
             job.write(JOB_QNAME, xout, typeMapper);
             xout.close();
@@ -157,25 +122,8 @@ public class RestConnection {
         }
     }
 
-    private HashMap<String, String> getHeaders() {
-        if (headers == null) {
-            headers = new HashMap<String, String>();
-        }
-        if (!headers.containsKey(SESSION_ID)) {
-            headers.put(SESSION_ID, config.getSessionId());
-        }
-        return headers;
-    }
-
-    public void setHeaders(HashMap<String, String> headers) {
-        this.headers = headers;
-    }
-
     public void addHeader(String headerName, String headerValue) {
-        if (this.headers == null) {
-            this.headers = new HashMap<String, String>();
-        }
-        this.headers.put(headerName, headerValue);
+        headers.put(headerName, headerValue);
     }
 
     private String getRestEndpoint() {
@@ -184,13 +132,51 @@ public class RestConnection {
         return endpoint;
     }
 
-    public BatchRequest createBatch(String jobId) throws AsyncApiException {
+    public BatchInfo createBatchFromStream(JobInfo jobInfo, InputStream input) throws AsyncApiException {
         try {
             String endpoint = getRestEndpoint();
             JdkHttpTransport transport = new JdkHttpTransport(config);
-            endpoint = endpoint + "job/" + jobId + "/batch";
-            OutputStream out = transport.connect(endpoint, getHeaders());
+            endpoint = endpoint + "job/" + jobInfo.getId() + "/batch";
+            String contentType = jobInfo.getContentType() == ContentType.CSV ? CSV_CONTENT_TYPE : XML_CONTENT_TYPE;
+            OutputStream out = transport.connect(endpoint, getHeaders(contentType));
 
+            FileUtil.copy(input, out);
+
+            InputStream result = transport.getContent();
+            return BatchRequest.loadBatchInfo(result);
+        } catch (IOException e) {
+            throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
+        } catch (PullParserException e) {
+            throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
+        } catch (ConnectionException e) {
+            throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
+        }
+    }
+
+    private HashMap<String, String> getHeaders(String contentType) {
+        HashMap<String, String> newMap = new HashMap<String, String>();
+
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            newMap.put(entry.getKey(), entry.getValue());
+        }
+
+        newMap.put("Content-Type", contentType);
+        newMap.put(SESSION_ID, config.getSessionId());
+        return newMap;
+    }
+
+    public BatchRequest createBatch(JobInfo job) throws AsyncApiException {
+        try {
+            String endpoint = getRestEndpoint();
+            JdkHttpTransport transport = new JdkHttpTransport(config);
+            endpoint = endpoint + "job/" + job.getId() + "/batch";
+
+            if (job.getContentType() == ContentType.CSV) {
+                throw new AsyncApiException("This method can only be used with xml content type",
+                        AsyncExceptionCode.ClientInputError);
+            }
+
+            OutputStream out = transport.connect(endpoint, getHeaders(XML_CONTENT_TYPE));
             return new BatchRequest(transport, out);
         } catch (IOException e) {
             throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
@@ -258,6 +244,17 @@ public class RestConnection {
         }
     }
 
+    public InputStream getBatchResultStream(String jobId, String batchId) throws AsyncApiException {
+        try {
+            String endpoint  = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/result";
+            URL url = new URL(endpoint);
+            return doHttpGet(url);
+        } catch (IOException e) {
+            throw new AsyncApiException("Failed to get result ", AsyncExceptionCode.ClientInputError, e);
+        }
+    }
+
+
     private InputStream doHttpGet(URL url) throws IOException, AsyncApiException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty(SESSION_ID, config.getSessionId());
@@ -269,6 +266,11 @@ public class RestConnection {
         } catch(IOException e) {
             success = false;
             in = connection.getErrorStream();
+        }
+
+        String encoding = connection.getHeaderField("Content-Encoding");
+        if ("gzip".equals(encoding)) {
+            in = new GZIPInputStream(in);
         }
 
         if (config.isTraceMessage()) {

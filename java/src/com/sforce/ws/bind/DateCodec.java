@@ -80,6 +80,10 @@ public class DateCodec {
      * @return calendar
      */
     public Calendar deserialize(String source) {
+        if (source == null) {
+            throw new NumberFormatException("Unable to parse date");
+        }
+
         Date result;
         boolean bc = false;
         Calendar calendar = Calendar.getInstance();

@@ -25,19 +25,21 @@
  */
 package com.sforce.ws.transport;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Map.Entry;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import java.util.*;
-
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.MessageHandler;
 import com.sforce.ws.tools.VersionInfo;
-import com.sforce.ws.util.FileUtil;
 import com.sforce.ws.util.Base64;
+import com.sforce.ws.util.FileUtil;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * This class is an implementation of Transport using the build in
@@ -58,7 +60,7 @@ public class JdkHttpTransport implements Transport {
     }
 
     public OutputStream connect(String uri, HashMap<String, String> httpHeaders) throws IOException {
-        return connect(uri, null, httpHeaders);
+        return connectLocal(uri, httpHeaders);
     }
 
     @Override
@@ -67,10 +69,16 @@ public class JdkHttpTransport implements Transport {
             soapAction = "";
         }
 
-        return connect(uri, soapAction, new HashMap<String, String>());
+        HashMap<String, String> header = new HashMap<String, String>();
+
+        header.put("SOAPAction", "\"" + soapAction + "\"");
+        header.put("Content-Type", "text/xml; charset=UTF-8");
+        header.put("Accept", "text/xml");
+
+        return connectLocal(uri, header);
     }
 
-    private OutputStream connect(String uri, String soapAction, HashMap<String, String> httpHeaders) throws IOException {
+    private OutputStream connectLocal(String uri, HashMap<String, String> httpHeaders) throws IOException {
         if (config.isTraceMessage()) {
             config.getTraceStream().println("WSC: Creating a new connection to " + uri +
                 " Proxy = " + config.getProxy() +  " username " + config.getProxyUsername());
@@ -82,8 +90,6 @@ public class JdkHttpTransport implements Transport {
         connection.setRequestMethod("POST");
         connection.setDoInput(true);
         connection.setDoOutput(true);
-        connection.addRequestProperty("Content-Type", "text/xml; charset=UTF-8");
-        connection.addRequestProperty("Accept", "text/xml");
         connection.addRequestProperty("User-Agent", VersionInfo.info());
 
         if (config.useChunkedPost()) {
@@ -109,10 +115,6 @@ public class JdkHttpTransport implements Transport {
             String auth = "Basic " + new String(Base64.encode(token.getBytes()));
             connection.addRequestProperty("Proxy-Authorization", auth);
             connection.addRequestProperty("Https-Proxy-Authorization", auth);
-        }
-
-        if (soapAction != null) {
-            connection.addRequestProperty("SOAPAction", "\"" + soapAction + "\"");
         }
 
         for (Map.Entry<String, String> entry : httpHeaders.entrySet()) {

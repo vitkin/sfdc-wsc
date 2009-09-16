@@ -242,6 +242,12 @@ public class TypeMapper {
     }
 
     public void writeString(XmlOutputStream out, TypeInfo info, String value, boolean isSet) throws IOException {
+        writeSimpleType(out, info, value, isSet, String.class.getName());
+    }
+
+    private void writeSimpleType(XmlOutputStream out, TypeInfo info, String value, boolean isSet, String javaType)
+            throws IOException {
+
         if (!isSet && info.getMinOcc() == 0) {
             return;
         }
@@ -252,6 +258,14 @@ public class TypeMapper {
             out.writeStartTag(getNamespace(info), info.getName());
             if (writeFieldXsiType) {
                 writeXsiType(out, info.getTypeNS(), info.getType());
+            } else {
+                if ("anyType".equals(info.getType()) && Constants.SCHEMA_NS.equals(info.getTypeNS())) {
+                    QName xmlType = getXmlType(javaType);
+                    if (xmlType == null) {
+                        throw new IOException("Failed to find xml type for java type: " + javaType);
+                    }
+                    writeXsiType(out, xmlType.getNamespaceURI(), xmlType.getLocalPart());
+                }
             }
             out.writeText(value);
             out.writeEndTag(getNamespace(info), info.getName());
@@ -263,25 +277,25 @@ public class TypeMapper {
     }
 
     public void writeBoolean(XmlOutputStream out, TypeInfo info, boolean value, boolean isSet) throws IOException {
-        writeString(out, info, "" + value, isSet);
+        writeSimpleType(out, info, "" + value, isSet, boolean.class.getName());
     }
 
     public void writeInt(XmlOutputStream out, TypeInfo info, int value, boolean isSet) throws IOException {
-        writeString(out, info, "" + value, isSet);
+        writeSimpleType(out, info, "" + value, isSet, int.class.getName());
     }
 
     public void writeLong(XmlOutputStream out, TypeInfo info, long value, boolean isSet) throws IOException {
-        writeString(out, info, "" + value, isSet);
+        writeSimpleType(out, info, "" + value, isSet, long.class.getName());
     }
 
     public void writeFloat(XmlOutputStream out, TypeInfo info, float value, boolean isSet) throws IOException {
-        writeString(out, info, "" + value, isSet);
+        writeSimpleType(out, info, "" + value, isSet, float.class.getName());
     }
 
     public void writeDouble(XmlOutputStream out, TypeInfo info, double value, boolean isSet) throws IOException {
         String strValue;
         strValue = writeDouble(value);
-        writeString(out, info, strValue, isSet);
+        writeSimpleType(out, info, strValue, isSet, double.class.getName());
     }
 
     public String writeDouble(double value) {
@@ -325,36 +339,32 @@ public class TypeMapper {
     }
 
     private void writeSingleObject(XmlOutputStream out, TypeInfo info, Object value) throws IOException {
-        if (value instanceof XMLizable) {
+        if (value == null) {
+            writeSimpleType(out, info, null, true, String.class.getName());
+        } else if (value instanceof XMLizable) {
             XMLizable xmlObject = (XMLizable) value;
             xmlObject.write(new QName(getNamespace(info), info.getName()), out, this);
         } else if (value instanceof Time) {
-            writeString(out, info, value.toString(), true);
+            writeSimpleType(out, info, value.toString(), true, Time.class.getName());
         } else if (value instanceof Calendar || value instanceof Date) {
             String s = calendarCodec.getValueAsString(value);
-            writeString(out, info, s, true);
+            writeSimpleType(out, info, s, true, Calendar.class.getName());
         } else if (value instanceof byte[]) {
             String s = new String(Base64.encode((byte[]) value));
-            writeString(out, info, s, true);
-        } else if (value == null) {
-            writeString(out, info, null, true);
+            writeSimpleType(out, info, s, true, "[B");
         } else if (value instanceof Double) {
-            writeString(out, info, doubleToString((Double)value), true);
+            writeDouble(out, info, (Double)value, true);
+        } else if (value instanceof Float) {
+            writeFloat(out, info, (Float)value, true);
+        } else if (value instanceof Long) {
+            writeLong(out, info, (Long)value, true);
+        } else if (value instanceof Integer) {
+            writeInt(out, info, (Integer)value, true);
+        } else if (value instanceof Boolean) {
+            writeBoolean(out, info, (Boolean)value, true);
         } else {
             writeString(out, info, value.toString(), true);
         }
-    }
-
-    private String doubleToString(Double value) {
-        String strValue;
-        if (value.equals(Double.POSITIVE_INFINITY)) {
-            strValue = "INF";
-        } else if (value.equals(Double.NEGATIVE_INFINITY)) {
-            strValue = "-INF";
-        } else {
-            strValue = value.toString();
-        }
-        return strValue;
     }
 
     private void writeNull(XmlOutputStream out, TypeInfo info) throws IOException {
@@ -459,10 +469,12 @@ public class TypeMapper {
             return Integer.parseInt(value);
         } else if ("double".equals(localType)) {
             return parseDouble(value);
+        } else if ("long".equals(localType)) {
+            return Long.parseLong(value);
         } else if ("time".equals(localType)) {
             return new Time(value);
         } else if ("date".equals(localType)) {
-            return calendarCodec.deserialize(value).getTime();
+            return dateCodec.deserialize(value).getTime();
         } else if ("dateTime".equals(localType)) {
             return calendarCodec.deserialize(value);
         } else if ("boolean".equals(localType)) {

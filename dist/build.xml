@@ -9,6 +9,7 @@
   </target>
 
   <path id="wsc.class.path">
+    <pathelement location="${wsc.root}/java/ext/annotations.jar"/>
     <pathelement location="${wsc.root}/java/ext/js-1.6R2.jar"/>
     <pathelement location="${wscclasses.dir}"/>
   </path>
@@ -35,6 +36,9 @@
 
   <target name="build.jar">
     <mkdir dir="${wsc.root}/dist/temp" />
+
+    <unzip src="${wsc.root}/java/ext/annotations.jar" 
+           dest="${wsc.root}/dist/temp" />
 
     <unzip src="${wsc.root}/java/ext/js-1.6R2.jar" 
            dest="${wsc.root}/dist/temp" />

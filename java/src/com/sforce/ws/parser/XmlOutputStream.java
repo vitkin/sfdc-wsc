@@ -27,6 +27,7 @@ package com.sforce.ws.parser;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * This is a minimal XML output stream, that can be used to write XML.
@@ -87,6 +88,11 @@ public class XmlOutputStream {
         serializer.text(text);
     }
 
+    // access the internal writer used by the serializer, use with care!
+    public Writer getWriter() {
+    	return serializer.getWriter();
+    }
+    
     public void flush() throws IOException {
         serializer.flush();
     }

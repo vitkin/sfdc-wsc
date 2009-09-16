@@ -25,11 +25,7 @@
  */
 package com.sforce.ws.util;
 
-import java.io.FileInputStream;
-import java.io.File;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * This class contains util method related to File handeling.
@@ -65,6 +61,20 @@ public class FileUtil {
 
         in.close();
         return bout.toByteArray();
+    }
+
+    public static void copy(InputStream from, OutputStream to) throws IOException {
+        try {
+            byte[] buf = new byte[1024];
+
+            int count;
+            while((count = from.read(buf, 0, buf.length)) != -1) {
+                to.write(buf, 0, count);
+            }
+        } finally {
+            to.close();
+            from.close();
+        }
     }
 
     private static String toString(InputStream in) throws IOException {

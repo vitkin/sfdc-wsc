@@ -22,5 +22,8 @@ public enum AsyncExceptionCode {
     InternalServerError,
     ClientInputError,
     Timeout,
-    TooManyLockFailure
+    TooManyLockFailure,
+    InvalidVersion,
+    HttpsRequired,
+    UnsupportedContentType
 }

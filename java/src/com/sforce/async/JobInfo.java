@@ -188,6 +188,233 @@ public class JobInfo implements com.sforce.ws.bind.XMLizable {
     externalIdFieldName__is_set = true;
   }
 
+
+  /**
+   * element  : operation of type {http://www.force.com/2009/06/asyncapi/dataload}ConcurrencyMode
+   * java type: String
+   */
+  private static final com.sforce.ws.bind.TypeInfo concurrencyMode__typeInfo =
+    new com.sforce.ws.bind.TypeInfo("http://www.force.com/2009/06/asyncapi/dataload",
+            "concurrencyMode","http://www.force.com/2009/06/asyncapi/dataload","ConcurrencyMode",0,1,true);
+
+  private boolean concurrencyMode__is_set = false;
+
+  private ConcurrencyMode concurrencyMode;
+
+  public ConcurrencyMode getConcurrencyMode() {
+    return concurrencyMode;
+  }
+
+    public void setConcurrencyMode(ConcurrencyMode concurrencyMode) {
+        this.concurrencyMode = concurrencyMode;
+        concurrencyMode__is_set = true;
+    }
+
+    /**
+     * element : numberBatchesQueued of type {http://www.w3.org/2001/XMLSchema}int java type: int
+     */
+    private static final com.sforce.ws.bind.TypeInfo numberBatchesQueued__typeInfo = new com.sforce.ws.bind.TypeInfo(
+            "http://www.force.com/2009/06/asyncapi/dataload", "numberBatchesQueued",
+            "http://www.w3.org/2001/XMLSchema", "int", 0, 1, true);
+
+    private boolean numberBatchesQueued__is_set = false;
+
+    private int numberBatchesQueued;
+
+    public int getNumberBatchesQueued() {
+        return numberBatchesQueued;
+    }
+
+    public void setNumberBatchesQueued(int numberBatchesQueued) {
+        this.numberBatchesQueued = numberBatchesQueued;
+        numberBatchesQueued__is_set = true;
+    }
+
+    /**
+     * element : numberBatchesInProgress of type {http://www.w3.org/2001/XMLSchema}int java type: int
+     */
+    private static final com.sforce.ws.bind.TypeInfo numberBatchesInProgress__typeInfo = new com.sforce.ws.bind.TypeInfo(
+            "http://www.force.com/2009/06/asyncapi/dataload", "numberBatchesInProgress",
+            "http://www.w3.org/2001/XMLSchema", "int", 0, 1, true);
+
+    private boolean numberBatchesInProgress__is_set = false;
+
+    private int numberBatchesInProgress;
+
+    public int getNumberBatchesInProgress() {
+        return numberBatchesInProgress;
+    }
+
+    public void setNumberBatchesInProgress(int numberBatchesInProgress) {
+        this.numberBatchesInProgress = numberBatchesInProgress;
+        numberBatchesInProgress__is_set = true;
+    }
+
+    /**
+     * element : numberBatchesCompleted of type {http://www.w3.org/2001/XMLSchema}int java type: int
+     */
+    private static final com.sforce.ws.bind.TypeInfo numberBatchesCompleted__typeInfo = new com.sforce.ws.bind.TypeInfo(
+            "http://www.force.com/2009/06/asyncapi/dataload", "numberBatchesCompleted",
+            "http://www.w3.org/2001/XMLSchema", "int", 0, 1, true);
+
+    private boolean numberBatchesCompleted__is_set = false;
+
+    private int numberBatchesCompleted;
+
+    public int getNumberBatchesCompleted() {
+        return numberBatchesCompleted;
+    }
+
+    public void setNumberBatchesCompleted(int numberBatchesCompleted) {
+        this.numberBatchesCompleted = numberBatchesCompleted;
+        numberBatchesCompleted__is_set = true;
+    }
+
+    /**
+     * element : numberBatchesFailed of type {http://www.w3.org/2001/XMLSchema}int java type: int
+     */
+    private static final com.sforce.ws.bind.TypeInfo numberBatchesFailed__typeInfo = new com.sforce.ws.bind.TypeInfo(
+            "http://www.force.com/2009/06/asyncapi/dataload", "numberBatchesFailed",
+            "http://www.w3.org/2001/XMLSchema", "int", 0, 1, true);
+
+    private boolean numberBatchesFailed__is_set = false;
+
+    private int numberBatchesFailed;
+
+    public int getNumberBatchesFailed() {
+        return numberBatchesFailed;
+    }
+
+    public void setNumberBatchesFailed(int numberBatchesFailed) {
+        this.numberBatchesFailed = numberBatchesFailed;
+        numberBatchesFailed__is_set = true;
+    }
+
+    /**
+     * element : numberBatchesTotal of type {http://www.w3.org/2001/XMLSchema}int java type: int
+     */
+    private static final com.sforce.ws.bind.TypeInfo numberBatchesTotal__typeInfo = new com.sforce.ws.bind.TypeInfo(
+            "http://www.force.com/2009/06/asyncapi/dataload", "numberBatchesTotal", "http://www.w3.org/2001/XMLSchema",
+            "int", 0, 1, true);
+
+    private boolean numberBatchesTotal__is_set = false;
+
+    private int numberBatchesTotal;
+
+    public int getNumberBatchesTotal() {
+        return numberBatchesTotal;
+    }
+
+    public void setNumberBatchesTotal(int numberBatchesTotal) {
+        this.numberBatchesTotal = numberBatchesTotal;
+        numberBatchesTotal__is_set = true;
+    }
+
+    /**
+     * element : numberRecordsProcessed of type {http://www.w3.org/2001/XMLSchema}int java type: int
+     */
+    private static final com.sforce.ws.bind.TypeInfo numberRecordsProcessed__typeInfo = new com.sforce.ws.bind.TypeInfo(
+            "http://www.force.com/2009/06/asyncapi/dataload", "numberRecordsProcessed",
+            "http://www.w3.org/2001/XMLSchema", "int", 0, 1, true);
+
+    private boolean numberRecordsProcessed__is_set = false;
+
+    private int numberRecordsProcessed;
+
+    public int getNumberRecordsProcessed() {
+        return numberRecordsProcessed;
+    }
+
+    public void setNumberRecordsProcessed(int numberRecordsProcessed) {
+        this.numberRecordsProcessed = numberRecordsProcessed;
+        numberRecordsProcessed__is_set = true;
+    }
+
+    /**
+     * element : numberRetries of type {http://www.w3.org/2001/XMLSchema}int java type: int
+     */
+    private static final com.sforce.ws.bind.TypeInfo numberRetries__typeInfo = new com.sforce.ws.bind.TypeInfo(
+            "http://www.force.com/2009/06/asyncapi/dataload", "numberRetries", "http://www.w3.org/2001/XMLSchema",
+            "int", 0, 1, true);
+
+    private boolean numberRetries__is_set = false;
+
+    private int numberRetries;
+
+    public int getNumberRetries() {
+        return numberRetries;
+    }
+
+    public void setNumberRetries(int numberRetries) {
+        this.numberRetries = numberRetries;
+        numberRetries__is_set = true;
+    }
+    
+  /**
+   * element  : operation of type {http://www.force.com/2009/06/asyncapi/dataload}ContentType
+   * java type: String
+   */
+  private static final com.sforce.ws.bind.TypeInfo contentType__typeInfo =
+    new com.sforce.ws.bind.TypeInfo("http://www.force.com/2009/06/asyncapi/dataload",
+            "contentType","http://www.force.com/2009/06/asyncapi/dataload","ContentType",0,1,true);
+
+  private boolean contentType__is_set = false;
+
+  private ContentType contentType;
+
+  public ContentType getContentType() {
+    return contentType;
+  }
+
+  public void setContentType(ContentType contentType) {
+    this.contentType = contentType;
+    contentType__is_set = true;
+  }
+
+  /**
+   * element  : operation of type {http://www.force.com/2009/06/asyncapi/dataload}ApiVersion
+   * java type: double
+   */
+  private static final com.sforce.ws.bind.TypeInfo apiVersion__typeInfo =
+    new com.sforce.ws.bind.TypeInfo("http://www.force.com/2009/06/asyncapi/dataload",
+            "apiVersion","http://www.force.com/2009/06/asyncapi/dataload","apiVersion",0,1,true);
+
+  private boolean apiVersion__is_set = false;
+
+  private double apiVersion;
+
+  public double getApiVersion() {
+    return apiVersion;
+  }
+
+  public void setApiVersion(double apiVersion) {
+    this.apiVersion = apiVersion;
+    apiVersion__is_set = true;
+  }
+
+
+    /**
+      * element  : assignmentRuleId of type {http://www.w3.org/2001/XMLSchema}string
+      * java type: java.lang.String
+      */
+     private static final com.sforce.ws.bind.TypeInfo assignmentRuleId__typeInfo =
+       new com.sforce.ws.bind.TypeInfo("http://www.force.com/2009/06/asyncapi/dataload",
+               "assignmentRuleId","http://www.w3.org/2001/XMLSchema","string",0,1,true);
+
+     private boolean assignmentRuleId__is_set = false;
+
+     private java.lang.String assignmentRuleId;
+
+     public java.lang.String getAssignmentRuleId() {
+       return assignmentRuleId;
+     }
+
+     public void setAssignmentRuleId(java.lang.String assignmentRuleId) {
+       this.assignmentRuleId = assignmentRuleId;
+       assignmentRuleId__is_set = true;
+     }
+
+
   /**
    */
   @Override
@@ -211,7 +438,21 @@ public class JobInfo implements com.sforce.ws.bind.XMLizable {
     __typeMapper.writeObject(__out, systemModstamp__typeInfo, systemModstamp, systemModstamp__is_set);
     __typeMapper.writeObject(__out, state__typeInfo, state, state__is_set);
     __typeMapper.writeObject(__out, externalIdFieldName__typeInfo, externalIdFieldName, externalIdFieldName__is_set);
-  }
+    __typeMapper.writeObject(__out, concurrencyMode__typeInfo, concurrencyMode, concurrencyMode__is_set);
+    __typeMapper.writeObject(__out, contentType__typeInfo, contentType, contentType__is_set);
+    __typeMapper.writeInt(__out, numberBatchesQueued__typeInfo, numberBatchesQueued, numberBatchesQueued__is_set);
+        __typeMapper.writeInt(__out, numberBatchesInProgress__typeInfo, numberBatchesInProgress,
+                numberBatchesInProgress__is_set);
+        __typeMapper.writeInt(__out, numberBatchesCompleted__typeInfo, numberBatchesCompleted,
+                numberBatchesCompleted__is_set);
+        __typeMapper.writeInt(__out, numberBatchesFailed__typeInfo, numberBatchesFailed, numberBatchesFailed__is_set);
+        __typeMapper.writeInt(__out, numberBatchesTotal__typeInfo, numberBatchesTotal, numberBatchesTotal__is_set);
+        __typeMapper.writeInt(__out, numberRecordsProcessed__typeInfo, numberRecordsProcessed,
+                numberRecordsProcessed__is_set);
+        __typeMapper.writeInt(__out, numberRetries__typeInfo, numberRetries, numberRetries__is_set);
+      __typeMapper.writeDouble(__out, apiVersion__typeInfo, apiVersion, apiVersion__is_set);
+      __typeMapper.writeString(__out, assignmentRuleId__typeInfo, assignmentRuleId, assignmentRuleId__is_set);
+    }
 
 
   @Override
@@ -257,6 +498,62 @@ public class JobInfo implements com.sforce.ws.bind.XMLizable {
     if (__typeMapper.isElement(__in, externalIdFieldName__typeInfo)) {
       setExternalIdFieldName(__typeMapper.readString(__in, externalIdFieldName__typeInfo, String.class));
     }
+    
+        __in.peekTag();
+        if (__typeMapper.isElement(__in, concurrencyMode__typeInfo)) {
+            setConcurrencyMode((ConcurrencyMode)__typeMapper.readObject(__in, concurrencyMode__typeInfo,
+                    ConcurrencyMode.class));
+        }
+        
+        __in.peekTag();
+        if (__typeMapper.isElement(__in, contentType__typeInfo)) {
+            setContentType((ContentType)__typeMapper.readObject(__in, contentType__typeInfo, ContentType.class));
+        }
+
+        __in.peekTag();
+        if (__typeMapper.isElement(__in, numberBatchesQueued__typeInfo)) {
+            setNumberBatchesQueued(__typeMapper.readInt(__in, numberBatchesQueued__typeInfo, int.class));
+        }
+
+        __in.peekTag();
+        if (__typeMapper.isElement(__in, numberBatchesInProgress__typeInfo)) {
+            setNumberBatchesInProgress(__typeMapper.readInt(__in, numberBatchesInProgress__typeInfo, int.class));
+        }
+
+        __in.peekTag();
+        if (__typeMapper.isElement(__in, numberBatchesCompleted__typeInfo)) {
+            setNumberBatchesCompleted(__typeMapper.readInt(__in, numberBatchesCompleted__typeInfo, int.class));
+        }
+
+        __in.peekTag();
+        if (__typeMapper.isElement(__in, numberBatchesFailed__typeInfo)) {
+            setNumberBatchesFailed(__typeMapper.readInt(__in, numberBatchesFailed__typeInfo, int.class));
+        }
+
+        __in.peekTag();
+        if (__typeMapper.isElement(__in, numberBatchesTotal__typeInfo)) {
+            setNumberBatchesTotal(__typeMapper.readInt(__in, numberBatchesTotal__typeInfo, int.class));
+        }
+
+        __in.peekTag();
+        if (__typeMapper.isElement(__in, numberRecordsProcessed__typeInfo)) {
+            setNumberRecordsProcessed(__typeMapper.readInt(__in, numberRecordsProcessed__typeInfo, int.class));
+        }
+
+        __in.peekTag();
+        if (__typeMapper.isElement(__in, numberRetries__typeInfo)) {
+            setNumberRetries(__typeMapper.readInt(__in, numberRetries__typeInfo, int.class));
+        }
+
+      __in.peekTag();
+      if (__typeMapper.isElement(__in, apiVersion__typeInfo)) {
+          setApiVersion(__typeMapper.readDouble(__in, apiVersion__typeInfo, double.class));
+      }
+
+      __in.peekTag();
+      if (__typeMapper.isElement(__in, assignmentRuleId__typeInfo)) {
+          setAssignmentRuleId(__typeMapper.readString(__in, assignmentRuleId__typeInfo, String.class));
+      }
   }
 
   @Override
@@ -280,6 +577,28 @@ public class JobInfo implements com.sforce.ws.bind.XMLizable {
     sb.append("'").append(com.sforce.ws.util.Verbose.toString(state)).append("'\n");
     sb.append(" externalIdFieldName=");
     sb.append("'").append(com.sforce.ws.util.Verbose.toString(externalIdFieldName)).append("'\n");
+      sb.append(" concurrencyMode=");
+      sb.append("'").append(com.sforce.ws.util.Verbose.toString(concurrencyMode)).append("'\n");
+      sb.append(" contentType=");
+      sb.append("'").append(com.sforce.ws.util.Verbose.toString(contentType)).append("'\n");
+      sb.append(" numberBatchesQueued=");
+      sb.append("'").append(com.sforce.ws.util.Verbose.toString(numberBatchesQueued)).append("'\n");
+        sb.append(" numberBatchesInProgress=");
+        sb.append("'").append(com.sforce.ws.util.Verbose.toString(numberBatchesInProgress)).append("'\n");
+        sb.append(" numberBatchesCompleted=");
+        sb.append("'").append(com.sforce.ws.util.Verbose.toString(numberBatchesCompleted)).append("'\n");
+        sb.append(" numberBatchesFailed=");
+        sb.append("'").append(com.sforce.ws.util.Verbose.toString(numberBatchesFailed)).append("'\n");
+        sb.append(" numberBatchesTotal=");
+        sb.append("'").append(com.sforce.ws.util.Verbose.toString(numberBatchesTotal)).append("'\n");
+        sb.append(" numberRecordsProcessed=");
+        sb.append("'").append(com.sforce.ws.util.Verbose.toString(numberRecordsProcessed)).append("'\n");
+        sb.append(" numberRetries=");
+        sb.append("'").append(com.sforce.ws.util.Verbose.toString(numberRetries)).append("'\n");
+      sb.append(" apiVersion=");
+      sb.append("'").append(com.sforce.ws.util.Verbose.toString(apiVersion)).append("'\n");
+      sb.append(" assignmentRuleId=");
+      sb.append("'").append(com.sforce.ws.util.Verbose.toString(assignmentRuleId)).append("'\n");
     sb.append("]\n");
     return sb.toString();
   }

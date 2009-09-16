@@ -5,13 +5,15 @@
  */
 package com.sforce.async;
 
-import java.io.*;
-
 import com.sforce.ws.ConnectionException;
+import com.sforce.ws.parser.PullParserException;
+import com.sforce.ws.parser.XmlInputStream;
 import com.sforce.ws.parser.XmlOutputStream;
 import com.sforce.ws.transport.JdkHttpTransport;
-import com.sforce.ws.parser.XmlInputStream;
-import com.sforce.ws.parser.PullParserException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * BatchRequest
@@ -52,11 +54,7 @@ public class BatchRequest {
             InputStream in = transport.getContent();
 
             if (transport.isSuccessful()) {
-                BatchInfo info = new BatchInfo();
-                XmlInputStream xin = new XmlInputStream();
-                xin.setInput(in, "UTF-8");
-                info.load(xin, RestConnection.typeMapper);
-                return info;
+                return loadBatchInfo(in);
             } else {
                 RestConnection.parseAndThrowException(in);
             }
@@ -68,5 +66,13 @@ public class BatchRequest {
             throw new AsyncApiException("Failed to complete request", AsyncExceptionCode.ClientInputError, e);
         }
         return null;
+    }
+
+    static BatchInfo loadBatchInfo(InputStream in) throws PullParserException, IOException, ConnectionException {
+        BatchInfo info = new BatchInfo();
+        XmlInputStream xin = new XmlInputStream();
+        xin.setInput(in, "UTF-8");
+        info.load(xin, RestConnection.typeMapper);
+        return info;
     }
 }
