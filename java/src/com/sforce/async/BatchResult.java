@@ -33,13 +33,13 @@ public class BatchResult implements com.sforce.ws.bind.XMLizable {
 
   private boolean result__is_set = false;
 
-  private SaveResult[] result = new SaveResult[0];
+  private Result[] result = new Result[0];
 
-  public SaveResult[] getResult() {
+  public Result[] getResult() {
     return result;
   }
 
-  public void setResult(SaveResult[] result) {
+  public void setResult(Result[] result) {
     this.result = result;
     result__is_set = true;
   }
@@ -73,7 +73,7 @@ public class BatchResult implements com.sforce.ws.bind.XMLizable {
           __typeMapper.consumeEndTag(__in);
       } catch(TypeMapper.PartialArrayException e) {
           partialResult = true;
-          setResult((SaveResult[]) e.getArrayResult());
+          setResult((Result[]) e.getArrayResult());
       }
   }
 
@@ -82,7 +82,7 @@ public class BatchResult implements com.sforce.ws.bind.XMLizable {
 
     __in.peekTag();
     if (__typeMapper.isElement(__in, result__typeInfo)) {
-        setResult((SaveResult[])__typeMapper.readPartialArray(__in, result__typeInfo, SaveResult[].class));
+        setResult((Result[])__typeMapper.readPartialArray(__in, result__typeInfo, Result[].class));
     }
   }
 

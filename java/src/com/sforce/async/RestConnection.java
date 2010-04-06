@@ -5,25 +5,21 @@
  */
 package com.sforce.async;
 
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
-import com.sforce.ws.bind.TypeMapper;
-import com.sforce.ws.parser.PullParserException;
-import com.sforce.ws.parser.XmlInputStream;
-import com.sforce.ws.parser.XmlOutputStream;
-import com.sforce.ws.transport.JdkHttpTransport;
-import com.sforce.ws.util.FileUtil;
-
-import javax.xml.namespace.QName;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
+
+import javax.xml.namespace.QName;
+
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.bind.TypeMapper;
+import com.sforce.ws.parser.*;
+import com.sforce.ws.transport.JdkHttpTransport;
+import com.sforce.ws.util.FileUtil;
 
 /**
  * RestConnection
@@ -256,7 +252,7 @@ public class RestConnection {
 
 
     private InputStream doHttpGet(URL url) throws IOException, AsyncApiException {
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = JdkHttpTransport.createConnection(config, url, null);
         connection.setRequestProperty(SESSION_ID, config.getSessionId());
 
         boolean success = true;

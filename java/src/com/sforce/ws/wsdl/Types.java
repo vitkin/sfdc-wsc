@@ -59,7 +59,13 @@ public class Types extends WsdlNode {
                 String name = parser.getName();
                 String namespace = parser.getNamespace();
 
-                if (SCHEMA.equals(name) && SCHEMA_NS.equals(namespace)) {
+                if (SCHEMA.equals(name)) {
+
+                    if (!SCHEMA_NS.equals(namespace)) {
+                        throw new WsdlParseException("Unsupport schema version: " + namespace +
+                            ". It must be: " + SCHEMA_NS);
+                    }
+
                     Schema schema = new Schema();
                     schema.read(parser);
                     schemas.put(schema.getTargetNamespace(), schema);

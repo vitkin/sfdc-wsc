@@ -328,6 +328,7 @@
     		<enumeration value="insert"/>
     		<enumeration value="upsert"/>
     		<enumeration value="update"/>
+            <enumeration value="delete"/>
     	</restriction>
     </simpleType>
 
@@ -342,6 +343,7 @@
     		<enumeration value="Open"/>
     		<enumeration value="Closed"/>
     		<enumeration value="Aborted"/>
+    		<enumeration value="Completed"/>
     		<enumeration value="Failed"/>
     	</restriction>
     </simpleType>
@@ -537,20 +539,20 @@
     </simpleType>
     <complexType name="BatchResult">
         <sequence>
-            <element name="result" type="tns:SaveResult" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="result" type="tns:Result" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
     </complexType>
 
-    <complexType name="SaveResult">
+    <complexType name="Result">
         <sequence>
-            <element name="errors" type="tns:SaveResultError" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="errors" type="tns:ResultError" minOccurs="0" maxOccurs="unbounded"/>
             <element name="id" type="string" minOccurs="1" maxOccurs="1"/>
             <element name="success" type="boolean" minOccurs="1" maxOccurs="1"/>
             <element name="created" type="boolean" minOccurs="1" maxOccurs="1"/>
         </sequence>
     </complexType>
 
-    <complexType name="SaveResultError">
+    <complexType name="ResultError">
         <sequence>
             <element name="fields"     type="string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
             <element name="message"    type="string"/>

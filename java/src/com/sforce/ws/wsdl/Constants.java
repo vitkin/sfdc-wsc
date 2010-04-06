@@ -46,6 +46,7 @@ public interface Constants {
     String META_SFORCE_NS = "http://soap.sforce.com/2006/04/metadata";
     String CROSS_INSTANCE_SFORCE_NS = "http://soap.sforce.com/2006/05/crossinstance";
     String INTERNAL_SFORCE_NS = "http://soap.sforce.com/2007/07/internal";
+    String CLIENT_SYNC_SFORCE_NS = "http://soap.sforce.com/2009/10/clientsync";
 
     String SCHEMA = "schema";
     String TYPES = "types";

@@ -29,6 +29,7 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 
+import com.sforce.ws.transport.JdkHttpTransport;
 import com.sforce.ws.util.Verbose;
 
 /**
@@ -57,14 +58,22 @@ public class ConnectorConfig {
     private String proxyUsername;
     private String proxyPassword;
     private HashMap<String, String> headers;
-    private Proxy proxy = Proxy.NO_PROXY;
+    private Proxy proxy = null;
     private ArrayList<MessageHandler> handlers = new ArrayList<MessageHandler>();
     private int maxRequestSize;
     private int maxResponseSize;
     private boolean validateSchema = true;
+    private Class transport = JdkHttpTransport.class;
 
     public static final ConnectorConfig DEFAULT = new ConnectorConfig();
 
+    public Class getTransport() {
+        return transport;
+    }
+
+    public void setTransport(Class transport) {
+        this.transport = transport;
+    }
 
     public void setNtlmDomain(String domain) {
         if (System.getProperty("http.auth.ntlm.domain") == null) {
@@ -92,7 +101,7 @@ public class ConnectorConfig {
     }
 
     public Proxy getProxy() {
-        return proxy;
+        return proxy == null ? Proxy.NO_PROXY : proxy;
     }
 
     public Map<String, String> getHeaders() {

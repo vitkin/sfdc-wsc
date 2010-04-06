@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 
+import com.sforce.ws.wsdl.Constants;
+
 /**
  * This is a minimal XML output stream, that can be used to write XML.
  *
@@ -75,9 +77,15 @@ public class XmlOutputStream {
 
 	// writes <elem>content</elem>
 	public void writeStringElement(String namespace, String name, String content) throws IOException {
-			writeStartTag(namespace, name);
-			writeText(content);
-			writeEndTag(namespace, name);
+        writeStartTag(namespace, name);
+
+        if (content == null) {
+            writeAttribute(Constants.SCHEMA_INSTANCE_NS, "nil", "true");
+        } else {
+            writeText(content);
+        }
+        
+		writeEndTag(namespace, name);
 	}
 		
     public void writeAttribute(String namespace, String name, String value) throws IOException {
@@ -86,6 +94,10 @@ public class XmlOutputStream {
 
     public void writeText(String text) throws IOException {
         serializer.text(text);
+    }
+
+    public void writeComment(String text) throws IOException {
+        serializer.comment(text);
     }
 
     // access the internal writer used by the serializer, use with care!

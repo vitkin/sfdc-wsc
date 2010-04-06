@@ -25,6 +25,8 @@
  */
 package com.sforce.ws.transport;
 
+import com.sforce.ws.ConnectorConfig;
+
 import java.io.OutputStream;
 import java.io.InputStream;
 import java.io.IOException;
@@ -37,6 +39,8 @@ import java.io.IOException;
  * @since 1.0  Nov 30, 2005
  */
 public interface Transport {
+
+    void setConfig(ConnectorConfig config);
 
     /**
      * Connect to the specified endpoint.

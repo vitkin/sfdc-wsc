@@ -5,12 +5,11 @@
   <property name="wscclasses.dir" value="${wsc.root}/java/classes" />
 
   <target name="usage">
-    <echo message="Usage: ant all" /> 
+    <echo message="Usage: ant all" />
   </target>
 
   <path id="wsc.class.path">
-    <pathelement location="${wsc.root}/java/ext/annotations.jar"/>
-    <pathelement location="${wsc.root}/java/ext/js-1.6R2.jar"/>
+    <pathelement location="${wsc.root}/java/ext/js-1.7R2.jar"/>
     <pathelement location="${wscclasses.dir}"/>
   </path>
 
@@ -25,11 +24,15 @@
   <target name="build">
     <mkdir dir="${wscclasses.dir}" />
 
-    <javac srcdir="${wscsrc.dir}"
-           destdir="${wscclasses.dir}" 
+  	<condition property="ant.build.javac.target" value="${compileTarget}">
+  	    <isset property="compileTarget" />
+  	</condition>
+
+  	<javac srcdir="${wscsrc.dir}"
+           destdir="${wscclasses.dir}"
            classpathref="wsc.class.path"
            debug="on" >
-    </javac> 
+    </javac>
 
     <antcall target="copy-template" />
   </target>
@@ -37,16 +40,13 @@
   <target name="build.jar">
     <mkdir dir="${wsc.root}/dist/temp" />
 
-    <unzip src="${wsc.root}/java/ext/annotations.jar" 
-           dest="${wsc.root}/dist/temp" />
-
-    <unzip src="${wsc.root}/java/ext/js-1.6R2.jar" 
+    <unzip src="${wsc.root}/java/ext/js-1.7R2.jar"
            dest="${wsc.root}/dist/temp" />
 
     <jar destfile="${wsc.root}/dist/wsc.jar">
       <fileset dir="${wscclasses.dir}" />
       <fileset dir="${wsc.root}/dist/temp/" />
-    </jar> 
+    </jar>
 
     <delete dir="${wsc.root}/dist/temp" />
   </target>

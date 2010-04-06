@@ -6,7 +6,8 @@ public enum SfdcApiType {
     Partner(true, Constants.PARTNER_NS, Constants.PARTNER_SOBJECT_NS, "verifyPartnerEndpoint"),
     Metadata(false, Constants.META_SFORCE_NS),
     CrossInstance(false, Constants.CROSS_INSTANCE_SFORCE_NS, Constants.CROSS_INSTANCE_SFORCE_NS, null),
-    Internal(false, Constants.INTERNAL_SFORCE_NS, Constants.INTERNAL_SFORCE_NS, null);
+    Internal(false, Constants.INTERNAL_SFORCE_NS, Constants.INTERNAL_SFORCE_NS, null),
+    ClientSync(false, Constants.CLIENT_SYNC_SFORCE_NS, Constants.CLIENT_SYNC_SFORCE_NS, null);
 
 
     private SfdcApiType(boolean hasLoginCall, String namespace) {

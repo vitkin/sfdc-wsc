@@ -95,7 +95,7 @@ public class SoapConnection {
         long startTime = System.currentTimeMillis();
 
         try {
-            Transport transport = new JdkHttpTransport(config);
+            Transport transport = newTransport(config);
             OutputStream out = transport.connect(url, soapAction);
             sendRequest(out, request, requestElement);
             InputStream in = transport.getContent();
@@ -111,6 +111,18 @@ public class SoapConnection {
 
         } catch (IOException e) {
             throw new ConnectionException("Failed to send request to " + url, e);
+        }
+    }
+
+    private Transport newTransport(ConnectorConfig config) throws ConnectionException {
+        try {
+            Transport t = (Transport) config.getTransport().newInstance();
+            t.setConfig(config);
+            return t;
+        } catch (InstantiationException e) {
+            throw new ConnectionException("Failed to create new Transport " + config.getTransport());
+        } catch (IllegalAccessException e) {
+            throw new ConnectionException("Failed to create new Transport " + config.getTransport());
         }
     }
 

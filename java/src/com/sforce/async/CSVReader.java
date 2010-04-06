@@ -88,21 +88,24 @@ public class CSVReader {
 
             if (rowSizeInCharacters > maxRowSizeInCharacters) {
                 throw new CSVParseException("Exceeded max length for one record: " + rowSizeInCharacters +
-                        ". It should be less than " + maxRowSizeInCharacters, parser.lineno());
+                                            ". Max length for one record should be less than or equal to " +
+                                            maxRowSizeInCharacters, parser.lineno());
             }
 
             fileSizeInCharacters += rowSizeInCharacters;
 
             if (fileSizeInCharacters > maxFileSizeInCharacters) {
-                throw new CSVParseException("Exceeded max file size : " + fileSizeInCharacters +
-                        ". It should be less than " + maxFileSizeInCharacters, parser.lineno());
+                throw new CSVParseException("Exceeded max file size: " + fileSizeInCharacters +
+                                            ". Max file size in characters should be less than or equal to " +
+                                            maxFileSizeInCharacters, parser.lineno());
             }
 
             rowsInFile++;
 
             if (rowsInFile > maxRowsInFile) {
                 throw new CSVParseException("Exceeded number of records : " + rowsInFile +
-                        ". It should be less than " + maxRowsInFile, parser.lineno());
+                                            ". Number of records should be less than or equal to " + maxRowsInFile,
+                                            parser.lineno());
             }
         }
     }

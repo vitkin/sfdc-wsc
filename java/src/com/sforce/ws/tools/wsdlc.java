@@ -58,6 +58,7 @@ public class wsdlc {
     private static final String LAX_MINOCCURS = "lax-minoccurs-checking";
     private static final String PACKAGE_PREFIX = "package-prefix";
     private static final String SOBJECT_TEMPLATE = "com/sforce/ws/tools/sobject.template";
+    private static final String AGG_RESULT_TEMPLATE = "com/sforce/ws/tools/aggregateResult.template";
 
 
     public wsdlc(String wsdlFile, String jarFile, String temp)
@@ -81,7 +82,9 @@ public class wsdlc {
 
         if (type != null && type.getSobjectNamespace() != null) {
             generateSObject(definitions);
+            generateAggregateResult(definitions);
         }
+
         compileTypes();
         generateJarFile(jarFile);
 
@@ -108,11 +111,14 @@ public class wsdlc {
         }
 
         File jf = new File(jarFile);
+
         if (jf.exists()) {
             throw new ToolsException("<jar-file> already exists");
         }
+
         File parentDir = jf.getParentFile();
-        if (!parentDir.exists() && !parentDir.mkdirs()) {
+
+        if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
             throw new ToolsException("<jar-file> path does not exist");
         }
     }
@@ -131,11 +137,28 @@ public class wsdlc {
         javaFiles.add(file);
     }
 
+    private void generateAggregateResult(Definitions definitions) throws IOException, TemplateException {
+        if (definitions.getApiType() == SfdcApiType.Enterprise) {
+
+            String packageName = NameMapper.getPackageName(
+                    definitions.getApiType().getSobjectNamespace(), packagePrefix);
+
+            File dir = FileUtil.mkdirs(packageName, tempDir);
+            Template template = new Template();
+            template.setProperty("packageName", packageName);
+            String className = "AggregateResult";
+            File javaFile = new File(dir, className + ".java");
+            template.exec(AGG_RESULT_TEMPLATE, javaFile.getAbsolutePath());
+            javaFiles.add(javaFile.getAbsolutePath());
+        }
+    }
+
+
 
 
     private void generateSObject(Definitions definitions) throws IOException, TemplateException {
         if (definitions.getApiType() == SfdcApiType.Partner || definitions.getApiType() == SfdcApiType.CrossInstance
-                || definitions.getApiType() == SfdcApiType.Internal) {
+                || definitions.getApiType() == SfdcApiType.Internal || definitions.getApiType() == SfdcApiType.ClientSync) {
             String packageName = NameMapper.getPackageName(definitions.getApiType().getSobjectNamespace(), packagePrefix);
             File dir = FileUtil.mkdirs(packageName, tempDir);
             Template template = new Template();
@@ -352,10 +375,13 @@ public class wsdlc {
         }
 
         public void compile(String[] files) throws ToolsException {
-            Verbose.log("Compiling ... ");
-
             String target = System.getProperty("compileTarget");
-            if (target == null) target = "1.6";
+            if (target == null) {
+                target = "1.6";
+            }
+
+            Verbose.log("Compiling to target " + target + "... ");
+
             String[] args = { "-g", "-d", tempDir.getAbsolutePath(), "-sourcepath", tempDir.getAbsolutePath(),
                     "-target", target };
 

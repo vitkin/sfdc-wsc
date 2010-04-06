@@ -172,9 +172,15 @@ public class TypeMapper {
         if ("sObject".equals(name) &&
                 (SfdcApiType.Partner.getSobjectNamespace().equals(namespace) ||
                         SfdcApiType.CrossInstance.getSobjectNamespace().equals(namespace) ||
-                        SfdcApiType.Internal.getSobjectNamespace().equals(namespace))) {
+                        SfdcApiType.Internal.getSobjectNamespace().equals(namespace) ||
+                        SfdcApiType.ClientSync.getSobjectNamespace().equals(namespace))) {
             return true;
         }
+
+        if ("AggregateResult".equals(name) && SfdcApiType.Enterprise.getSobjectNamespace().equals(namespace)) {
+            return true;
+        }
+
         QName type = new QName(namespace, name);
         return xmlJavaMapping.containsKey(type);
     }
@@ -468,6 +474,8 @@ public class TypeMapper {
         } else if ("int".equals(localType)) {
             return Integer.parseInt(value);
         } else if ("double".equals(localType)) {
+            return parseDouble(value);
+        } else if ("decimal".equals(localType)) {
             return parseDouble(value);
         } else if ("long".equals(localType)) {
             return Long.parseLong(value);

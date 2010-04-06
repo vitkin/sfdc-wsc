@@ -25,21 +25,18 @@
  */
 package com.sforce.ws.transport;
 
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
 import com.sforce.ws.ConnectorConfig;
 import com.sforce.ws.MessageHandler;
 import com.sforce.ws.tools.VersionInfo;
 import com.sforce.ws.util.Base64;
 import com.sforce.ws.util.FileUtil;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * This class is an implementation of Transport using the build in
@@ -52,10 +49,18 @@ import java.util.zip.GZIPOutputStream;
 public class JdkHttpTransport implements Transport {
     private HttpURLConnection connection;
     private boolean successful;
-    private final ConnectorConfig config;
-		private URL url;
+    private ConnectorConfig config;
+	private URL url;
+
+    public JdkHttpTransport() {
+    }
 		
     public JdkHttpTransport(ConnectorConfig config) {
+        setConfig(config);
+    }
+
+    @Override
+    public void setConfig(ConnectorConfig config) {
         this.config = config;
     }
 
@@ -79,22 +84,49 @@ public class JdkHttpTransport implements Transport {
     }
 
     private OutputStream connectLocal(String uri, HashMap<String, String> httpHeaders) throws IOException {
-        if (config.isTraceMessage()) {
-            config.getTraceStream().println("WSC: Creating a new connection to " + uri +
-                " Proxy = " + config.getProxy() +  " username " + config.getProxyUsername());
-        }
-
         url = new URL(uri);
-        connection = (HttpURLConnection) url.openConnection(config.getProxy());
 
+        connection = createConnection(config, url, httpHeaders);
         connection.setRequestMethod("POST");
         connection.setDoInput(true);
         connection.setDoOutput(true);
-        connection.addRequestProperty("User-Agent", VersionInfo.info());
-
         if (config.useChunkedPost()) {
             connection.setChunkedStreamingMode(4096);
         }
+
+
+        OutputStream output = connection.getOutputStream();
+
+        if (config.getMaxRequestSize() > 0) {
+            output = new LimitingOutputStream(config.getMaxRequestSize(), output);
+        }
+
+        if (config.isCompression()) {
+            output = new GZIPOutputStream(output);
+        }
+
+        if (config.isTraceMessage()) {
+            output = new TeeOutputStream(output);
+        }
+
+        if (config.hasMessageHandlers()) {
+            output = new MessageHandlerOutputStream(output);
+        }
+
+        return output;
+    }
+
+    public static HttpURLConnection createConnection(ConnectorConfig config, URL url,
+            HashMap<String, String> httpHeaders) throws IOException,
+            ProtocolException {
+        if (config.isTraceMessage()) {
+            config.getTraceStream().println(
+                    "WSC: Creating a new connection to " + url + " Proxy = " + config.getProxy() + " username "
+                            + config.getProxyUsername());
+        }
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection(config.getProxy());
+
+        connection.addRequestProperty("User-Agent", VersionInfo.info());
 
         /*
          * Add all the client specific headers here
@@ -117,8 +149,10 @@ public class JdkHttpTransport implements Transport {
             connection.addRequestProperty("Https-Proxy-Authorization", auth);
         }
 
-        for (Map.Entry<String, String> entry : httpHeaders.entrySet()) {
-            connection.addRequestProperty(entry.getKey(), entry.getValue());
+        if (httpHeaders != null) {
+            for (Map.Entry<String, String> entry : httpHeaders.entrySet()) {
+                connection.addRequestProperty(entry.getKey(), entry.getValue());
+            }
         }
 
         if (config.getReadTimeout() != 0) {
@@ -128,26 +162,7 @@ public class JdkHttpTransport implements Transport {
         if (config.getConnectionTimeout() != 0) {
             connection.setConnectTimeout(config.getConnectionTimeout());
         }
-
-        OutputStream output = connection.getOutputStream();
-
-        if (config.getMaxRequestSize() > 0) {
-            output = new LimitingOutputStream(config.getMaxRequestSize(), output);
-        }
-
-        if (config.isCompression()) {
-            output = new GZIPOutputStream(output);
-        }
-
-        if (config.isTraceMessage()) {
-            output = new TeeOutputStream(output);
-        }
-
-        if (config.hasMessageHandlers()) {
-            output = new MessageHandlerOutputStream(output);
-        }
-
-        return output;
+        return connection;
     }
 
     @Override
