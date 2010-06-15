@@ -173,7 +173,8 @@ public class TypeMapper {
                 (SfdcApiType.Partner.getSobjectNamespace().equals(namespace) ||
                         SfdcApiType.CrossInstance.getSobjectNamespace().equals(namespace) ||
                         SfdcApiType.Internal.getSobjectNamespace().equals(namespace) ||
-                        SfdcApiType.ClientSync.getSobjectNamespace().equals(namespace))) {
+                        SfdcApiType.ClientSync.getSobjectNamespace().equals(namespace) ||
+                        SfdcApiType.SyncApi.getSobjectNamespace().equals(namespace))) {
             return true;
         }
 

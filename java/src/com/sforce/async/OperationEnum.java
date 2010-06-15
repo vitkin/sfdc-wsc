@@ -5,5 +5,6 @@ public enum OperationEnum {
     upsert,
     update,
     delete,
+    hardDelete,
 }
 

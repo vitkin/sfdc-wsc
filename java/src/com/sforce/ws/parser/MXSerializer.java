@@ -942,7 +942,6 @@ public class MXSerializer {
                     //in XML 1.0 only legal character are #x9 | #xA | #xD
                     if( ch == 9 || ch == 10 || ch == 13) {
                         // pass through
-
                         //                    } else if(ch == 13) { //escape
                         //                        if(i > pos) out.write(text.substring(pos, i));
                         //                        out.write("&#");
@@ -950,10 +949,13 @@ public class MXSerializer {
                         //                        out.write(';');
                         //                        pos = i + 1;
                     } else {
-                        if(TRACE_ESCAPING) System.err.println(getClass().getName()+" DEBUG TEXT value.len="+text.length()+" "+printable(text));
-                        throw new IllegalStateException(
-                            "character "+Integer.toString(ch)+" is not allowed in output"+getLocation()
-                                +" (text value="+printable(text)+")");
+                        // since XmlWriter.writeTextImpl ignores invalid XML chars let's do the same here. commenting below.
+                        if (i > pos) out.write(text.substring(pos, i));
+                        pos = i + 1;
+//                        if(TRACE_ESCAPING) System.err.println(getClass().getName()+" DEBUG TEXT value.len="+text.length()+" "+printable(text));
+//                        throw new IllegalStateException(
+//                            "character "+Integer.toString(ch)+" is not allowed in output"+getLocation()
+//                                +" (text value="+printable(text)+")");
                         // in XML 1.1 legal are [#x1-#xD7FF]
                         //              if(ch > 0) {
                         //                  if(i > pos) out.write(text.substring(pos, i));
@@ -1032,11 +1034,14 @@ public class MXSerializer {
                         //                        out.write(';');
                         //                        pos = i + 1;
                     } else {
-                        if(TRACE_ESCAPING) System.err.println(
-                                getClass().getName()+" DEBUG TEXT value.len="
-                                    +len+" "+printable(new String(buf,off,len)));
-                        throw new IllegalStateException(
-                            "character "+printable(ch)+" ("+Integer.toString(ch)+") is not allowed in output"+getLocation());
+                        // since XmlWriter.writeTextImpl ignores invalid XML chars let's do the same here. commenting below.
+                        if(i > pos) out.write(buf, pos, i - pos);
+                        pos = i + 1;
+//                        if(TRACE_ESCAPING) System.err.println(
+//                                getClass().getName()+" DEBUG TEXT value.len="
+//                                    +len+" "+printable(new String(buf,off,len)));
+//                        throw new IllegalStateException(
+//                            "character "+printable(ch)+" ("+Integer.toString(ch)+") is not allowed in output"+getLocation());
                         // in XML 1.1 legal are [#x1-#xD7FF]
                         //              if(ch > 0) {
                         //                  if(i > pos) out.write(text.substring(pos, i));

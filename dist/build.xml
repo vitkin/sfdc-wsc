@@ -62,6 +62,8 @@
               todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
     <copy file="${wscsrc.dir}/com/sforce/ws/tools/simpleType.template"
               todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
+       <copy file="${wscsrc.dir}/com/sforce/ws/tools/aggregateResult.template"
+              todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
     <copy file="${wscsrc.dir}/com/sforce/ws/runtime-classes.txt"
               todir="${wscclasses.dir}/com/sforce/ws/"/>
   </target>

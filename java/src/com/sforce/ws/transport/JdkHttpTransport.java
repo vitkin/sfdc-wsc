@@ -32,8 +32,7 @@ import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import com.sforce.ws.ConnectorConfig;
-import com.sforce.ws.MessageHandler;
+import com.sforce.ws.*;
 import com.sforce.ws.tools.VersionInfo;
 import com.sforce.ws.util.Base64;
 import com.sforce.ws.util.FileUtil;
@@ -117,15 +116,14 @@ public class JdkHttpTransport implements Transport {
     }
 
     public static HttpURLConnection createConnection(ConnectorConfig config, URL url,
-            HashMap<String, String> httpHeaders) throws IOException,
-            ProtocolException {
-        if (config.isTraceMessage()) {
-            config.getTraceStream().println(
-                    "WSC: Creating a new connection to " + url + " Proxy = " + config.getProxy() + " username "
-                            + config.getProxyUsername());
-        }
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection(config.getProxy());
+            HashMap<String, String> httpHeaders) throws IOException {
 
+        if (config.isTraceMessage()) {
+            config.getTraceStream().println( "WSC: Creating a new connection to " + url + " Proxy = " +
+                    config.getProxy() + " username " + config.getProxyUsername());
+        }
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection(config.getProxy());
         connection.addRequestProperty("User-Agent", VersionInfo.info());
 
         /*
@@ -162,6 +160,7 @@ public class JdkHttpTransport implements Transport {
         if (config.getConnectionTimeout() != 0) {
             connection.setConnectTimeout(config.getConnectionTimeout());
         }
+
         return connection;
     }
 
@@ -198,7 +197,11 @@ public class JdkHttpTransport implements Transport {
                 Iterator<MessageHandler> it = config.getMessagerHandlers();
                 while(it.hasNext()) {
                     MessageHandler handler = it.next();
-                    handler.handleResponse(url, bytes);
+                    if (handler instanceof MessageHandlerWithHeaders) {
+                        ((MessageHandlerWithHeaders) handler).handleResponse(url, bytes, connection.getHeaderFields());
+                    } else {
+                        handler.handleResponse(url, bytes);
+                    }
                 }
             }
 
@@ -416,6 +419,16 @@ public class JdkHttpTransport implements Transport {
             size += len;
             checkSizeLimit();
             out.write(b, off, len);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            out.flush();
+        }
+
+        @Override
+        public void close() throws IOException {
+            out.close();
         }
     }
 

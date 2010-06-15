@@ -7,7 +7,8 @@ public enum SfdcApiType {
     Metadata(false, Constants.META_SFORCE_NS),
     CrossInstance(false, Constants.CROSS_INSTANCE_SFORCE_NS, Constants.CROSS_INSTANCE_SFORCE_NS, null),
     Internal(false, Constants.INTERNAL_SFORCE_NS, Constants.INTERNAL_SFORCE_NS, null),
-    ClientSync(false, Constants.CLIENT_SYNC_SFORCE_NS, Constants.CLIENT_SYNC_SFORCE_NS, null);
+    ClientSync(false, Constants.CLIENT_SYNC_SFORCE_NS, Constants.CLIENT_SYNC_SFORCE_NS, null),
+    SyncApi(false, Constants.SYNC_API_SFORCE_NS, Constants.SYNC_API_SFORCE_NS, null);
 
 
     private SfdcApiType(boolean hasLoginCall, String namespace) {

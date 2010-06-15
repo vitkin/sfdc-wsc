@@ -1,7 +1,7 @@
 package com.sforce.async;
 
 /**
- * Generated class, please do not edit.
+ * Async Api BatchInfo
  */
 public class BatchInfo implements com.sforce.ws.bind.XMLizable {
 
@@ -165,7 +165,87 @@ public class BatchInfo implements com.sforce.ws.bind.XMLizable {
     this.numberRecordsProcessed = numberRecordsProcessed;
     numberRecordsProcessed__is_set = true;
   }
-  
+
+  /**
+   * element : numberRecordsFailed of type {http://www.w3.org/2001/XMLSchema}int java type: int
+   */
+  private static final com.sforce.ws.bind.TypeInfo numberRecordsFailed__typeInfo = new com.sforce.ws.bind.TypeInfo(
+          "http://www.force.com/2009/06/asyncapi/dataload", "numberRecordsFailed",
+            "http://www.w3.org/2001/XMLSchema", "int", 0, 1, true);
+
+  private boolean numberRecordsFailed__is_set = false;
+
+  private int numberRecordsFailed;
+
+  public int getNumberRecordsFailed() {
+      return numberRecordsFailed;
+  }
+
+  public void setNumberRecordsFailed(int numberRecordsFailed) {
+      this.numberRecordsFailed = numberRecordsFailed;
+      numberRecordsFailed__is_set = true;
+  }
+
+  /**
+   * element : totalProcessingTime of type {http://www.w3.org/2001/XMLSchema}long java type: long
+   */
+  private static final com.sforce.ws.bind.TypeInfo totalProcessingTime__typeInfo = new com.sforce.ws.bind.TypeInfo(
+          "http://www.force.com/2009/06/asyncapi/dataload", "totalProcessingTime",
+            "http://www.w3.org/2001/XMLSchema", "long", 0, 1, true);
+
+  private boolean totalProcessingTime__is_set = false;
+
+  private long totalProcessingTime;
+
+  public long getTotalProcessingTime() {
+      return totalProcessingTime;
+  }
+
+  public void setTotalProcessingTime(long totalProcessingTime) {
+      this.totalProcessingTime = totalProcessingTime;
+      totalProcessingTime__is_set = true;
+  }
+
+  /**
+   * element : apiActiveProcessingTime of type {http://www.w3.org/2001/XMLSchema}long java type: long
+   */
+  private static final com.sforce.ws.bind.TypeInfo apiActiveProcessingTime__typeInfo = new com.sforce.ws.bind.TypeInfo(
+          "http://www.force.com/2009/06/asyncapi/dataload", "apiActiveProcessingTime",
+          "http://www.w3.org/2001/XMLSchema",
+ "long", 0, 1, true);
+
+  private boolean apiActiveProcessingTime__is_set = false;
+
+  private long apiActiveProcessingTime;
+
+  public long getApiActiveProcessingTime() {
+      return apiActiveProcessingTime;
+  }
+
+  public void setApiActiveProcessingTime(long apiActiveProcessingTime) {
+      this.apiActiveProcessingTime = apiActiveProcessingTime;
+      apiActiveProcessingTime__is_set = true;
+  }
+
+  /**
+   * element : apexProcessingTime of type {http://www.w3.org/2001/XMLSchema}long java type: long
+   */
+  private static final com.sforce.ws.bind.TypeInfo apexProcessingTime__typeInfo = new com.sforce.ws.bind.TypeInfo(
+          "http://www.force.com/2009/06/asyncapi/dataload", "apexProcessingTime", "http://www.w3.org/2001/XMLSchema",
+            "long", 0, 1, true);
+
+  private boolean apexProcessingTime__is_set = false;
+
+  private long apexProcessingTime;
+
+  public long getApexProcessingTime() {
+      return apexProcessingTime;
+  }
+
+  public void setApexProcessingTime(long apexProcessingTime) {
+      this.apexProcessingTime = apexProcessingTime;
+      apexProcessingTime__is_set = true;
+  }
 
   /**
    */
@@ -189,6 +269,10 @@ public class BatchInfo implements com.sforce.ws.bind.XMLizable {
     __typeMapper.writeObject(__out, createdDate__typeInfo, createdDate, createdDate__is_set);
     __typeMapper.writeObject(__out, systemModstamp__typeInfo, systemModstamp, systemModstamp__is_set);
     __typeMapper.writeInt(__out, numberRecordsProcessed__typeInfo, numberRecordsProcessed, numberRecordsProcessed__is_set);
+    __typeMapper.writeInt(__out, numberRecordsFailed__typeInfo, numberRecordsFailed, numberRecordsFailed__is_set);
+    __typeMapper.writeLong(__out, totalProcessingTime__typeInfo, totalProcessingTime, totalProcessingTime__is_set);
+    __typeMapper.writeLong(__out, apiActiveProcessingTime__typeInfo, apiActiveProcessingTime, apiActiveProcessingTime__is_set);
+    __typeMapper.writeLong(__out, apexProcessingTime__typeInfo, apexProcessingTime, apexProcessingTime__is_set);
   }
 
 
@@ -229,7 +313,23 @@ public class BatchInfo implements com.sforce.ws.bind.XMLizable {
     }
     __in.peekTag();
     if (__typeMapper.isElement(__in, numberRecordsProcessed__typeInfo)) {
-      setNumberRecordsProcessed(__typeMapper.readInt(__in, numberRecordsProcessed__typeInfo, int.class));
+        setNumberRecordsProcessed(__typeMapper.readInt(__in, numberRecordsProcessed__typeInfo, int.class));
+    }
+    __in.peekTag();
+    if (__typeMapper.isElement(__in, numberRecordsFailed__typeInfo)) {
+        setNumberRecordsFailed(__typeMapper.readInt(__in, numberRecordsFailed__typeInfo, int.class));
+    }
+    __in.peekTag();
+    if (__typeMapper.isElement(__in, totalProcessingTime__typeInfo)) {
+        setTotalProcessingTime(__typeMapper.readLong(__in, totalProcessingTime__typeInfo, long.class));
+    }
+    __in.peekTag();
+    if (__typeMapper.isElement(__in, apiActiveProcessingTime__typeInfo)) {
+        setApiActiveProcessingTime(__typeMapper.readLong(__in, apiActiveProcessingTime__typeInfo, long.class));
+    }
+    __in.peekTag();
+    if (__typeMapper.isElement(__in, apexProcessingTime__typeInfo)) {
+        setApexProcessingTime(__typeMapper.readLong(__in, apexProcessingTime__typeInfo, long.class));
     }
   }
 
@@ -252,6 +352,14 @@ public class BatchInfo implements com.sforce.ws.bind.XMLizable {
       sb.append("'").append(com.sforce.ws.util.Verbose.toString(systemModstamp)).append("'\n");
     sb.append(" numberRecordsProcessed=");
       sb.append("'").append(com.sforce.ws.util.Verbose.toString(numberRecordsProcessed)).append("'\n");
+    sb.append(" numberRecordsFailed=");
+      sb.append("'").append(com.sforce.ws.util.Verbose.toString(numberRecordsFailed)).append("'\n");
+    sb.append(" totalProcessingTime=");
+      sb.append("'").append(com.sforce.ws.util.Verbose.toString(totalProcessingTime)).append("'\n");
+    sb.append(" apiActiveProcessingTime=");
+      sb.append("'").append(com.sforce.ws.util.Verbose.toString(apiActiveProcessingTime)).append("'\n");
+    sb.append(" apexProcessingTime=");
+      sb.append("'").append(com.sforce.ws.util.Verbose.toString(apexProcessingTime)).append("'\n");
     sb.append("]\n");
     return sb.toString();
   }

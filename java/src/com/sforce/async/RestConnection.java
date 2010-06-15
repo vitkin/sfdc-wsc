@@ -8,14 +8,12 @@ package com.sforce.async;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.namespace.QName;
 
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.*;
 import com.sforce.ws.bind.TypeMapper;
 import com.sforce.ws.parser.*;
 import com.sforce.ws.transport.JdkHttpTransport;
@@ -269,10 +267,28 @@ public class RestConnection {
             in = new GZIPInputStream(in);
         }
 
-        if (config.isTraceMessage()) {
+        if (config.isTraceMessage() || config.hasMessageHandlers()) {
             byte[] bytes = FileUtil.toBytes(in);
-            new JdkHttpTransport.TeeInputStream(config, bytes);
             in = new ByteArrayInputStream(bytes);
+
+            if (config.hasMessageHandlers()) {
+                Iterator<MessageHandler> it = config.getMessagerHandlers();
+                while (it.hasNext()) {
+                    MessageHandler handler = it.next();
+                    if (handler instanceof MessageHandlerWithHeaders) {
+                        ((MessageHandlerWithHeaders) handler)
+                                .handleRequest(url, new byte[0], null);
+                        ((MessageHandlerWithHeaders) handler).handleResponse(url, bytes, connection.getHeaderFields());
+                    } else {
+                        handler.handleRequest(url, new byte[0]);
+                        handler.handleResponse(url, bytes);
+                    }
+                }
+            }
+
+            if (config.isTraceMessage()) {
+                new JdkHttpTransport.TeeInputStream(config, bytes);
+            }
         }
 
         if (!success) {

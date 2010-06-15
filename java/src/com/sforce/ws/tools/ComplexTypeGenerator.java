@@ -167,7 +167,7 @@ public class ComplexTypeGenerator extends TypeGenerator {
         StringBuilder sb = new StringBuilder();
         if (isArray(element.getMaxOccurs())) {
             sb.append(" = new ");
-            sb.append(mapper.getJavaClassName(element.getType(), types, false));
+            sb.append(mapper.getJavaClassName(element.getType(), types, element.isNillable()));
             sb.append("[0]");
         }
         return sb.toString();

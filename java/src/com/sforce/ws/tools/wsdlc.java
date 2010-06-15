@@ -158,7 +158,8 @@ public class wsdlc {
 
     private void generateSObject(Definitions definitions) throws IOException, TemplateException {
         if (definitions.getApiType() == SfdcApiType.Partner || definitions.getApiType() == SfdcApiType.CrossInstance
-                || definitions.getApiType() == SfdcApiType.Internal || definitions.getApiType() == SfdcApiType.ClientSync) {
+                || definitions.getApiType() == SfdcApiType.Internal || definitions.getApiType() == SfdcApiType.ClientSync
+                || definitions.getApiType() == SfdcApiType.SyncApi) {
             String packageName = NameMapper.getPackageName(definitions.getApiType().getSobjectNamespace(), packagePrefix);
             File dir = FileUtil.mkdirs(packageName, tempDir);
             Template template = new Template();
