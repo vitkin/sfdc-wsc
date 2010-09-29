@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, salesforce.com, inc.
+ * Copyright (c) 2010, salesforce.com, inc.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided 
@@ -23,36 +23,12 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package com.sforce.ws.template;
+package com.sforce.ws;
 
-import com.sforce.ws.util.FileUtil;
+public interface SessionRenewer {
 
-import java.io.IOException;
-
-/**
- * This class represents
- *
- * @author http://cheenath
- * @version 1.0
- * @since 1.0  Nov 21, 2005
- */
-class Expression implements JspNode {
-  private String expression;
-
-  public Expression(JspTokenizer tokenizer) throws IOException, TemplateException {
-    expression = tokenizer.getText();
-
-    Token token = tokenizer.nextToken();
-    if (token != Token.END_TAG) {
-      throw new TemplateException("Found unexpected token:" + token);
-    }
-  }
-
-  @Override
-public void toJavaScript(StringBuilder sb) {
-    sb.append("out.print(");
-    sb.append(expression);
-    sb.append(");");
-    sb.append(FileUtil.EOL);
-  }
+    /**
+     * This method is called when an expired session is detected
+     */
+    void renewSession(ConnectorConfig config) throws ConnectionException;
 }

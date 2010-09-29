@@ -60,6 +60,7 @@ public class SoapHeaderObject implements com.sforce.ws.bind.XMLizable {
 
     /**
      */
+    @Override
     public void write(javax.xml.namespace.QName __element, XmlOutputStream __out, TypeMapper __typeMapper)
             throws IOException {
         __out.writeStartTag(__element.getNamespaceURI(), __element.getLocalPart());
@@ -79,6 +80,7 @@ public class SoapHeaderObject implements com.sforce.ws.bind.XMLizable {
         }
     }
 
+    @Override
     public void load(XmlInputStream __in, TypeMapper __typeMapper) throws IOException, ConnectionException {
         __typeMapper.consumeStartTag(__in);
         loadFields(__in, __typeMapper);

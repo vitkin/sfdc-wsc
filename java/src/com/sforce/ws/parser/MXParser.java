@@ -428,7 +428,8 @@ public class MXParser
    * @param state a  boolean
    * @throws XmlPullParserException
    */
-  public void setFeature(String name,
+  @Override
+public void setFeature(String name,
                          boolean state) throws XmlPullParserException {
     if (name == null) throw new IllegalArgumentException("feature name should not be null");
     if (FEATURE_PROCESS_NAMESPACES.equals(name)) {
@@ -465,7 +466,8 @@ public class MXParser
   /**
    * Unknown properties are <string>always</strong> returned as false
    */
-  public boolean getFeature(String name) {
+  @Override
+public boolean getFeature(String name) {
     if (name == null) throw new IllegalArgumentException("feature name should not be nulll");
     if (FEATURE_PROCESS_NAMESPACES.equals(name)) {
       return processNamespaces;
@@ -484,7 +486,8 @@ public class MXParser
     return false;
   }
 
-  public void setProperty(String name,
+  @Override
+public void setProperty(String name,
                           Object value)
       throws XmlPullParserException {
     if (PROPERTY_LOCATION.equals(name)) {
@@ -495,7 +498,8 @@ public class MXParser
   }
 
 
-  public Object getProperty(String name) {
+  @Override
+public Object getProperty(String name) {
     if (name == null) throw new IllegalArgumentException("property name should not be nulll");
     if (PROPERTY_XMLDECL_VERSION.equals(name)) {
       return xmlDeclVersion;
@@ -510,13 +514,15 @@ public class MXParser
   }
 
 
-  public void setInput(Reader in) throws XmlPullParserException {
+  @Override
+public void setInput(Reader in) throws XmlPullParserException {
     reset();
     reader = in;
   }
 
 
-  public void setInput(java.io.InputStream inputStream, String inputEncoding)
+  @Override
+public void setInput(java.io.InputStream inputStream, String inputEncoding)
       throws XmlPullParserException {
     if (inputStream == null) {
       throw new IllegalArgumentException("input stream can not be null");
@@ -541,11 +547,13 @@ public class MXParser
     this.inputEncoding = inputEncoding;
   }
 
-  public String getInputEncoding() {
+  @Override
+public String getInputEncoding() {
     return inputEncoding;
   }
 
-  public void defineEntityReplacementText(String entityName,
+  @Override
+public void defineEntityReplacementText(String entityName,
                                           String replacementText)
       throws XmlPullParserException {
     //      throw new XmlPullParserException("not allowed");
@@ -568,7 +576,8 @@ public class MXParser
     // TOOD keepEntityNormalizedForAttributeValue cached as well ...
   }
 
-  public int getNamespaceCount(int depth)
+  @Override
+public int getNamespaceCount(int depth)
       throws XmlPullParserException {
     if (!processNamespaces || depth == 0) {
       return 0;
@@ -580,7 +589,8 @@ public class MXParser
     return elNamespaceCount[depth];
   }
 
-  public String getNamespacePrefix(int pos)
+  @Override
+public String getNamespacePrefix(int pos)
       throws XmlPullParserException {
 
     //int end = eventType == END_TAG ? elNamespaceCount[ depth + 1 ] : namespaceEnd;
@@ -593,7 +603,8 @@ public class MXParser
     }
   }
 
-  public String getNamespaceUri(int pos) throws XmlPullParserException {
+  @Override
+public String getNamespaceUri(int pos) throws XmlPullParserException {
     //int end = eventType == END_TAG ? elNamespaceCount[ depth + 1 ] : namespaceEnd;
     //if(pos < end) {
     if (pos < namespaceEnd) {
@@ -604,7 +615,8 @@ public class MXParser
     }
   }
 
-  public String getNamespace(String prefix)
+  @Override
+public String getNamespace(String prefix)
   //throws XmlPullParserException
   {
     //int count = namespaceCount[ depth ];
@@ -631,7 +643,8 @@ public class MXParser
   }
 
 
-  public int getDepth() {
+  @Override
+public int getDepth() {
     return depth;
   }
 
@@ -660,7 +673,8 @@ public class MXParser
    * Return string describing current position of parsers as
    * text 'STATE [seen %s...] @line:column'.
    */
-  public String getPositionDescription() {
+  @Override
+public String getPositionDescription() {
     String fragment = null;
     if (posStart <= pos) {
       final int start = findFragment(0, buf, posStart, pos);
@@ -679,16 +693,19 @@ public class MXParser
         + "@" + getLineNumber() + ":" + getColumnNumber();
   }
 
-  public int getLineNumber() {
+  @Override
+public int getLineNumber() {
     return lineNumber;
   }
 
-  public int getColumnNumber() {
+  @Override
+public int getColumnNumber() {
     return columnNumber;
   }
 
 
-  public boolean isWhitespace() throws XmlPullParserException {
+  @Override
+public boolean isWhitespace() throws XmlPullParserException {
     if (eventType == TEXT || eventType == CDSECT) {
       if (usePC) {
         for (int i = pcStart; i < pcEnd; i++) {
@@ -707,7 +724,8 @@ public class MXParser
     throw new XmlPullParserException("no content available to check for whitespaces");
   }
 
-  public String getText() {
+  @Override
+public String getText() {
     if (eventType == START_DOCUMENT || eventType == END_DOCUMENT) {
       //throw new XmlPullParserException("no content available to read");
       //      if(roundtripSupported) {
@@ -728,7 +746,8 @@ public class MXParser
     return text;
   }
 
-  public char[] getTextCharacters(int [] holderForStartAndLength) {
+  @Override
+public char[] getTextCharacters(int [] holderForStartAndLength) {
     if (eventType == TEXT) {
       if (usePC) {
         holderForStartAndLength[0] = pcStart;
@@ -770,7 +789,8 @@ public class MXParser
     //      return cb;
   }
 
-  public String getNamespace() {
+  @Override
+public String getNamespace() {
     if (eventType == START_TAG) {
       //return processNamespaces ? elUri[ depth - 1 ] : NO_NAMESPACE;
       return processNamespaces ? elUri[depth] : NO_NAMESPACE;
@@ -796,7 +816,8 @@ public class MXParser
     //        return "";
   }
 
-  public String getName() {
+  @Override
+public String getName() {
     if (eventType == START_TAG) {
       //return elName[ depth - 1 ] ;
       return elName[depth];
@@ -812,7 +833,8 @@ public class MXParser
     }
   }
 
-  public String getPrefix() {
+  @Override
+public String getPrefix() {
     if (eventType == START_TAG) {
       //return elPrefix[ depth - 1 ] ;
       return elPrefix[depth];
@@ -826,18 +848,21 @@ public class MXParser
   }
 
 
-  public boolean isEmptyElementTag() throws XmlPullParserException {
+  @Override
+public boolean isEmptyElementTag() throws XmlPullParserException {
     if (eventType != START_TAG) throw new XmlPullParserException(
         "parser must be on START_TAG to check for empty element", this, null);
     return emptyElementTag;
   }
 
-  public int getAttributeCount() {
+  @Override
+public int getAttributeCount() {
     if (eventType != START_TAG) return -1;
     return attributeCount;
   }
 
-  public String getAttributeNamespace(int index) {
+  @Override
+public String getAttributeNamespace(int index) {
     if (eventType != START_TAG) throw new IndexOutOfBoundsException(
         "only START_TAG can have attributes");
     if (!processNamespaces) return NO_NAMESPACE;
@@ -846,7 +871,8 @@ public class MXParser
     return attributeUri[index];
   }
 
-  public String getAttributeName(int index) {
+  @Override
+public String getAttributeName(int index) {
     if (eventType != START_TAG) throw new IndexOutOfBoundsException(
         "only START_TAG can have attributes");
     if (index < 0 || index >= attributeCount) throw new IndexOutOfBoundsException(
@@ -854,7 +880,8 @@ public class MXParser
     return attributeName[index];
   }
 
-  public String getAttributePrefix(int index) {
+  @Override
+public String getAttributePrefix(int index) {
     if (eventType != START_TAG) throw new IndexOutOfBoundsException(
         "only START_TAG can have attributes");
     if (!processNamespaces) return null;
@@ -863,7 +890,8 @@ public class MXParser
     return attributePrefix[index];
   }
 
-  public String getAttributeType(int index) {
+  @Override
+public String getAttributeType(int index) {
     if (eventType != START_TAG) throw new IndexOutOfBoundsException(
         "only START_TAG can have attributes");
     if (index < 0 || index >= attributeCount) throw new IndexOutOfBoundsException(
@@ -871,7 +899,8 @@ public class MXParser
     return "CDATA";
   }
 
-  public boolean isAttributeDefault(int index) {
+  @Override
+public boolean isAttributeDefault(int index) {
     if (eventType != START_TAG) throw new IndexOutOfBoundsException(
         "only START_TAG can have attributes");
     if (index < 0 || index >= attributeCount) throw new IndexOutOfBoundsException(
@@ -879,7 +908,8 @@ public class MXParser
     return false;
   }
 
-  public String getAttributeValue(int index) {
+  @Override
+public String getAttributeValue(int index) {
     if (eventType != START_TAG) throw new IndexOutOfBoundsException(
         "only START_TAG can have attributes");
     if (index < 0 || index >= attributeCount) throw new IndexOutOfBoundsException(
@@ -887,7 +917,8 @@ public class MXParser
     return attributeValue[index];
   }
 
-  public String getAttributeValue(String namespace,
+  @Override
+public String getAttributeValue(String namespace,
                                   String name) {
     if (eventType != START_TAG) throw new IndexOutOfBoundsException(
         "only START_TAG can have attributes" + getPositionDescription());
@@ -925,12 +956,14 @@ public class MXParser
   }
 
 
-  public int getEventType()
+  @Override
+public int getEventType()
       throws XmlPullParserException {
     return eventType;
   }
 
-  public void require(int type, String namespace, String name)
+  @Override
+public void require(int type, String namespace, String name)
       throws XmlPullParserException, IOException {
     if (!processNamespaces && namespace != null) {
       throw new XmlPullParserException(
@@ -988,7 +1021,8 @@ public class MXParser
   //        return result;
   //    }
 
-  public String nextText() throws XmlPullParserException, IOException {
+  @Override
+public String nextText() throws XmlPullParserException, IOException {
     //        String result = null;
     //        boolean onStartTag = false;
     //        if(eventType == START_TAG) {
@@ -1031,7 +1065,8 @@ public class MXParser
     }
   }
 
-  public int nextTag() throws XmlPullParserException, IOException {
+  @Override
+public int nextTag() throws XmlPullParserException, IOException {
     next();
     if (eventType == TEXT && isWhitespace()) {  // skip whitespace
       next();
@@ -1043,13 +1078,15 @@ public class MXParser
     return eventType;
   }
 
-  public int next()
+  @Override
+public int next()
       throws XmlPullParserException, IOException {
     tokenize = false;
     return nextImpl();
   }
 
-  public int nextToken()
+  @Override
+public int nextToken()
       throws XmlPullParserException, IOException {
     tokenize = true;
     return nextImpl();

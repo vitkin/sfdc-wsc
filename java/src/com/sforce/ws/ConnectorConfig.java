@@ -26,8 +26,8 @@
 package com.sforce.ws;
 
 import java.io.*;
-import java.util.*;
 import java.net.*;
+import java.util.*;
 
 import com.sforce.ws.transport.JdkHttpTransport;
 import com.sforce.ws.util.Verbose;
@@ -64,6 +64,7 @@ public class ConnectorConfig {
     private int maxResponseSize;
     private boolean validateSchema = true;
     private Class transport = JdkHttpTransport.class;
+    private SessionRenewer sessionRenewer;
 
     public static final ConnectorConfig DEFAULT = new ConnectorConfig();
 
@@ -329,5 +330,13 @@ public class ConnectorConfig {
 
     public void setRestEndpoint(String restEndpoint) {
         this.restEndpoint = restEndpoint;
+    }
+    
+    public SessionRenewer getSessionRenewer() {
+        return sessionRenewer;
+    }
+    
+    public void setSessionRenewer(SessionRenewer sessionRenewer) {
+        this.sessionRenewer = sessionRenewer;
     }
 }

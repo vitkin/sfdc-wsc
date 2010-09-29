@@ -25,9 +25,7 @@
  */
 package com.sforce.ws.transport;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.SocketTimeoutException;
@@ -36,15 +34,9 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
-import com.sforce.ws.SoapFaultException;
-import com.sforce.ws.bind.TypeInfo;
-import com.sforce.ws.bind.TypeMapper;
-import com.sforce.ws.bind.XMLizable;
-import com.sforce.ws.parser.PullParserException;
-import com.sforce.ws.parser.XmlInputStream;
-import com.sforce.ws.parser.XmlOutputStream;
+import com.sforce.ws.*;
+import com.sforce.ws.bind.*;
+import com.sforce.ws.parser.*;
 import com.sforce.ws.util.Verbose;
 import com.sforce.ws.wsdl.Constants;
 
@@ -95,13 +87,25 @@ public class SoapConnection {
         long startTime = System.currentTimeMillis();
 
         try {
-            Transport transport = newTransport(config);
-            OutputStream out = transport.connect(url, soapAction);
-            sendRequest(out, request, requestElement);
-            InputStream in = transport.getContent();
-            XMLizable result;
-            result = receive(transport, responseElement, responseType, in);
-            return result;
+            boolean firstTime = true;
+            while(true) {
+                try {
+                    Transport transport = newTransport(config);
+                    OutputStream out = transport.connect(url, soapAction);
+                    sendRequest(out, request, requestElement);
+                    InputStream in = transport.getContent();
+                    XMLizable result;
+                    result = receive(transport, responseElement, responseType, in);
+                    return result;
+                } catch (SessionTimedOutException se) {
+                    if (config.getSessionRenewer() == null || !firstTime) {
+                        throw (ConnectionException) se.getCause();
+                    } else {
+                        config.getSessionRenewer().renewSession(config);
+                    }
+                }
+                firstTime = false;
+            }
         } catch (SocketTimeoutException e) {
             long timeTaken = System.currentTimeMillis() - startTime;
             throw new ConnectionException("Request to " + url + " timed out. TimeTaken=" + timeTaken +
@@ -222,6 +226,9 @@ public class SoapConnection {
             e = (ConnectionException) typeMapper.readObject(xin, info, ConnectionException.class);
             if (e instanceof SoapFaultException) {
                 ((SoapFaultException)e).setFaultCode(faultCode);
+                if (faultstring != null && faultstring.contains("Session timed out") && "INVALID_SESSION_ID".equals(faultCode.getLocalPart())) {
+                    e = new SessionTimedOutException(faultstring, e);
+                }
             }
         } catch (ConnectionException ce) {
             throw new ConnectionException("Failed to parse detail: " + xin + " due to: " + ce, ce.getCause());
@@ -351,5 +358,11 @@ public class SoapConnection {
 
     public void clearHeaders() {
         headers.clear();
+    }
+    
+    private static class SessionTimedOutException extends ConnectionException {
+        private SessionTimedOutException(String faultString, Exception e) {
+            super(faultString, e);
+        }
     }
 }

@@ -27,12 +27,10 @@ package com.sforce.ws.tools;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 import com.sforce.ws.bind.TypeMapper;
-import com.sforce.ws.wsdl.Enumeration;
-import com.sforce.ws.wsdl.Schema;
-import com.sforce.ws.wsdl.SimpleType;
-import com.sforce.ws.wsdl.Types;
+import com.sforce.ws.wsdl.*;
 
 /**
  * SimpleTypeGenerator
@@ -45,6 +43,7 @@ public class SimpleTypeGenerator extends TypeGenerator {
     private SimpleType simpleType;
     private static final String TEMPLATE = "com/sforce/ws/tools/simpleType.template";
     private TypeMapper typeMapper;
+    private static final Pattern DASH_PATTERN = Pattern.compile("-");
 
     public SimpleTypeGenerator(Types types, Schema schema, SimpleType simpleType, File tempDir, TypeMapper typeMapper) {
         super(types, schema, simpleType.getName(), tempDir, typeMapper);
@@ -67,6 +66,9 @@ public class SimpleTypeGenerator extends TypeGenerator {
         String subname = index == -1 ? name : name.substring(index+1);
         if (typeMapper.isKeyWord(subname)) {
             subname = "_" + subname;
+        }
+        if (subname.indexOf("-") > 0) {
+            subname = DASH_PATTERN.matcher(subname).replaceAll("_");
         }
         return subname;
     }

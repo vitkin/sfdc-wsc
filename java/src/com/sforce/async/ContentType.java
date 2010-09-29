@@ -8,5 +8,7 @@ package com.sforce.async;
  */
 public enum ContentType {
     XML,
-    CSV
+    CSV,
+    ZIP_XML,
+    ZIP_CSV
 }

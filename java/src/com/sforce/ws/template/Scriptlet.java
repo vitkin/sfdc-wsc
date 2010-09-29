@@ -46,7 +46,8 @@ class Scriptlet implements JspNode {
     }
   }
 
-  public void toJavaScript(StringBuilder sb) {
+  @Override
+public void toJavaScript(StringBuilder sb) {
     sb.append(code);
   }
 }

@@ -1,7 +1,5 @@
 /*
- * Copyright, 1999-2008, SALESFORCE.com
- * All Rights Reserved
- * Company Confidential
+ * Copyright, 1999-2008, SALESFORCE.com All Rights Reserved Company Confidential
  */
 package com.sforce.async;
 
@@ -9,7 +7,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
+import java.util.zip.*;
 
 import javax.xml.namespace.QName;
 
@@ -21,7 +19,7 @@ import com.sforce.ws.util.FileUtil;
 
 /**
  * RestConnection
- *
+ * 
  * @author mcheenath
  * @since 160
  */
@@ -31,6 +29,8 @@ public class RestConnection {
     public static final String SESSION_ID = "X-SFDC-Session";
     public static final String XML_CONTENT_TYPE = "application/xml";
     public static final String CSV_CONTENT_TYPE = "text/csv";
+    public static final String ZIP_XML_CONTENT_TYPE = "zip/xml";
+    public static final String ZIP_CSV_CONTENT_TYPE = "zip/csv";
 
     public static final QName JOB_QNAME = new QName(NAMESPACE, "jobInfo");
     public static final QName BATCH_QNAME = new QName(NAMESPACE, "batchInfo");
@@ -42,19 +42,15 @@ public class RestConnection {
     public static final TypeMapper typeMapper = new TypeMapper();
 
     public RestConnection(ConnectorConfig config) throws AsyncApiException {
-        if (config == null) {
-            throw new AsyncApiException("config can not be null", AsyncExceptionCode.ClientInputError);
-        }
+        if (config == null) { throw new AsyncApiException("config can not be null", AsyncExceptionCode.ClientInputError); }
 
-        if (config.getRestEndpoint() == null) {
-            throw new AsyncApiException("rest endpoint cannot be null", AsyncExceptionCode.ClientInputError);
-        }
+        if (config.getRestEndpoint() == null) { throw new AsyncApiException("rest endpoint cannot be null",
+                AsyncExceptionCode.ClientInputError); }
 
         this.config = config;
 
-        if (config.getSessionId() == null) {
-            throw new AsyncApiException("session ID not found", AsyncExceptionCode.ClientInputError);
-        }
+        if (config.getSessionId() == null) { throw new AsyncApiException("session ID not found",
+                AsyncExceptionCode.ClientInputError); }
     }
 
     public JobInfo createJob(String object, String operation) throws AsyncApiException {
@@ -79,7 +75,6 @@ public class RestConnection {
             xout.close();
 
             InputStream in = transport.getContent();
-
 
             if (transport.isSuccessful()) {
                 XmlInputStream xin = new XmlInputStream();
@@ -127,12 +122,24 @@ public class RestConnection {
     }
 
     public BatchInfo createBatchFromStream(JobInfo jobInfo, InputStream input) throws AsyncApiException {
+        return createBatchFromStreamImpl(jobInfo, input, false);
+    }
+
+    public BatchInfo createBatchFromZipStream(JobInfo jobInfo, InputStream zipInput) throws AsyncApiException {
+        return createBatchFromStreamImpl(jobInfo, zipInput, true);
+    }
+
+    private BatchInfo createBatchFromStreamImpl(JobInfo jobInfo, InputStream input, boolean isZip)
+            throws AsyncApiException {
         try {
             String endpoint = getRestEndpoint();
             JdkHttpTransport transport = new JdkHttpTransport(config);
             endpoint = endpoint + "job/" + jobInfo.getId() + "/batch";
-            String contentType = jobInfo.getContentType() == ContentType.CSV ? CSV_CONTENT_TYPE : XML_CONTENT_TYPE;
-            OutputStream out = transport.connect(endpoint, getHeaders(contentType));
+            String contentType = getContentTypeString(jobInfo.getContentType(), isZip);
+            HashMap<String, String> httpHeaders = getHeaders(contentType);
+            // TODO do we want to allow the zip content to be gzipped
+            boolean allowZipToBeGzipped = false;
+            OutputStream out = transport.connect(endpoint, httpHeaders, allowZipToBeGzipped || !isZip);
 
             FileUtil.copy(input, out);
 
@@ -144,6 +151,119 @@ public class RestConnection {
             throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
         } catch (ConnectionException e) {
             throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
+        }
+    }
+
+    public BatchInfo createBatchFromDir(JobInfo job, InputStream batchContent, File attachmentDir)
+            throws AsyncApiException {
+        final List<File> files = FileUtil.listFilesRecursive(attachmentDir, false);
+        final Map<String, File> fileMap = new HashMap<String, File>(files.size());
+        final String rootPath = attachmentDir.getAbsolutePath() + "/";
+        for (File f : files) {
+            String name = f.getAbsolutePath().replace(rootPath, "");
+            fileMap.put(name, f);
+        }
+        return createBatchWithFileAttachments(job, batchContent, fileMap);
+    }
+
+    public BatchInfo createBatchWithFileAttachments(JobInfo jobInfo, InputStream batchContent, File rootDirectory,
+            String... files) throws AsyncApiException {
+        Map<String, File> fileMap = new HashMap<String, File>(files.length);
+        for (String fileName : files) {
+            File f = new File(rootDirectory, fileName);
+            fileMap.put(fileName, f);
+        }
+        return createBatchWithFileAttachments(jobInfo, batchContent, fileMap);
+    }
+
+    public BatchInfo createBatchWithFileAttachments(JobInfo jobInfo, InputStream batchContent,
+            Map<String, File> attachedFiles) throws AsyncApiException {
+
+        Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>(attachedFiles.size());
+        for (Map.Entry<String, File> entry : attachedFiles.entrySet()) {
+            final File file = entry.getValue();
+            try {
+                inputStreamMap.put(entry.getKey(), new FileInputStream(file));
+            } catch (IOException e) {
+                throw new AsyncApiException("Failed to create batch. Could not read file : " + file,
+                        AsyncExceptionCode.ClientInputError, e);
+            }
+        }
+        return createBatchWithInputStreamAttachments(jobInfo, batchContent, inputStreamMap);
+    }
+
+    /**
+     * @param jobInfo
+     *            Parent job for new batch.
+     * @param batchContent
+     *            InputStream containing the xml or csv content of the batch, or null only if request.txt is contained
+     *            in attachments map
+     * @param attachments
+     *            Map of attachments where the key is the filename to be used in the zip file and the value is the
+     *            InputStream representing that file.
+     * @return BatchInfo of uploaded batch.
+     */
+    public BatchInfo createBatchWithInputStreamAttachments(JobInfo jobInfo, InputStream batchContent,
+            Map<String, InputStream> attachments) throws AsyncApiException {
+
+        if (batchContent != null && attachments.get("request.txt") != null)
+            throw new AsyncApiException("Request content cannot be included as both input stream and attachment",
+                    AsyncExceptionCode.ClientInputError);
+        try {
+            String endpoint = getRestEndpoint();
+            endpoint = endpoint + "job/" + jobInfo.getId() + "/batch";
+            JdkHttpTransport transport = new JdkHttpTransport(config);
+            ZipOutputStream zipOut = new ZipOutputStream(transport.connect(endpoint, getHeaders(getContentTypeString(
+                    jobInfo.getContentType(), true)), false));
+
+            try {
+                if (batchContent != null) {
+                    zipOut.putNextEntry(new ZipEntry("request.txt"));
+                    FileUtil.copy(batchContent, zipOut, false);
+                }
+                for (Map.Entry<String, InputStream> entry : attachments.entrySet()) {
+                    zipOut.putNextEntry(new ZipEntry(entry.getKey()));
+                    FileUtil.copy(entry.getValue(), zipOut, false);
+                }
+            } finally {
+                zipOut.close();
+            }
+
+            InputStream result = transport.getContent();
+            return BatchRequest.loadBatchInfo(result);
+        } catch (IOException e) {
+            throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
+        } catch (PullParserException e) {
+            throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
+        } catch (ConnectionException e) {
+            throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
+        }
+    }
+
+    private String getContentTypeString(ContentType contentType, boolean isZip) throws AsyncApiException {
+        ContentType ct = contentType == null ? ContentType.XML : contentType;
+        if (isZip) {
+            switch (ct) {
+            case ZIP_CSV:
+                return ZIP_CSV_CONTENT_TYPE;
+            case ZIP_XML:
+                return ZIP_XML_CONTENT_TYPE;
+            default:
+                // non zip content type
+                throw new AsyncApiException("Invalid zip content type: " + contentType,
+                        AsyncExceptionCode.ClientInputError);
+            }
+        } else {
+            switch (ct) {
+            case XML:
+                return XML_CONTENT_TYPE;
+            case CSV:
+                return CSV_CONTENT_TYPE;
+            default:
+                // zip content type
+                throw new AsyncApiException("Not expecting zip content type: " + contentType,
+                        AsyncExceptionCode.ClientInputError);
+            }
         }
     }
 
@@ -164,11 +284,9 @@ public class RestConnection {
             String endpoint = getRestEndpoint();
             JdkHttpTransport transport = new JdkHttpTransport(config);
             endpoint = endpoint + "job/" + job.getId() + "/batch";
-
-            if (job.getContentType() == ContentType.CSV) {
-                throw new AsyncApiException("This method can only be used with xml content type",
-                        AsyncExceptionCode.ClientInputError);
-            }
+            ContentType ct = job.getContentType();
+            if (ct != null && ct != ContentType.XML) { throw new AsyncApiException(
+                    "This method can only be used with xml content type", AsyncExceptionCode.ClientInputError); }
 
             OutputStream out = transport.connect(endpoint, getHeaders(XML_CONTENT_TYPE));
             return new BatchRequest(transport, out);
@@ -179,7 +297,7 @@ public class RestConnection {
 
     public BatchInfoList getBatchInfoList(String jobId) throws AsyncApiException {
         try {
-            String endpoint  = getRestEndpoint() + "job/" + jobId + "/batch/";
+            String endpoint = getRestEndpoint() + "job/" + jobId + "/batch/";
             URL url = new URL(endpoint);
             InputStream stream = doHttpGet(url);
 
@@ -199,7 +317,7 @@ public class RestConnection {
 
     public BatchInfo getBatchInfo(String jobId, String batchId) throws AsyncApiException {
         try {
-            String endpoint  = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId;
+            String endpoint = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId;
             URL url = new URL(endpoint);
             InputStream stream = doHttpGet(url);
 
@@ -217,10 +335,9 @@ public class RestConnection {
         }
     }
 
-
     public BatchResult getBatchResult(String jobId, String batchId) throws AsyncApiException {
         try {
-            String endpoint  = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/result";
+            String endpoint = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/result";
             URL url = new URL(endpoint);
             InputStream stream = doHttpGet(url);
 
@@ -240,14 +357,13 @@ public class RestConnection {
 
     public InputStream getBatchResultStream(String jobId, String batchId) throws AsyncApiException {
         try {
-            String endpoint  = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/result";
+            String endpoint = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/result";
             URL url = new URL(endpoint);
             return doHttpGet(url);
         } catch (IOException e) {
             throw new AsyncApiException("Failed to get result ", AsyncExceptionCode.ClientInputError, e);
         }
     }
-
 
     private InputStream doHttpGet(URL url) throws IOException, AsyncApiException {
         HttpURLConnection connection = JdkHttpTransport.createConnection(config, url, null);
@@ -257,7 +373,7 @@ public class RestConnection {
         InputStream in;
         try {
             in = connection.getInputStream();
-        } catch(IOException e) {
+        } catch (IOException e) {
             success = false;
             in = connection.getErrorStream();
         }
@@ -276,9 +392,8 @@ public class RestConnection {
                 while (it.hasNext()) {
                     MessageHandler handler = it.next();
                     if (handler instanceof MessageHandlerWithHeaders) {
-                        ((MessageHandlerWithHeaders) handler)
-                                .handleRequest(url, new byte[0], null);
-                        ((MessageHandlerWithHeaders) handler).handleResponse(url, bytes, connection.getHeaderFields());
+                        ((MessageHandlerWithHeaders)handler).handleRequest(url, new byte[0], null);
+                        ((MessageHandlerWithHeaders)handler).handleResponse(url, bytes, connection.getHeaderFields());
                     } else {
                         handler.handleRequest(url, new byte[0]);
                         handler.handleResponse(url, bytes);

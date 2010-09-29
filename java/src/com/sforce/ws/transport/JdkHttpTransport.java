@@ -26,7 +26,8 @@
 package com.sforce.ws.transport;
 
 import java.io.*;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
@@ -64,7 +65,12 @@ public class JdkHttpTransport implements Transport {
     }
 
     public OutputStream connect(String uri, HashMap<String, String> httpHeaders) throws IOException {
-        return connectLocal(uri, httpHeaders);
+        return connectLocal(uri, httpHeaders, true);
+    }
+
+    public OutputStream connect(String uri, HashMap<String, String> httpHeaders, boolean enableCompression)
+            throws IOException {
+        return connectLocal(uri, httpHeaders, enableCompression);
     }
 
     @Override
@@ -83,24 +89,21 @@ public class JdkHttpTransport implements Transport {
     }
 
     private OutputStream connectLocal(String uri, HashMap<String, String> httpHeaders) throws IOException {
-        url = new URL(uri);
+        return connectLocal(uri, httpHeaders, true);
+    }
 
-        connection = createConnection(config, url, httpHeaders);
-        connection.setRequestMethod("POST");
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        if (config.useChunkedPost()) {
-            connection.setChunkedStreamingMode(4096);
-        }
+    private OutputStream connectLocal(String uri, HashMap<String, String> httpHeaders, boolean enableCompression)
+            throws IOException {
+        return wrapOutput(connectRaw(uri, httpHeaders, enableCompression), enableCompression);
+    }
 
-
-        OutputStream output = connection.getOutputStream();
-
+    private OutputStream wrapOutput(OutputStream output, boolean enableCompression) throws IOException {
         if (config.getMaxRequestSize() > 0) {
             output = new LimitingOutputStream(config.getMaxRequestSize(), output);
         }
 
-        if (config.isCompression()) {
+        // when we are writing a zip file we don't bother with compression
+        if (enableCompression && config.isCompression()) {
             output = new GZIPOutputStream(output);
         }
 
@@ -115,8 +118,28 @@ public class JdkHttpTransport implements Transport {
         return output;
     }
 
+    private OutputStream connectRaw(String uri, HashMap<String, String> httpHeaders, boolean enableCompression)
+            throws IOException {
+        url = new URL(uri);
+
+        connection = createConnection(config, url, httpHeaders, enableCompression);
+        connection.setRequestMethod("POST");
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        if (config.useChunkedPost()) {
+            connection.setChunkedStreamingMode(4096);
+        }
+
+        return connection.getOutputStream();
+    }
+
     public static HttpURLConnection createConnection(ConnectorConfig config, URL url,
             HashMap<String, String> httpHeaders) throws IOException {
+        return createConnection(config, url, httpHeaders, true);
+    }
+
+    private static HttpURLConnection createConnection(ConnectorConfig config, URL url,
+            HashMap<String, String> httpHeaders, boolean enableCompression) throws IOException {
 
         if (config.isTraceMessage()) {
             config.getTraceStream().println( "WSC: Creating a new connection to " + url + " Proxy = " +
@@ -135,7 +158,7 @@ public class JdkHttpTransport implements Transport {
             }
         }
 
-        if (config.isCompression()) {
+        if (enableCompression && config.isCompression()) {
             connection.addRequestProperty("Content-Encoding", "gzip");
             connection.addRequestProperty("Accept-Encoding", "gzip");
         }
@@ -466,4 +489,5 @@ public class JdkHttpTransport implements Transport {
             config.getTraceStream().println("------------ Request end   ----------");
         }
     }
+
 }

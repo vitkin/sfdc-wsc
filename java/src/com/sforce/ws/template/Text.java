@@ -67,6 +67,7 @@ class Text implements JspNode {
         return sb.toString();
     }
 
+    @Override
     public void toJavaScript(StringBuilder sb) {
         for (int i = 0; i < text.length; i++) {
             sb.append(FileUtil.EOL);

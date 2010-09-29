@@ -26,6 +26,8 @@
 package com.sforce.ws.util;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class contains util method related to File handeling.
@@ -64,16 +66,25 @@ public class FileUtil {
     }
 
     public static void copy(InputStream from, OutputStream to) throws IOException {
+        copy(from, to, true);
+    }
+
+    public static void copy(InputStream from, OutputStream to, boolean closeOutput) throws IOException {
+        copy(from, true, to, closeOutput);
+    }
+
+    public static void copy(InputStream from, boolean closeInput, OutputStream to, boolean closeOutput)
+            throws IOException {
         try {
             byte[] buf = new byte[1024];
 
             int count;
-            while((count = from.read(buf, 0, buf.length)) != -1) {
+            while ((count = from.read(buf, 0, buf.length)) != -1) {
                 to.write(buf, 0, count);
             }
         } finally {
-            to.close();
-            from.close();
+            if (closeOutput) to.close();
+            if (closeInput) from.close();
         }
     }
 
@@ -109,5 +120,54 @@ public class FileUtil {
         }
 
         return dir.delete();
+    }
+
+    public static List<File> listFilesRecursive(File dir, boolean includeDirs) {
+        List<File> result = null;
+        if (dir.isDirectory()) {
+            result = new ArrayList<File>();
+            listFilesRecursive(dir, result, includeDirs);
+        }
+        return result;
+    }
+
+    private static void listFilesRecursive(File dir, List<File> result, boolean includeDirs) {
+        for (String child : dir.list()) {
+            File f = new File(dir, child);
+            if (f.isDirectory()) {
+                if (includeDirs) result.add(f);
+                listFilesRecursive(f, result, includeDirs);
+            } else {
+                result.add(f);
+            }
+        }
+    }
+
+    public static File makeTempDirectory(String dirName, boolean deleteIfExists) throws IOException {
+        return makeTempDirectory(null, dirName, deleteIfExists);
+    }
+
+    public static File makeTempDirectory(File parentTempDir, String dirName, boolean deleteIfExists) throws IOException {
+        File dir = new File(getSystemTempDirectory(parentTempDir), dirName);
+        if (dir.exists()) {
+            if (deleteIfExists)
+                deleteDir(dir);
+            else
+                throw new IOException("Cannot create directory that already exists: " + dir);
+        }
+        dir.mkdirs();
+        dir.deleteOnExit();
+        return dir;
+    }
+
+    public static File getSystemTempDirectory(File parentTempDir) throws IOException {
+        if (parentTempDir != null && parentTempDir.exists() && parentTempDir.isDirectory()) return parentTempDir;
+
+        final File t = File.createTempFile("java", ".tmp", parentTempDir);
+        try {
+            return t.getParentFile();
+        } finally {
+            t.delete();
+        }
     }
 }
