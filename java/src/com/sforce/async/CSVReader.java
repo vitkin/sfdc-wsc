@@ -1,7 +1,8 @@
 package com.sforce.async;
 
-import java.util.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * Copyright, 1999, SALESFORCE.com
@@ -269,6 +270,10 @@ public class CSVReader {
 
     public void setMaxRowsInFile(int newMax) {
         this.maxRowsInFile = newMax;
+    }
+
+    public void setMaxCharsInFile(int newMax) {
+        this.maxFileSizeInCharacters = newMax;
     }
     //*****************
     // Excption classes

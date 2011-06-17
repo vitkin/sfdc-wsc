@@ -83,8 +83,11 @@ public class FileUtil {
                 to.write(buf, 0, count);
             }
         } finally {
-            if (closeOutput) to.close();
-            if (closeInput) from.close();
+            try {
+                if (closeOutput) to.close();
+            } finally {
+                if (closeInput) from.close();
+            }
         }
     }
 

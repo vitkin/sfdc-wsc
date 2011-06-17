@@ -234,7 +234,11 @@ public class XmlObject implements XMLizable {
             		info = ((XmlTypeInfoProvider)value).getTypeInfo(name.getNamespaceURI(), name.getLocalPart(), typeMapper);
             	}
             	if (info == null) {
-            		QName xmlType = typeMapper.getXmlType(value.getClass().getName());
+                    QName xmlType = typeMapper.getXmlType(value.getClass().getName());
+                    for (Class<?> classForType = value.getClass(); classForType != Object.class && xmlType == null;
+                        classForType = classForType.getSuperclass()) {
+                        xmlType = typeMapper.getXmlType(classForType.getName());
+                    }
             		if (xmlType == null) {
             			//todo: throw right exception
             			throw new IOException("Unable to find xml type for :" + value.getClass().getName());

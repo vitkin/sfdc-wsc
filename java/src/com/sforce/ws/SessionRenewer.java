@@ -25,10 +25,19 @@
  */
 package com.sforce.ws;
 
+import javax.xml.namespace.QName;
+
 public interface SessionRenewer {
 
+	public class SessionRenewalHeader {
+		public QName name;
+		public Object headerElement;
+	}
+	
     /**
-     * This method is called when an expired session is detected
+     * This method is called when an expired session is detected. The returned object needs to be a valid SessionRenewAlHeader
+     * so that the current request can be re-tried. If the return value is null current call shall not be retired even though the
+     * session has been refreshed.
      */
-    void renewSession(ConnectorConfig config) throws ConnectionException;
+	SessionRenewalHeader renewSession(ConnectorConfig config) throws ConnectionException;
 }

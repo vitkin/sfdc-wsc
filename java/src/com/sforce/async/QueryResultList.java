@@ -3,41 +3,37 @@ package com.sforce.async;
 import com.sforce.ws.bind.TypeInfo;
 
 /**
- * BatchInfoList --
+ * QueryResultList --
  *
  * @author mcheenath
- * @since 160
+ * @since 170
  */
 
-public class BatchInfoList implements com.sforce.ws.bind.XMLizable {
+public class QueryResultList implements com.sforce.ws.bind.XMLizable {
 
     /**
      * Constructor
      */
-    public BatchInfoList() {
+    public QueryResultList() {
     }
 
     private static final String NAMESPACE = BulkConnection.NAMESPACE;
 
-    /**
-     * element  : batchInfo of type {urn:partner.soap.sforce.com}Error
-     * java type: com.sforce.soap.partner.wsc.Error[]
-     */
-    private static final TypeInfo batchInfo__typeInfo =
-            new com.sforce.ws.bind.TypeInfo(NAMESPACE, "batchInfo", NAMESPACE, "BatchInfo", 0, -1, true);
+    private static final TypeInfo result__typeInfo =
+            new TypeInfo(NAMESPACE, "result", "http://www.w3.org/2001/XMLSchema","string", 0, -1, true);
 
-    private boolean batchInfo__is_set = false;
+    private boolean result__is_set = false;
 
-    private BatchInfo[] batchInfo = new BatchInfo[0];
+    private String[] result = new String[0];
 
-    public BatchInfo[] getBatchInfo() {
-        return batchInfo;
+    public String[] getResult() {
+        return result;
     }
 
 
-    public void setBatchInfo(BatchInfo[] batchInfo) {
-        this.batchInfo = batchInfo;
-        batchInfo__is_set = true;
+    public void setResult(String[] result) {
+        this.result = result;
+        result__is_set = true;
     }
 
 
@@ -56,7 +52,7 @@ public class BatchInfoList implements com.sforce.ws.bind.XMLizable {
     protected void writeFields(com.sforce.ws.parser.XmlOutputStream __out,
                                com.sforce.ws.bind.TypeMapper __typeMapper) throws java.io.IOException {
 
-        __typeMapper.writeObject(__out, batchInfo__typeInfo, batchInfo, batchInfo__is_set);
+        __typeMapper.writeObject(__out, result__typeInfo, result, result__is_set);
     }
 
 
@@ -72,17 +68,17 @@ public class BatchInfoList implements com.sforce.ws.bind.XMLizable {
                               com.sforce.ws.bind.TypeMapper __typeMapper) throws java.io.IOException, com.sforce.ws.ConnectionException {
 
         __in.peekTag();
-        if (__typeMapper.isElement(__in, batchInfo__typeInfo)) {
-            setBatchInfo((BatchInfo[]) __typeMapper.readObject(__in, batchInfo__typeInfo, BatchInfo[].class));
+        if (__typeMapper.isElement(__in, result__typeInfo)) {
+            setResult((String[]) __typeMapper.readObject(__in, result__typeInfo, String[].class));
         }
     }
 
     @Override
     public String toString() {
-        java.lang.StringBuilder sb = new java.lang.StringBuilder();
-        sb.append("[BatchInfoList ");
-        sb.append(" batchInfo=");
-        sb.append("'").append(com.sforce.ws.util.Verbose.toString(batchInfo)).append("'\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("[ResultList ");
+        sb.append(" result=");
+        sb.append("'").append(com.sforce.ws.util.Verbose.toString(result)).append("'\n");
         sb.append("]\n");
         return sb.toString();
     }

@@ -138,7 +138,7 @@ public class JdkHttpTransport implements Transport {
         return createConnection(config, url, httpHeaders, true);
     }
 
-    private static HttpURLConnection createConnection(ConnectorConfig config, URL url,
+    public static HttpURLConnection createConnection(ConnectorConfig config, URL url,
             HashMap<String, String> httpHeaders, boolean enableCompression) throws IOException {
 
         if (config.isTraceMessage()) {
@@ -229,6 +229,13 @@ public class JdkHttpTransport implements Transport {
             }
 
             if (config.isTraceMessage()) {
+                Map<String, List<String>> headers = connection.getHeaderFields();
+                for (Map.Entry header : headers.entrySet()) {
+                    config.getTraceStream().print(header.getKey());
+                    config.getTraceStream().print("=");
+                    config.getTraceStream().println(header.getValue());
+                }
+                
                 new TeeInputStream(config, bytes);
             }
         }
@@ -414,6 +421,10 @@ public class JdkHttpTransport implements Transport {
         public LimitingOutputStream(int maxSize, OutputStream out) {
             this.maxSize = maxSize;
             this.out = out;
+        }
+
+        public int getSize() {
+            return size;
         }
 
         @Override

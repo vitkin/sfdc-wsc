@@ -9,7 +9,8 @@
   </target>
 
   <path id="wsc.class.path">
-    <pathelement location="${wsc.root}/java/ext/js-1.7R2.jar"/>
+  	<pathelement location="${wsc.root}/java/ext/gson-1.6.jar"/>
+  	<pathelement location="${wsc.root}/java/ext/js-1.7R2.jar"/>
     <pathelement location="${wscclasses.dir}"/>
   </path>
 
@@ -40,6 +41,9 @@
   <target name="build.jar">
     <mkdir dir="${wsc.root}/dist/temp" />
 
+    <unzip src="${wsc.root}/java/ext/gson-1.6.jar"
+    	dest="${wsc.root}/dist/temp" />
+  	
     <unzip src="${wsc.root}/java/ext/js-1.7R2.jar"
            dest="${wsc.root}/dist/temp" />
 
@@ -53,6 +57,8 @@
   </target>
 
   <target name="copy-template">
+    <copy file="${wsc.root}/dist/wsc_license.html"
+              todir="${wscclasses.dir}"/>
     <copy file="${wscsrc.dir}/com/sforce/ws/tools/type.template"
               todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
     <copy file="${wscsrc.dir}/com/sforce/ws/tools/connection.template"

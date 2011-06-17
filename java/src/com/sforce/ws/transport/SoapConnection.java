@@ -101,7 +101,10 @@ public class SoapConnection {
                     if (config.getSessionRenewer() == null || !firstTime) {
                         throw (ConnectionException) se.getCause();
                     } else {
-                        config.getSessionRenewer().renewSession(config);
+                    	SessionRenewer.SessionRenewalHeader sessionHeader = config.getSessionRenewer().renewSession(config);
+                    	if (sessionHeader != null) {
+                            addHeader(sessionHeader.name, sessionHeader.headerElement);
+                    	}
                     }
                 }
                 firstTime = false;
@@ -226,7 +229,7 @@ public class SoapConnection {
             e = (ConnectionException) typeMapper.readObject(xin, info, ConnectionException.class);
             if (e instanceof SoapFaultException) {
                 ((SoapFaultException)e).setFaultCode(faultCode);
-                if (faultstring != null && faultstring.contains("Session timed out") && "INVALID_SESSION_ID".equals(faultCode.getLocalPart())) {
+                if (faultstring != null && (faultstring.contains("Session timed out") || faultstring.contains("Session not found")) && "INVALID_SESSION_ID".equals(faultCode.getLocalPart())) {
                     e = new SessionTimedOutException(faultstring, e);
                 }
             }

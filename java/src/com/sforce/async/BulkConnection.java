@@ -23,7 +23,7 @@ import com.sforce.ws.util.FileUtil;
  * @author mcheenath
  * @since 160
  */
-public class RestConnection {
+public class BulkConnection {
 
     public static final String NAMESPACE = "http://www.force.com/2009/06/asyncapi/dataload";
     public static final String SESSION_ID = "X-SFDC-Session";
@@ -41,16 +41,22 @@ public class RestConnection {
     private HashMap<String, String> headers = new HashMap<String, String>();
     public static final TypeMapper typeMapper = new TypeMapper();
 
-    public RestConnection(ConnectorConfig config) throws AsyncApiException {
-        if (config == null) { throw new AsyncApiException("config can not be null", AsyncExceptionCode.ClientInputError); }
+    public BulkConnection(ConnectorConfig config) throws AsyncApiException {
+        if (config == null) {
+            throw new AsyncApiException("config can not be null", AsyncExceptionCode.ClientInputError);
+        }
 
-        if (config.getRestEndpoint() == null) { throw new AsyncApiException("rest endpoint cannot be null",
-                AsyncExceptionCode.ClientInputError); }
+        if (config.getRestEndpoint() == null) {
+            throw new AsyncApiException("rest endpoint cannot be null",
+                AsyncExceptionCode.ClientInputError);
+        }
 
         this.config = config;
 
-        if (config.getSessionId() == null) { throw new AsyncApiException("session ID not found",
-                AsyncExceptionCode.ClientInputError); }
+        if (config.getSessionId() == null) {
+            throw new AsyncApiException("session ID not found",
+                AsyncExceptionCode.ClientInputError);
+        }
     }
 
     public JobInfo createJob(String object, String operation) throws AsyncApiException {
@@ -144,6 +150,7 @@ public class RestConnection {
             FileUtil.copy(input, out);
 
             InputStream result = transport.getContent();
+            if (!transport.isSuccessful()) parseAndThrowException(result);
             return BatchRequest.loadBatchInfo(result);
         } catch (IOException e) {
             throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
@@ -365,6 +372,45 @@ public class RestConnection {
         }
     }
 
+    public InputStream getBatchRequestInputStream(String jobId, String batchId) throws AsyncApiException {
+        try {
+            String endpoint = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/request";
+            URL url = new URL(endpoint);
+            return doHttpGet(url);
+        } catch(IOException e) {
+            throw new AsyncApiException("Failed to get request ", AsyncExceptionCode.ClientInputError, e);
+        }
+    }
+
+    public QueryResultList getQueryResultList(String jobId, String batchId) throws AsyncApiException {
+        InputStream stream = getBatchResultStream(jobId, batchId);
+
+        try {
+            XmlInputStream xin = new XmlInputStream();
+            xin.setInput(stream, "UTF-8");
+            QueryResultList result = new QueryResultList();
+            result.load(xin, typeMapper);
+            return result;
+        } catch (ConnectionException e) {
+            throw new AsyncApiException("Failed to parse query result list ", AsyncExceptionCode.ClientInputError, e);
+        } catch (PullParserException e) {
+            throw new AsyncApiException("Failed to parse query result list ", AsyncExceptionCode.ClientInputError, e);
+        } catch (IOException e) {
+            throw new AsyncApiException("Failed to parse query result list ", AsyncExceptionCode.ClientInputError, e);
+        }
+    }
+
+    public InputStream getQueryResultStream(String jobId, String batchId, String resultId) throws AsyncApiException {
+        try {
+            String endpoint = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/result" + "/" + resultId;
+            URL url = new URL(endpoint);
+            return doHttpGet(url);
+        } catch (IOException e) {
+            throw new AsyncApiException("Failed to get result ", AsyncExceptionCode.ClientInputError, e);
+        }
+    }
+    
+
     private InputStream doHttpGet(URL url) throws IOException, AsyncApiException {
         HttpURLConnection connection = JdkHttpTransport.createConnection(config, url, null);
         connection.setRequestProperty(SESSION_ID, config.getSessionId());
@@ -402,6 +448,22 @@ public class RestConnection {
             }
 
             if (config.isTraceMessage()) {
+                config.getTraceStream().println(url.toExternalForm());
+
+                Map<String, List<String>> headers = connection.getHeaderFields();
+                for (Map.Entry<String, List<String>>entry : headers.entrySet()) {
+                    StringBuffer sb = new StringBuffer();
+                    List<String> values = entry.getValue();
+
+                    if (values != null) {
+                        for (String v : values) {
+                            sb.append(v);
+                        }
+                    }
+
+                    config.getTraceStream().println(entry.getKey() + ": " + sb.toString());
+                }
+
                 new JdkHttpTransport.TeeInputStream(config, bytes);
             }
         }
