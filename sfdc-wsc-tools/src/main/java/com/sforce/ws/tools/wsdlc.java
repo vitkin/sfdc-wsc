@@ -85,8 +85,10 @@ public class wsdlc {
             generateAggregateResult(definitions);
         }
 
-        compileTypes();
-        generateJarFile(jarFile);
+        if (Boolean.parseBoolean(System.getProperty("create-jar", "true"))) {
+            compileTypes();
+            generateJarFile(jarFile);
+        }
 
         if (Boolean.parseBoolean(System.getProperty("del-temp-dir", "true"))) {
             Verbose.log("Delete temp dir: " + tempDir.getAbsolutePath());
@@ -383,8 +385,8 @@ public class wsdlc {
 
             Verbose.log("Compiling to target " + target + "... ");
 
-            String[] args = { "-g", "-d", tempDir.getAbsolutePath(), "-sourcepath", tempDir.getAbsolutePath(),
-                    "-target", target };
+            String[] args = { "-g", /*"-verbose",*/ "-d", tempDir.getAbsolutePath(), "-sourcepath", tempDir.getAbsolutePath(),
+                    "-target", target, "-source", target};
 
             String[] call = new String[args.length + files.length];
 
