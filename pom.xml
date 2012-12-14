@@ -1,0 +1,134 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>com.sforce</groupId>
+  <artifactId>sfdc-wsc</artifactId>
+  <packaging>pom</packaging>
+  
+  <name>sfdc-wsc</name>
+  
+  <version>26.0</version>
+  
+  <url>http://code.google.com/p/sfdc-wsc-maven/</url>
+  
+  <issueManagement>
+    <system>Google Code</system>
+    <url>http://code.google.com/p/sfdc-wsc-maven/issues/list</url>
+  </issueManagement>
+  
+  <licenses>
+    <license>
+      <name>BSD-3-Clause</name>
+      <url>http://opensource.org/licenses/BSD-3-Clause</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  
+  <scm>
+    <connection>scm:git:https://code.google.com/p/sfdc-wsc-maven/</connection>
+    <developerConnection>scm:git:https://code.google.com/p/sfdc-wsc-maven/</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://code.google.com/p/sfdc-wsc-maven/</url>
+  </scm>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.${project.jdk.version}</source>
+          <target>1.${project.jdk.version}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <classifier>jdk1${project.jdk.version}</classifier>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <profiles>
+    <profile>
+      <id>attach-sources</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <classifier>jdk1${project.jdk.version}</classifier>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>attach-javadocs</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <classifier>${sfdc.wsdl.type}-jdk1${project.jdk.version}</classifier>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.jdk.version>6</project.jdk.version>
+    <project.generated>${basedir}/target/generated-sources/sfdc-ws-wsc</project.generated>
+  </properties>
+  
+  <modules>
+    <module>sfdc-wsc-ws</module>
+    <module>sfdc-wsc-ws-gae</module>
+    <module>sfdc-wsc-async</module>
+    <module>sfdc-wsc-bulk</module>
+    <module>sfdc-wsc-rest</module>
+    <module>sfdc-wsc-tools</module>
+    <module>sfdc-wsc-ws-apex</module>
+    <module>sfdc-wsc-ws-enterprise</module>
+    <module>sfdc-wsc-ws-metadata</module>
+    <module>sfdc-wsc-ws-partner</module>
+  </modules>
+</project>

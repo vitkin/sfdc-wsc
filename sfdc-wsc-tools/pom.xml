@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>com.sforce.sfdc-wsc</groupId>
+  <artifactId>sfdc-wsc-tools</artifactId>
+  <packaging>jar</packaging>
+  
+  <name>sfdc-wsc-tools</name>
+  
+  <parent>
+    <artifactId>sfdc-wsc</artifactId>
+    <groupId>com.sforce</groupId>
+    <version>26.0</version>
+  </parent>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.12.4</version>
+        <configuration>
+          <systemProperties>
+            <property>
+              <name>runTests</name>
+              <value>false</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+ 
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.birt.runtime.3_7_1</groupId>
+      <artifactId>org.mozilla.javascript</artifactId>
+      <version>1.7.2</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>sfdc-wsc-ws</artifactId>
+      <version>${project.version}</version>
+      <classifier>jdk1${project.jdk.version}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>sfdc-wsc-rest</artifactId>
+      <version>${project.version}</version>
+      <classifier>jdk1${project.jdk.version}</classifier>
+    </dependency>
+  </dependencies>
+</project>
