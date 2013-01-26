@@ -43,6 +43,7 @@ import com.sforce.ws.util.FileUtil;
  * JDK URLConnection.
  *
  * @author http://cheenath.com
+ * @author jesperudby
  * @version 1.0
  * @since 1.0  Nov 30, 2005
  */
@@ -192,16 +193,16 @@ public class JdkHttpTransport implements Transport {
         InputStream in;
 
         try {
-            successful = true;
             in = connection.getInputStream();
         } catch (IOException e) {
-            successful = false;
             in = connection.getErrorStream();
             if (in == null) {
                 throw e;
             }
         }
 
+        this.successful = connection.getResponseCode() < 400;
+        
         String encoding = connection.getHeaderField("Content-Encoding");
 
         if (config.getMaxResponseSize() > 0) {
@@ -230,7 +231,7 @@ public class JdkHttpTransport implements Transport {
 
             if (config.isTraceMessage()) {
                 Map<String, List<String>> headers = connection.getHeaderFields();
-                for (Map.Entry header : headers.entrySet()) {
+                for (Map.Entry<String, List<String>> header : headers.entrySet()) {
                     config.getTraceStream().print(header.getKey());
                     config.getTraceStream().print("=");
                     config.getTraceStream().println(header.getValue());

@@ -45,6 +45,7 @@ import com.sforce.ws.wsdl.*;
  * wsdlc is a tool that can generate java stubs from WSDL.
  *
  * @author http://cheenath
+ * @author jesperudby
  * @version 1.0
  * @since 1.0  Nov 22, 2005
  */
@@ -55,8 +56,10 @@ public class wsdlc {
     private ArrayList<String> javaFiles = new ArrayList<String>();
     private String packagePrefix = null;
     private boolean laxMinOccursMode;
+    private boolean markGenerated;
     private static final String LAX_MINOCCURS = "lax-minoccurs-checking";
     private static final String PACKAGE_PREFIX = "package-prefix";
+    private static final String MARK_GENERATED = "mark-generated";
     private static final String SOBJECT_TEMPLATE = "com/sforce/ws/tools/sobject.template";
     private static final String AGG_RESULT_TEMPLATE = "com/sforce/ws/tools/aggregateResult.template";
 
@@ -70,6 +73,8 @@ public class wsdlc {
 
         packagePrefix = System.getProperty(PACKAGE_PREFIX);
         laxMinOccursMode = System.getProperty(LAX_MINOCCURS) != null;
+        markGenerated = System.getProperty(MARK_GENERATED) != null;
+        		
         typeMapper.setPackagePrefix(packagePrefix);
 
         Definitions definitions = WsdlFactory.create(wsdlFile);
@@ -279,7 +284,7 @@ public class wsdlc {
             ComplexType complexType = complexTypes.next();
             if (!typeMapper.isWellKnownType(complexType.getSchema().getTargetNamespace(), complexType.getName())) {
                 ComplexTypeGenerator typeGenerator =
-                        new ComplexTypeGenerator(types, schema, complexType, tempDir, typeMapper, laxMinOccursMode);
+                        new ComplexTypeGenerator(types, schema, complexType, tempDir, typeMapper, laxMinOccursMode, markGenerated);
                 String file = typeGenerator.generate();
                 javaFiles.add(file);
             }
@@ -290,7 +295,7 @@ public class wsdlc {
             SimpleType simpleType = simpleTypes.next();
             if (!typeMapper.isWellKnownType(simpleType.getSchema().getTargetNamespace(), simpleType.getName())) {
                 SimpleTypeGenerator typeGenerator =
-                        new SimpleTypeGenerator(types, schema, simpleType, tempDir, typeMapper);
+                        new SimpleTypeGenerator(types, schema, simpleType, tempDir, typeMapper, markGenerated);
                 String file = typeGenerator.generate();
                 javaFiles.add(file);
             }
@@ -360,12 +365,11 @@ public class wsdlc {
             }
         }
 
-        @SuppressWarnings("unchecked")
         private void findCompiler(ClassLoader loader)
                 throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException {
 
-            Class c = loader.loadClass("com.sun.tools.javac.Main");
-            Class arg = (new String[0]).getClass();
+            Class<?> c = loader.loadClass("com.sun.tools.javac.Main");
+            Class<?> arg = (new String[0]).getClass();
             main = c.newInstance();
             method = c.getMethod("compile", arg);
         }

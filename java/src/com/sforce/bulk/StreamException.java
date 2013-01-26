@@ -8,6 +8,7 @@ package com.sforce.bulk;
  * Date: Dec 14, 2010
  */
 public class StreamException extends Exception {
+    private static final long serialVersionUID = 1L;
 
     public StreamException(String message) {
         super(message);

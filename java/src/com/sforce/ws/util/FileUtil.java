@@ -41,7 +41,7 @@ public class FileUtil {
     /**
      * end of line
      */
-    public static final String EOL = System.getProperty("line.separator");
+    public static final String EOL = "\n";
 
     /**
      * @param file

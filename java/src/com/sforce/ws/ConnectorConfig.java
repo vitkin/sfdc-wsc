@@ -25,17 +25,27 @@
  */
 package com.sforce.ws;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import com.sforce.ws.transport.JdkHttpTransport;
+import com.sforce.ws.transport.Transport;
 import com.sforce.ws.util.Verbose;
 
 /**
  * This class contains a set of configuration properties
  *
  * @author http://cheenath.com
+ * @author jesperudby
  * @version 1.0
  * @since 1.0  Dec 19, 2005
  */
@@ -63,16 +73,16 @@ public class ConnectorConfig {
     private int maxRequestSize;
     private int maxResponseSize;
     private boolean validateSchema = true;
-    private Class transport = JdkHttpTransport.class;
+    private Class<? extends Transport> transport = JdkHttpTransport.class;
     private SessionRenewer sessionRenewer;
 
     public static final ConnectorConfig DEFAULT = new ConnectorConfig();
 
-    public Class getTransport() {
+    public Class<? extends Transport> getTransport() {
         return transport;
     }
 
-    public void setTransport(Class transport) {
+    public void setTransport(Class<? extends Transport> transport) {
         this.transport = transport;
     }
 

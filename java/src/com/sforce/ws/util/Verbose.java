@@ -28,6 +28,8 @@ package com.sforce.ws.util;
 import java.io.PrintStream;
 import java.lang.reflect.Array;
 
+import com.sforce.ws.tools.VersionInfo;
+
 
 /**
  * Util class to log debug messages.
@@ -76,7 +78,7 @@ public class Verbose {
 
     StackTraceElement[] stack = Thread.currentThread().getStackTrace();
     StackTraceElement element = stack[3];
-    out.print("[WSC]");
+    out.print("[WSC" + VersionInfo.VERSION + "]");
     String className = element.getClassName();
     int index = className.lastIndexOf(".");
     className = className.substring(index+1);

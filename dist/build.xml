@@ -1,79 +1,108 @@
 <project name="wsc" basedir="." default="all" >
 
-  <property name="wsc.root" value=".." />
-  <property name="wscsrc.dir" value="${wsc.root}/java/src" />
-  <property name="wscclasses.dir" value="${wsc.root}/java/classes" />
+	<property name="version" value="23" />
+	<property name="wsc.root" value=".." />
+	<property name="wscsrc.dir" value="${wsc.root}/java/src" />
+	<property name="wscsrc.build" value="${wsc.root}/java/build" />
+	<property name="wscclasses.dir" value="${wsc.root}/java/classes" />
 
-  <target name="usage">
-    <echo message="Usage: ant all" />
-  </target>
+	<tstamp>
+		<format property="NOW" pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="UTC"/>
+		<format property="YEAR" pattern="yyyy" timezone="UTC"/>
+	</tstamp>
 
-  <path id="wsc.class.path">
-  	<pathelement location="${wsc.root}/java/ext/gson-1.6.jar"/>
-  	<pathelement location="${wsc.root}/java/ext/js-1.7R2.jar"/>
-    <pathelement location="${wscclasses.dir}"/>
-  </path>
+	<target name="usage">
+		<echo message="Usage: ant all" />
+	</target>
 
-  <target name="all" depends="clean,build,build.jar" />
+	<path id="wsc.class.path">
+		<pathelement location="${wsc.root}/java/ext/gson-1.6.jar"/>
+		<pathelement location="${wsc.root}/java/ext/js-1.7R2.jar"/>
+		<pathelement location="${wscclasses.dir}"/>
+	</path>
 
-  <target name="clean">
-    <delete dir="${wscclasses.dir}" />
-    <delete dir="${wsc.root}/dist/temp" />
-    <delete file="${wsc.root}/dist/wsc.jar" />
-  </target>
+	<target name="all" depends="clean,build,build.jar" />
 
-  <target name="build">
-    <mkdir dir="${wscclasses.dir}" />
+	<target name="clean">
+		<delete dir="${wscclasses.dir}" />
+		<delete dir="${wscsrc.build}" />
+		<delete dir="${wsc.root}/dist/temp" />
+		<delete file="${wsc.root}/dist/wsc-${version}.jar" />
+	</target>
 
-  	<condition property="ant.build.javac.target" value="${compileTarget}">
-  	    <isset property="compileTarget" />
-  	</condition>
+	<target name="build">
+		<mkdir dir="${wscclasses.dir}" />
+		<mkdir dir="${wscsrc.build}" />
 
-  	<javac srcdir="${wscsrc.dir}"
+		<condition property="ant.build.javac.target" value="${compileTarget}">
+			<isset property="compileTarget" />
+		</condition>
+
+		<copy todir="${wscsrc.build}">
+			<fileset dir="${wscsrc.dir}"/>
+			<filterset>
+				<filter token="VERSION" value="${version}" />
+				<filter token="BUILD_TZ" value="${NOW}" />
+				<filter token="YEAR" value="${YEAR}" />
+			</filterset>
+		</copy>
+
+		<javac srcdir="${wscsrc.build}"
            destdir="${wscclasses.dir}"
            classpathref="wsc.class.path"
            debug="on" >
-    </javac>
+		</javac>
 
-    <antcall target="copy-template" />
-  </target>
+		<antcall target="copy-template" />
+	</target>
 
-  <target name="build.jar">
-    <mkdir dir="${wsc.root}/dist/temp" />
+	<target name="build.jar">
+		<mkdir dir="${wsc.root}/dist/temp" />
 
-    <unzip src="${wsc.root}/java/ext/gson-1.6.jar"
+		<unzip src="${wsc.root}/java/ext/gson-1.6.jar"
     	dest="${wsc.root}/dist/temp" />
-  	
-    <unzip src="${wsc.root}/java/ext/js-1.7R2.jar"
+
+		<unzip src="${wsc.root}/java/ext/js-1.7R2.jar"
            dest="${wsc.root}/dist/temp" />
 
-    <jar destfile="${wsc.root}/dist/wsc.jar">
-      <fileset dir="${wscsrc.dir}" />
-      <fileset dir="${wscclasses.dir}" />
-      <fileset dir="${wsc.root}/dist/temp/" />
-    </jar>
+		<manifest file="${wsc.root}/dist/temp/META-INF/MANIFEST.MF">
+			<attribute name="Built-By" value="${user.name}"/>
+			<attribute name="Main-Class" value="com.sforce.ws.tools.wsdlc"/>
+			<attribute name="Implementation-Version" value="${version}"/>
+			<attribute name="Built-Date" value="${NOW}"/>
+		</manifest>
 
-    <delete dir="${wsc.root}/dist/temp" />
-  </target>
+		<jar destfile="${wsc.root}/dist/wsc-${version}.jar" manifest="${wsc.root}/dist/temp/META-INF/MANIFEST.MF">
+			<fileset dir="${wscsrc.build}" />
+			<fileset dir="${wscclasses.dir}" />
+			<fileset dir="${wsc.root}/dist/temp/" />
+		</jar>
 
-  <target name="copy-template">
-    <copy file="${wsc.root}/dist/wsc_license.html"
-              todir="${wscclasses.dir}"/>
-    <copy file="${wscsrc.dir}/com/sforce/ws/tools/type.template"
+		<delete dir="${wsc.root}/dist/temp" />
+		<delete dir="${wscsrc.build}" />
+	</target>
+
+	<target name="copy-template">
+		<copy file="${wsc.root}/dist/wsc_license.html" todir="${wscclasses.dir}">
+			<filterset>
+				<filter token="VERSION" value="${version}" />
+				<filter token="YEAR" value="${YEAR}" />
+			</filterset>
+		</copy>
+		<copy file="${wscsrc.dir}/com/sforce/ws/tools/type.template" todir="${wscclasses.dir}/com/sforce/ws/tools/" />
+		<copy file="${wscsrc.dir}/com/sforce/ws/tools/connection.template"
               todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-    <copy file="${wscsrc.dir}/com/sforce/ws/tools/connection.template"
+		<copy file="${wscsrc.dir}/com/sforce/ws/tools/connector.template"
               todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-    <copy file="${wscsrc.dir}/com/sforce/ws/tools/connector.template"
+		<copy file="${wscsrc.dir}/com/sforce/ws/tools/sobject.template"
               todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-    <copy file="${wscsrc.dir}/com/sforce/ws/tools/sobject.template"
+		<copy file="${wscsrc.dir}/com/sforce/ws/tools/simpleType.template"
               todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-    <copy file="${wscsrc.dir}/com/sforce/ws/tools/simpleType.template"
+		<copy file="${wscsrc.dir}/com/sforce/ws/tools/aggregateResult.template"
               todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-       <copy file="${wscsrc.dir}/com/sforce/ws/tools/aggregateResult.template"
-              todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-    <copy file="${wscsrc.dir}/com/sforce/ws/runtime-classes.txt"
+		<copy file="${wscsrc.dir}/com/sforce/ws/runtime-classes.txt"
               todir="${wscclasses.dir}/com/sforce/ws/"/>
-  </target>
+	</target>
 
 
 </project>
