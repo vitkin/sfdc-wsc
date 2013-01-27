@@ -25,13 +25,26 @@
  */
 package com.sforce.ws.tools;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.jar.*;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
 import com.sforce.ws.bind.NameMapper;
 import com.sforce.ws.bind.TypeMapper;
@@ -39,7 +52,14 @@ import com.sforce.ws.template.Template;
 import com.sforce.ws.template.TemplateException;
 import com.sforce.ws.util.FileUtil;
 import com.sforce.ws.util.Verbose;
-import com.sforce.ws.wsdl.*;
+import com.sforce.ws.wsdl.ComplexType;
+import com.sforce.ws.wsdl.Definitions;
+import com.sforce.ws.wsdl.Schema;
+import com.sforce.ws.wsdl.SfdcApiType;
+import com.sforce.ws.wsdl.SimpleType;
+import com.sforce.ws.wsdl.Types;
+import com.sforce.ws.wsdl.WsdlFactory;
+import com.sforce.ws.wsdl.WsdlParseException;
 
 /**
  * wsdlc is a tool that can generate java stubs from WSDL.
@@ -50,16 +70,13 @@ import com.sforce.ws.wsdl.*;
  * @since 1.0  Nov 22, 2005
  */
 public class wsdlc {
-
     private File tempDir;
     private TypeMapper typeMapper = new TypeMapper();
     private ArrayList<String> javaFiles = new ArrayList<String>();
     private String packagePrefix = null;
     private boolean laxMinOccursMode;
-    private boolean markGenerated;
     private static final String LAX_MINOCCURS = "lax-minoccurs-checking";
     private static final String PACKAGE_PREFIX = "package-prefix";
-    private static final String MARK_GENERATED = "mark-generated";
     private static final String SOBJECT_TEMPLATE = "com/sforce/ws/tools/sobject.template";
     private static final String AGG_RESULT_TEMPLATE = "com/sforce/ws/tools/aggregateResult.template";
 
@@ -73,7 +90,6 @@ public class wsdlc {
 
         packagePrefix = System.getProperty(PACKAGE_PREFIX);
         laxMinOccursMode = System.getProperty(LAX_MINOCCURS) != null;
-        markGenerated = System.getProperty(MARK_GENERATED) != null;
         		
         typeMapper.setPackagePrefix(packagePrefix);
 
@@ -93,9 +109,13 @@ public class wsdlc {
         compileTypes();
         generateJarFile(jarFile);
 
-        if (Boolean.parseBoolean(System.getProperty("del-temp-dir", "true"))) {
+        String delTempDir = System.getProperty("del-temp-dir");
+        // only delete tempDir if specifically asked and if temp not given on cmd line
+        if ("true".equalsIgnoreCase(delTempDir) || (delTempDir == null && temp == null)) {
             Verbose.log("Delete temp dir: " + tempDir.getAbsolutePath());
-            Verbose.log("Set system property del-temp-dir=false to not delete temp dir.");
+            if (delTempDir == null) {
+            	Verbose.log("Set system property del-temp-dir=false to not delete temp dir.");
+            }
             FileUtil.deleteDir(tempDir);
         }
     }
@@ -111,8 +131,8 @@ public class wsdlc {
     }
 
     private void checkTargetFile(String jarFile) throws ToolsException {
-        if (!jarFile.endsWith(".jar")) {
-            throw new ToolsException("<jar-file> must have a .jar extension");
+        if (!jarFile.endsWith(".jar") && !jarFile.endsWith(".zip")) {
+            throw new ToolsException("<jar-file> must have a .jar/.zip extension");
         }
 
         File jf = new File(jarFile);
@@ -257,7 +277,8 @@ public class wsdlc {
 
     private InputStream getManifest() {
         String m = "Manifest-Version: 1.0\n" +
-                   "Created-By: 1.4.2_05-b04 (Sun Microsystems Inc.)\n";
+                   "Created-By: " + System.getProperty("java.runtime.version") + " ("  + System.getProperty("java.vm.specification.vendor") + ")\n" +
+                   "Built-By: " + System.getProperty("user.name") + " (WSC-" + VersionInfo.VERSION + ")\n";
 
         return new ByteArrayInputStream(m.getBytes());
     }
@@ -284,7 +305,7 @@ public class wsdlc {
             ComplexType complexType = complexTypes.next();
             if (!typeMapper.isWellKnownType(complexType.getSchema().getTargetNamespace(), complexType.getName())) {
                 ComplexTypeGenerator typeGenerator =
-                        new ComplexTypeGenerator(types, schema, complexType, tempDir, typeMapper, laxMinOccursMode, markGenerated);
+                        new ComplexTypeGenerator(types, schema, complexType, tempDir, typeMapper, laxMinOccursMode);
                 String file = typeGenerator.generate();
                 javaFiles.add(file);
             }
@@ -295,7 +316,7 @@ public class wsdlc {
             SimpleType simpleType = simpleTypes.next();
             if (!typeMapper.isWellKnownType(simpleType.getSchema().getTargetNamespace(), simpleType.getName())) {
                 SimpleTypeGenerator typeGenerator =
-                        new SimpleTypeGenerator(types, schema, simpleType, tempDir, typeMapper, markGenerated);
+                        new SimpleTypeGenerator(types, schema, simpleType, tempDir, typeMapper);
                 String file = typeGenerator.generate();
                 javaFiles.add(file);
             }
@@ -381,23 +402,27 @@ public class wsdlc {
 
         public void compile(String[] files) throws ToolsException {
             String target = System.getProperty("compileTarget");
-            if (target == null) {
-                target = "1.6";
+
+            Verbose.log("Compiling to target " + (target!=null ? target : "default" ) + "... ");
+
+            List<String> call = new ArrayList<String>();
+            call.add("-g");
+            
+            call.add("-d");
+            call.add(tempDir.getAbsolutePath());
+            
+            call.add("-sourcepath");
+            call.add(tempDir.getAbsolutePath());
+            
+            if (target != null) {
+            	call.add("-target");
+            	call.add(target);
             }
-
-            Verbose.log("Compiling to target " + target + "... ");
-
-            String[] args = { "-g", "-d", tempDir.getAbsolutePath(), "-sourcepath", tempDir.getAbsolutePath(),
-                    "-target", target };
-
-            String[] call = new String[args.length + files.length];
-
-            System.arraycopy(args, 0, call, 0, args.length);
-            System.arraycopy(files, 0, call, args.length, files.length);
-
-
+            
+            call.addAll(Arrays.asList(files));
+            
             try {
-                Integer result = (Integer) method.invoke(main, new Object[]{call});
+                Integer result = (Integer) method.invoke(main, new Object[]{call.toArray(new String[call.size()])});
                 if (result != 0) {
                     throw new ToolsException("Failed to compile");
                 }

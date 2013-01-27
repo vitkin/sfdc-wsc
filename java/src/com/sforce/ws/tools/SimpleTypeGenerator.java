@@ -36,7 +36,6 @@ import com.sforce.ws.wsdl.*;
  * SimpleTypeGenerator
  *
  * @author http://cheenath.com
- * @author jesperudby
  * @version 1.0
  * @since 1.0  Mar 7, 2006
  */
@@ -46,8 +45,8 @@ public class SimpleTypeGenerator extends TypeGenerator {
     private TypeMapper typeMapper;
     private static final Pattern DASH_PATTERN = Pattern.compile("-");
 
-    public SimpleTypeGenerator(Types types, Schema schema, SimpleType simpleType, File tempDir, TypeMapper typeMapper, boolean markGenerated) {
-        super(types, schema, simpleType.getName(), tempDir, markGenerated, typeMapper);
+    public SimpleTypeGenerator(Types types, Schema schema, SimpleType simpleType, File tempDir, TypeMapper typeMapper) {
+        super(types, schema, simpleType.getName(), tempDir, typeMapper);
         this.simpleType = simpleType;
         this.typeMapper = typeMapper;
     }

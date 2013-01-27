@@ -41,7 +41,6 @@ import com.sforce.ws.wsdl.*;
  * This class contains util methods used by type.template.
  *
  * @author http://cheenath
- * @author jesperudby
  * @version 1.0
  * @since 1.0  Nov 22, 2005
  */
@@ -51,8 +50,8 @@ public class ComplexTypeGenerator extends TypeGenerator {
     private static final JavaTypeMap javaTypeMap = javaTypeMap();
     private static final String TEMPLATE = "com/sforce/ws/tools/type.template";
 
-    public ComplexTypeGenerator(Types types, Schema schema, ComplexType complexType, File tempDir, TypeMapper typeMapper, boolean laxMinOccursMode, boolean markGenerated) {
-        super(types, schema, complexType.getName(), tempDir, markGenerated, typeMapper);
+    public ComplexTypeGenerator(Types types, Schema schema, ComplexType complexType, File tempDir, TypeMapper typeMapper, boolean laxMinOccursMode) {
+        super(types, schema, complexType.getName(), tempDir, typeMapper);
         this.complexType = complexType;
         this.laxMinOccursMode = laxMinOccursMode;
     }

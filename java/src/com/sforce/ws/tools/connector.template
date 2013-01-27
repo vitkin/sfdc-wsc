@@ -10,6 +10,14 @@ public class Connector {
 
   public static final String END_POINT = "<%=gen.endpoint()%>";
 
+  public static <%=gen.className%> newConnection(String username, String password, String authEndpoint) throws ConnectionException {
+    ConnectorConfig config = new ConnectorConfig();
+    config.setUsername(username);
+    config.setPassword(password);
+    config.setAuthEndpoint(authEndpoint);
+    return newConnection(config);
+  }
+
   public static <%=gen.className%> newConnection(String username, String password) throws ConnectionException {
     ConnectorConfig config = new ConnectorConfig();
     config.setUsername(username);
