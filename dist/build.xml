@@ -48,22 +48,22 @@
 		</copy>
 
 		<javac srcdir="${wscsrc.build}"
-           destdir="${wscclasses.dir}"
-           classpathref="wsc.class.path"
-           debug="on" >
+			destdir="${wscclasses.dir}"
+			classpathref="wsc.class.path"
+			debug="on" >
 		</javac>
 
-		<antcall target="copy-template" />
+		<antcall target="copy-license" />
 	</target>
 
 	<target name="build.jar">
 		<mkdir dir="${wsc.root}/dist/temp" />
 
 		<unzip src="${wsc.root}/java/ext/gson-1.6.jar"
-    	dest="${wsc.root}/dist/temp" />
+    		dest="${wsc.root}/dist/temp" />
 
 		<unzip src="${wsc.root}/java/ext/js-1.7R2.jar"
-           dest="${wsc.root}/dist/temp" />
+        	dest="${wsc.root}/dist/temp" />
 
 		<manifest file="${wsc.root}/dist/temp/META-INF/MANIFEST.MF">
 			<attribute name="Built-By" value="${user.name}"/>
@@ -82,27 +82,12 @@
 		<delete dir="${wscsrc.build}" />
 	</target>
 
-	<target name="copy-template">
+	<target name="copy-license">
 		<copy file="${wsc.root}/dist/wsc_license.html" todir="${wscclasses.dir}">
 			<filterset>
 				<filter token="VERSION" value="${version}" />
 				<filter token="YEAR" value="${YEAR}" />
 			</filterset>
 		</copy>
-		<copy file="${wscsrc.dir}/com/sforce/ws/tools/type.template" todir="${wscclasses.dir}/com/sforce/ws/tools/" />
-		<copy file="${wscsrc.dir}/com/sforce/ws/tools/connection.template"
-              todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-		<copy file="${wscsrc.dir}/com/sforce/ws/tools/connector.template"
-              todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-		<copy file="${wscsrc.dir}/com/sforce/ws/tools/sobject.template"
-              todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-		<copy file="${wscsrc.dir}/com/sforce/ws/tools/simpleType.template"
-              todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-		<copy file="${wscsrc.dir}/com/sforce/ws/tools/aggregateResult.template"
-              todir="${wscclasses.dir}/com/sforce/ws/tools/"/>
-		<copy file="${wscsrc.dir}/com/sforce/ws/runtime-classes.txt"
-              todir="${wscclasses.dir}/com/sforce/ws/"/>
 	</target>
-
-
 </project>
