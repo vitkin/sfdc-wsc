@@ -27,24 +27,28 @@ package com.sforce.ws.tools;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+
+import javax.tools.Diagnostic;
+import javax.tools.Diagnostic.Kind;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 
 import com.sforce.ws.bind.NameMapper;
 import com.sforce.ws.bind.TypeMapper;
@@ -178,9 +182,6 @@ public class wsdlc {
         }
     }
 
-
-
-
     private void generateSObject(Definitions definitions) throws IOException, TemplateException {
         if (definitions.getApiType() == SfdcApiType.Partner || definitions.getApiType() == SfdcApiType.CrossInstance
                 || definitions.getApiType() == SfdcApiType.Internal || definitions.getApiType() == SfdcApiType.ClientSync
@@ -262,7 +263,6 @@ public class wsdlc {
     }
 
     private ArrayList<String> getRuntimeClasses(ClassLoader cl) throws IOException {
-
         ArrayList<String> classes = new ArrayList<String>();
         InputStream in = cl.getResourceAsStream("com/sforce/ws/runtime-classes.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -275,17 +275,17 @@ public class wsdlc {
         return classes;
     }
 
-    private InputStream getManifest() {
+    private InputStream getManifest() throws IOException {
         String m = "Manifest-Version: 1.0\n" +
                    "Created-By: " + System.getProperty("java.runtime.version") + " ("  + System.getProperty("java.vm.specification.vendor") + ")\n" +
                    "Built-By: " + System.getProperty("user.name") + " (WSC-" + VersionInfo.VERSION + ")\n";
 
-        return new ByteArrayInputStream(m.getBytes());
+        return new ByteArrayInputStream(m.getBytes("UTF-8"));
     }
 
     private void compileTypes() throws ToolsException {
         Compiler compiler = new Compiler();
-        compiler.compile(javaFiles.toArray(new String[javaFiles.size()]));
+        compiler.compile(javaFiles);
     }
 
     private void generateTypes(Types types) throws IOException, TemplateException {
@@ -343,147 +343,47 @@ public class wsdlc {
         }
     }
 
-    class Compiler {
-        private Object main;
-        private Method method;
-
-        public Compiler() throws ToolsException {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-
-            if (loader == null) {
-                loader = getClass().getClassLoader();
-            }
-
-            try {
-                findCompiler(loader);
-            } catch (ClassNotFoundException e) {
-                findCompilerInToolsJar(loader);
-            } catch (NoSuchMethodException e) {
-                throwToolsexception(e);
-            } catch (IllegalAccessException e) {
-                throwToolsexception(e);
-            } catch (InstantiationException e) {
-                throwToolsexception(e);
-            }
+    static class Compiler {
+        public Compiler() {
         }
 
-        private void findCompilerInToolsJar(ClassLoader loader) throws ToolsException {
-            try {
-                ToolsJarClassLoader tloader = new ToolsJarClassLoader(loader);
-                findCompiler(tloader);
-           } catch (MalformedURLException e) {
-                throwToolsexception(e);
-            } catch (NoSuchMethodException e) {
-                throwToolsexception(e);
-            } catch (IllegalAccessException e) {
-                throwToolsexception(e);
-            } catch (InstantiationException e) {
-                throwToolsexception(e);
-            } catch (ClassNotFoundException e) {
-                throwToolsexception(e);
-            } catch (IOException e) {
-                throwToolsexception(e);
-            }
-        }
-
-        private void findCompiler(ClassLoader loader)
-                throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-
-            Class<?> c = loader.loadClass("com.sun.tools.javac.Main");
-            Class<?> arg = (new String[0]).getClass();
-            main = c.newInstance();
-            method = c.getMethod("compile", arg);
-        }
-
-        private void throwToolsexception(Exception e) throws ToolsException {
-            e.printStackTrace();
-            throw new ToolsException("Unable to find compiler. Make sure that tools.jar is in your classpath: " + e);
-        }
-
-        public void compile(String[] files) throws ToolsException {
+        public void compile(List<String> javaFiles) throws ToolsException {
             String target = System.getProperty("compileTarget");
 
             Verbose.log("Compiling to target " + (target!=null ? target : "default" ) + "... ");
 
-            List<String> call = new ArrayList<String>();
-            call.add("-g");
-            
-            call.add("-d");
-            call.add(tempDir.getAbsolutePath());
-            
-            call.add("-sourcepath");
-            call.add(tempDir.getAbsolutePath());
-            
+            List<String> options = new ArrayList<String>();
+            options.add("-g");
+
             if (target != null) {
-            	call.add("-target");
-            	call.add(target);
+            	options.add("-target");
+            	options.add(target);
             }
             
-            call.addAll(Arrays.asList(files));
-            
-            try {
-                Integer result = (Integer) method.invoke(main, new Object[]{call.toArray(new String[call.size()])});
-                if (result != 0) {
-                    throw new ToolsException("Failed to compile");
-                }
-            } catch (IllegalAccessException e) {
-                throw new ToolsException("Failed to compile: " + e);
-            } catch (InvocationTargetException e) {
-                throw new ToolsException("Failed to compile: " + e);
-            }
+			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+			if (compiler == null) {
+	            throw new ToolsException("Unable to find compiler. Make sure that tools.jar is in your classpath");				
+			}
 
-            Verbose.log("Compiled " + files.length + " java files.");
-        }
-    }
+			DiagnosticCollector<JavaFileObject> diagnosticsCollector = new DiagnosticCollector<JavaFileObject>();
+			
+			StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnosticsCollector, null, Charset.forName("UTF-8"));
+			Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromStrings(javaFiles);
+			
+			compiler.getTask(null, fileManager, diagnosticsCollector, options, null, compilationUnits).call();
 
-    public static class ToolsJarClassLoader extends ClassLoader {
-
-        private JarFile toolsJar;
-
-        ToolsJarClassLoader(ClassLoader parent) throws IOException {
-            super(parent);
-            String javaHome = System.getProperty("java.home");
-            if (javaHome.endsWith("jre")) {
-                javaHome = javaHome.substring(0, javaHome.length() - 3);
-            }
-            if (!javaHome.endsWith("/")) {
-                javaHome = javaHome + "/";
-            }
-            String tj = javaHome + "lib/tools.jar";
-            File tjf = new File(tj);
-            toolsJar = new JarFile(tjf);
-        }
-
-        @Override
-        public Class<?> findClass(String name) throws ClassNotFoundException {
-            byte[] b;
-            try {
-                b = getBytes(name);
-            } catch (IOException e) {
-                throw new ClassNotFoundException(name);
-            }
-            return defineClass(null, b, 0, b.length);
-        }
-
-        private byte[] getBytes(String name) throws IOException, ClassNotFoundException {
-            name = name.replace(".", "/");
-            name += ".class";
-            JarEntry entry = toolsJar.getJarEntry(name);
-
-            if (entry == null) {
-                throw new ClassNotFoundException(name);
-            }
-
-            InputStream io = toolsJar.getInputStream(entry);
-
-            ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            int ch;
-            while((ch=io.read()) != -1) {
-                bout.write((char)ch);
-            }
-            io.close();
-
-            return bout.toByteArray();
+			List<Diagnostic<? extends JavaFileObject>> diagnostics = diagnosticsCollector.getDiagnostics();
+			boolean errors = false;
+			for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
+				if (diagnostic.getKind() == Kind.ERROR) {
+					errors = true;
+				}
+				System.out.println(diagnostic.getMessage(Locale.getDefault()));
+			}
+			if (errors) {
+				throw new ToolsException("Compilation failed");
+			}
+            Verbose.log("Compiled " + javaFiles.size() + " java files.");
         }
     }
 }
