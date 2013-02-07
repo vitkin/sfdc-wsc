@@ -27,18 +27,24 @@ package com.sforce.ws.tools;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
@@ -147,8 +153,12 @@ public class wsdlc {
 
         File parentDir = jf.getParentFile();
 
-        if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
-            throw new ToolsException("<jar-file> path does not exist");
+        // !parentDir.exists() is in here twice, before and after the mkdirs, since the mkdirs can return false in
+        // the case that some other process (typically, another parallel wsdlc process) comes in and makes the 
+        // directory between the first exists() check and the mkdirs().  We still want to catch unusual failures,
+        // other than that case, so we do a second exists() if mkdirs fails
+        if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs() && !parentDir.exists()) {
+            throw new ToolsException("<jar-file> failed while creating parent directory " + parentDir.getPath());
         }
     }
 
@@ -343,10 +353,121 @@ public class wsdlc {
         }
     }
 
+
+    static class ToolsJarClassLoader extends ClassLoader {
+        private final JarFile toolsJar;
+
+        ToolsJarClassLoader(ClassLoader parent, File file) throws IOException {
+            super(parent);
+            toolsJar = new JarFile(file);
+        }
+
+        @Override
+        public Class<?> findClass(String name) throws ClassNotFoundException {
+            byte[] b;
+            try {
+                b = getBytes(name);
+            } catch (IOException e) {
+                throw new ClassNotFoundException(name);
+            }
+            return defineClass(null, b, 0, b.length);
+        }
+
+        private byte[] getBytes(String name) throws IOException, ClassNotFoundException {
+            String className = name.replace(".", "/") + ".class";
+            
+            JarEntry entry = toolsJar.getJarEntry(className);
+            if (entry == null) {
+                throw new ClassNotFoundException(name);
+            }
+
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            
+        	InputStream io = toolsJar.getInputStream(entry);
+            try {
+                int ch;
+                while((ch=io.read()) != -1) {
+                    bout.write((char)ch);
+                }
+            } finally {
+            	io.close();
+            }
+            
+            return bout.toByteArray();
+        }
+    }
+
     static class Compiler {
         public Compiler() {
         }
 
+        private JavaCompiler findCompiler() throws ToolsException {        	
+    		JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
+    		if (javaCompiler != null) {
+    			return javaCompiler;
+    		} else {
+    			String javaHome = System.getProperty("java.home");
+    			File dir;
+				try {
+					dir = new File(javaHome, "..").getCanonicalFile();
+				} catch (IOException e) {
+					throw new ToolsException("Cannot find JavaCompiler", e);
+				}
+				
+    			final List<File> files = new ArrayList<File>();
+    			dir.listFiles(new FileFilter() {
+    				@Override
+    				public boolean accept(File pathname) {
+    					if (pathname.isDirectory()) {
+    						pathname.listFiles(this);
+    					} else if (pathname.getName().equals("tools.jar")) {
+    						files.add(pathname);
+    					}
+    					return false;
+    				}
+    			});
+    			
+    			final String version = System.getProperty("java.version");
+    			Collections.sort(files, new Comparator<File>() {
+    				@Override
+    				public int compare(File f1, File f2) {
+    					try {
+    						return f1.getCanonicalPath().compareTo(f2.getCanonicalPath());
+    					} catch (IOException e) {
+    						throw new RuntimeException(e);
+    					}
+    				}
+    			});
+    			File candidate = null;
+    			for (File file : files) {
+    				String f;
+					try {
+						f = file.getCanonicalPath();
+					} catch (IOException e) {
+						throw new ToolsException("Cannot find JavaCompiler", e);
+					}
+    				if (f.contains(version)) {
+    					candidate = file;
+    				}
+    			}
+    			if (candidate == null) { 
+    				if (!files.isEmpty()) {
+        				candidate = files.get(files.size() - 1);
+        			} else {
+        				throw new ToolsException("Unable to find compiler. Make sure that tools.jar is in your classpath");
+        			}
+    			}
+    			try {
+    				ClassLoader cl = new ToolsJarClassLoader(JavaCompiler.class.getClassLoader(), candidate);
+    				Class<?> clazz = cl.loadClass("com.sun.tools.javac.api.JavacTool");
+    				Method m = clazz.getMethod("create");
+    				return (JavaCompiler) m.invoke(null);
+    			} catch (Exception e) {
+    				throw new ToolsException("Cannot find JavaCompiler", e);
+    			}
+    		}
+        }
+        
         public void compile(List<String> javaFiles) throws ToolsException {
             String target = System.getProperty("compileTarget");
 
@@ -360,10 +481,7 @@ public class wsdlc {
             	options.add(target);
             }
             
-			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-			if (compiler == null) {
-	            throw new ToolsException("Unable to find compiler. Make sure that tools.jar is in your classpath");				
-			}
+			JavaCompiler compiler = findCompiler();
 
 			DiagnosticCollector<JavaFileObject> diagnosticsCollector = new DiagnosticCollector<JavaFileObject>();
 			

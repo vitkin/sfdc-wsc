@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, salesforce.com, inc.
+ * Copyright (c) 2013, Jesper Udby, judby.dk.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided 
@@ -11,7 +11,7 @@
  *    Redistributions in binary form must reproduce the above copyright notice, this list of conditions and 
  *    the following disclaimer in the documentation and/or other materials provided with the distribution. 
  *    
- *    Neither the name of salesforce.com, inc. nor the names of its contributors may be used to endorse or 
+ *    Neither the name of judby.dk nor the names of its contributors may be used to endorse or 
  *    promote products derived from this software without specific prior written permission.
  *  
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
@@ -23,50 +23,45 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package com.sforce.ws.transport;
+package com.sforce.ws;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
+import java.io.PrintStream;
 
-import com.sforce.ws.ConnectorConfig;
+public class TeeOutputStream extends OutputStream {
+    private final OutputStream out;
+    private final PrintStream traceStream;
 
-/**
- * This interface defines a Transport.
- *
- * @author http://cheenath.com
- * @author jesperudby
- * @version 1.0
- * @since 1.0  Nov 30, 2005
- */
-public interface Transport {
+    public TeeOutputStream(OutputStream out, PrintStream traceStream) {
+        this.out = out;
+        this.traceStream = traceStream;
+        this.traceStream.println("------------ Request start   ----------");
+    }
 
-    void setConfig(ConnectorConfig config);
+    @Override
+    public void write(int b) throws IOException {
+    	traceStream.write((char) b);
+        out.write(b);
+    }
 
-    /**
-     * Connect to the specified endpoint.
-     *
-     * @param url endpoint address
-     * @param httpHeaders HTTP headers to add to request
-     * @param enableCompression false to disable gzip compression (overrides config setting)
-     * @return output stream that can be used to send response
-     * @throws IOException failed to connect to the endpoint
-     */
-    OutputStream connect(String endpoint, Map<String, String> httpHeaders, boolean enableCompression) throws IOException;
+    @Override
+    public void write(byte b[]) throws IOException {
+    	traceStream.write(b);
+        out.write(b);
+    }
 
-    /**
-     * returns the response from the endpoint. This method must be called after
-     * a connect call.
-     *
-     * @return response or error stream.
-     * @throws java.io.IOException failed to get content
-     */
-    InputStream getContent() throws IOException;
+    @Override
+    public void write(byte b[], int off, int len) throws IOException {
+    	traceStream.write(b, off, len);
+        out.write(b, off, len);
+    }
 
-    /**
-     * checks whether the response from the remote server is successful or not.
-     * @return true if the call was successful
-     */
-    boolean isSuccessful();
+    @Override
+    public void close() throws IOException {
+    	traceStream.println();
+    	traceStream.flush();
+        out.close();
+        traceStream.println("------------ Request end   ----------");
+    }
 }

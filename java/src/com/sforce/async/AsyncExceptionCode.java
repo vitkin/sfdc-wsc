@@ -4,9 +4,9 @@ package com.sforce.async;
  * AsyncExceptionCode --
  *
  * @author mcheenath
+ * @author jesperudby
  * @since 160
  */
-
 public enum AsyncExceptionCode {
     Unknown,
     InvalidSessionId,
@@ -25,5 +25,6 @@ public enum AsyncExceptionCode {
     TooManyLockFailure,
     InvalidVersion,
     HttpsRequired,
-    UnsupportedContentType
+    UnsupportedContentType,
+    InvalidEntity
 }

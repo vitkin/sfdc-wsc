@@ -1,10 +1,15 @@
 package com.sforce.bulk;
 
-import com.sforce.async.*;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+
+import com.sforce.async.BatchInfo;
+import com.sforce.async.BatchInfoList;
+import com.sforce.async.BatchStateEnum;
+import com.sforce.async.BulkConnection;
+import com.sforce.async.CSVReader;
+import com.sforce.async.JobInfo;
 
 /**
  * This class represents
@@ -38,7 +43,7 @@ public class UpdateResultStream {
                 BatchInfoList bList = bulkConnection.getBatchInfoList(job.getId());
                 batchList = bList.getBatchInfo();
                 break;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 handler.error("Failed to get batch list", e);
             }
         }
@@ -100,7 +105,7 @@ public class UpdateResultStream {
 
                 Thread.sleep(waitTime);
                 count++;
-            } catch(Throwable e) {
+            } catch(Exception e) {
                 handler.error("Failed to read result for batch " + batchList[batchIndex].getId(), e);
             }
         }
@@ -120,7 +125,7 @@ public class UpdateResultStream {
                 resultReader = new CSVReader(resultStream);
                 resultReader.nextRecord(); //comsume header
                 break;
-            } catch(Throwable e) {
+            } catch(Exception e) {
                 handler.error("Failed to read result for batch " + batchList[batchIndex].getId(), e);
             }
         }

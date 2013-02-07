@@ -87,6 +87,15 @@ public class SoapConnection {
 
     public XMLizable send(String soapAction, QName requestElement, XMLizable request, QName responseElement, Class<?> responseType)
             throws ConnectionException {
+        if (soapAction == null) {
+            soapAction = "";
+        }
+        
+        Map<String, String> soapHttpHeaders = new HashMap<String, String>();
+
+        soapHttpHeaders.put("SOAPAction", "\"" + soapAction + "\"");
+        soapHttpHeaders.put("Content-Type", "text/xml; charset=UTF-8");
+        soapHttpHeaders.put("Accept", "text/xml");
 
     	long startTime = 0;
         try {
@@ -94,8 +103,8 @@ public class SoapConnection {
             while(true) {
                 try {
                 	startTime = System.currentTimeMillis();
-					Transport transport = newTransport(config);
-					OutputStream out = transport.connect(url, soapAction);
+					Transport transport = config.createTransport();
+					OutputStream out = transport.connect(url, soapHttpHeaders, true);
 					sendRequest(out, request, requestElement);
 					InputStream in = transport.getContent();
 					return receive(transport, responseElement, responseType, in);
@@ -124,18 +133,6 @@ public class SoapConnection {
     private boolean isSessionTimedOutFault(SoapFaultException sfe) {
 		return "INVALID_SESSION_ID".equals(sfe.getFaultCode().getLocalPart()) && sfe.getMessage() != null && (sfe.getMessage().contains("Session timed out") || sfe.getMessage().contains("Session not found"));
 	}
-
-	private Transport newTransport(ConnectorConfig config) throws ConnectionException {
-        try {
-            Transport t = (Transport) config.getTransport().newInstance();
-            t.setConfig(config);
-            return t;
-        } catch (InstantiationException e) {
-            throw new ConnectionException("Failed to create new Transport " + config.getTransport());
-        } catch (IllegalAccessException e) {
-            throw new ConnectionException("Failed to create new Transport " + config.getTransport());
-        }
-    }
 
     private XMLizable receive(Transport transport, QName responseElement,
                               Class<?> responseType, InputStream in) throws IOException, ConnectionException {

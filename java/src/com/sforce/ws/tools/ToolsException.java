@@ -39,11 +39,24 @@ public class ToolsException extends Exception {
 	 */
 	private static final long serialVersionUID = 6129376265141779778L;
 
-	public ToolsException(String message) {
-        super(message);
-    }
 
-    @Override
+    public ToolsException() {
+		super();
+	}
+
+	public ToolsException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public ToolsException(String message) {
+		super(message);
+	}
+
+	public ToolsException(Throwable cause) {
+		super(cause);
+	}
+
+	@Override
     public String toString() {
         return "Error: " + getMessage();
     }

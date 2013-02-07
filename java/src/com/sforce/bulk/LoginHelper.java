@@ -1,11 +1,12 @@
 package com.sforce.bulk;
 
-import com.sforce.ws.transport.JdkHttpTransport;
-import com.sforce.ws.util.FileUtil;
-
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.sforce.ws.transport.Transport;
+import com.sforce.ws.util.FileUtil;
 
 /**
  * This class is a helper to do login using partner wsdl.
@@ -22,7 +23,7 @@ public class LoginHelper {
         this.handler = handler;
     }
 
-    void doLogin() throws IOException, StreamException {
+    void doLogin() throws Exception {
         handler.info("Calling login on: " + handler.getConfig().getAuthEndpoint());
 
         String request = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -41,8 +42,15 @@ public class LoginHelper {
                 "</env:Body>" +
                 "</env:Envelope>";
 
-        JdkHttpTransport transport = new JdkHttpTransport(handler.getConfig());
-        OutputStream out = transport.connect(handler.getConfig().getAuthEndpoint(), "");
+        Transport transport = handler.getConfig().createTransport();
+
+        Map<String, String> soapHttpHeaders = new HashMap<String, String>();
+
+        soapHttpHeaders.put("SOAPAction", "\"\"");
+        soapHttpHeaders.put("Content-Type", "text/xml; charset=UTF-8");
+        soapHttpHeaders.put("Accept", "text/xml");
+
+        OutputStream out = transport.connect(handler.getConfig().getAuthEndpoint(), soapHttpHeaders, true);
         out.write(request.getBytes());
         out.close();
 

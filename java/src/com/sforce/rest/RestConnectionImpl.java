@@ -25,7 +25,10 @@
  */
 package com.sforce.rest;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -39,6 +42,7 @@ import com.sforce.ws.transport.JdkHttpTransport;
  * RestConnection
  * 
  * @author gwester
+ * @author jesperudby
  * @since 172
  */
 public class RestConnectionImpl implements RestConnection {
@@ -230,33 +234,39 @@ public class RestConnectionImpl implements RestConnection {
         HttpURLConnection connection = JdkHttpTransport.createConnection(config, url, headers, false);
     	connection.setInstanceFollowRedirects(true);
 
-    	InputStream in;
     	System.out.println("HTTP " + connection.getResponseCode());
-    	if(connection.getResponseCode() >= 400) {
-    	    in = connection.getErrorStream();
-    	} else {
-    	    in = connection.getInputStream();
-    	}
-
-        String encoding = connection.getHeaderField(CONTENT_HEADER);
-        StringBuilder responseBuilder = new StringBuilder();
-        if (encoding.startsWith(ContentType.JSON.toString())) {
-            BufferedInputStream bin = new BufferedInputStream(in);
-
-            //read the server response body
-            byte[] buffer = new byte[1024];
-            int bytesRead = 0;
-            while ((bytesRead = bin.read(buffer)) != -1) {
-            	responseBuilder.append(new String(buffer, 0, bytesRead));
+    	InputStream in;
+        try {
+            in = connection.getInputStream();
+        } catch (IOException e) {
+            in = connection.getErrorStream();
+            if (in == null) {
+                throw e;
             }
-            
-        } else {
-        	throw new IllegalStateException("Unknown content type on HTTP GET.");
         }
-        in.close();
-        
-        //send back the server response
-        return responseBuilder.toString();
+        try {
+	        String encoding = connection.getHeaderField(CONTENT_HEADER);
+	        StringBuilder responseBuilder = new StringBuilder();
+	        if (encoding.startsWith(ContentType.JSON.toString())) {
+	            BufferedInputStream bin = new BufferedInputStream(in);
+	            try {
+		            //read the server response body
+		            byte[] buffer = new byte[1024];
+		            int bytesRead = 0;
+		            while ((bytesRead = bin.read(buffer)) != -1) {
+		            	responseBuilder.append(new String(buffer, 0, bytesRead, "UTF-8"));
+		            }
+	            } finally {
+	            	bin.close();
+	            }
+	        } else {
+	        	throw new IllegalStateException("Unknown content type on HTTP GET.");
+	        }
+	        //send back the server response
+	        return responseBuilder.toString();
+        } finally {
+        	in.close();
+        }
     }
     
     /**
@@ -274,36 +284,48 @@ public class RestConnectionImpl implements RestConnection {
         connection.setRequestMethod("POST");
         
         OutputStream out = connection.getOutputStream();
-        InputStream in;
-        out.write(body.getBytes());
-        out.flush();
-        out.close();     
-        
+        try {
+	        out.write(body.getBytes());
+	        out.flush();
+        } finally {
+        	out.close();
+        }
 
         System.out.print("HTTP " + connection.getResponseCode());
-        if(connection.getResponseCode() >= 400) {
-            in = connection.getErrorStream();
-        } else {
+
+        InputStream in;
+        try {
             in = connection.getInputStream();
+        } catch (IOException e) {
+            in = connection.getErrorStream();
+            if (in == null) {
+                throw e;
+            }
         }
-        
-        BufferedInputStream bin = new BufferedInputStream(in);
+        try {
+	        StringBuilder responseBuilder = new StringBuilder();
+	        BufferedInputStream bin = new BufferedInputStream(in);
+	        try {
+		        //read the server response body
+		        byte[] buffer = new byte[1024];
+		        int bytesRead = 0;
+		        while ((bytesRead = bin.read(buffer)) != -1) {
+		            responseBuilder.append(new String(buffer, 0, bytesRead, "UTF-8"));
+		        }
 
-        StringBuilder responseBuilder = new StringBuilder();
-
-        //read the server response body
-        byte[] buffer = new byte[1024];
-        int bytesRead = 0;
-        while ((bytesRead = bin.read(buffer)) != -1) {
-            responseBuilder.append(new String(buffer, 0, bytesRead));
-        }
-        String serverResponse = responseBuilder.toString();
-        System.out.print(serverResponse + "\r\n");
-        
-        if(connection.getResponseCode() >= 400) {
-            throw new IllegalStateException(serverResponse);
-        } else {
-            return serverResponse;
+		        String serverResponse = responseBuilder.toString();
+		        System.out.print(serverResponse + "\r\n");
+		        
+		        if (connection.getResponseCode() >= 400) {
+		            throw new IllegalStateException(serverResponse);
+		        } else {
+		            return serverResponse;
+		        }
+	        } finally {
+	        	bin.close();
+	        }
+        } finally {
+        	in.close();
         }
     }
     

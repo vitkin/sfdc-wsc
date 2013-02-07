@@ -34,7 +34,7 @@ import java.net.Proxy;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import com.sforce.ws.transport.JdkHttpTransport;
@@ -67,16 +67,15 @@ public class ConnectorConfig {
     private PrintStream traceStream;
     private String proxyUsername;
     private String proxyPassword;
-    private HashMap<String, String> headers;
+    private Map<String, String> headers;
     private Proxy proxy = null;
-    private ArrayList<MessageHandler> handlers = new ArrayList<MessageHandler>();
+    private List<MessageHandler> handlers = new ArrayList<MessageHandler>();
     private int maxRequestSize;
     private int maxResponseSize;
     private boolean validateSchema = true;
     private Class<? extends Transport> transport = JdkHttpTransport.class;
     private SessionRenewer sessionRenewer;
-
-    public static final ConnectorConfig DEFAULT = new ConnectorConfig();
+    private String ntlmDomain;
 
     public Class<? extends Transport> getTransport() {
         return transport;
@@ -87,13 +86,18 @@ public class ConnectorConfig {
     }
 
     public void setNtlmDomain(String domain) {
+    	this.ntlmDomain = domain;
         if (System.getProperty("http.auth.ntlm.domain") == null) {
             System.setProperty("http.auth.ntlm.domain", domain);
         } else {
             Verbose.log("http.auth.ntlm.domain already set");
         }
     }
-
+    
+    public String getNtlmDomain() {
+    	return ntlmDomain;
+    }
+    
     public boolean isValidateSchema() {
         return validateSchema;
     }
@@ -187,7 +191,7 @@ public class ConnectorConfig {
     }
 
     public void setServiceEndpoint(String serviceEndpoint) {
-        if (serviceEndpoint == null || serviceEndpoint.equals("")) {
+        if (serviceEndpoint == null || serviceEndpoint.isEmpty()) {
             throw new IllegalArgumentException("illegal service endpoint " + serviceEndpoint);
         }
         this.serviceEndpoint = serviceEndpoint;
@@ -291,12 +295,12 @@ public class ConnectorConfig {
         verifyEndpoint("/services/Soap/c/");
     }
 
-    public Iterator<MessageHandler> getMessagerHandlers() {
-        return handlers.iterator();
+    public List<MessageHandler> getMessagerHandlers() {
+        return handlers;
     }
 
     public boolean hasMessageHandlers() {
-        return handlers.size() != 0;
+        return !handlers.isEmpty();
     }
 
     public void addMessageHandler(MessageHandler handler) {
@@ -348,5 +352,17 @@ public class ConnectorConfig {
     
     public void setSessionRenewer(SessionRenewer sessionRenewer) {
         this.sessionRenewer = sessionRenewer;
+    }
+
+    public Transport createTransport() throws ConnectionException {
+        try {
+            Transport t = (Transport)getTransport().newInstance();
+            t.setConfig(this);
+            return t;
+        } catch (InstantiationException e) {
+            throw new ConnectionException("Failed to create new Transport " + getTransport());
+        } catch (IllegalAccessException e) {
+            throw new ConnectionException("Failed to create new Transport " + getTransport());
+        }
     }
 }
