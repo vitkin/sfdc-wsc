@@ -29,15 +29,16 @@ package com.sforce.ws.tools;
  * version
  *
  * @author http://cheenath.com
+ * @author jesperudby
  * @version 1.0
  * @since 1.0  Jan 20, 2006
  */
 public class VersionInfo {
-
-    public static final double VERSION = 1.0;
+    public static final String VERSION = "@VERSION@";
+    public static final String BUILD_TZ = "@BUILD_TZ@";
 
     public static String info() {
-        return "Salesforce Web Service Connector For Java/" + VERSION;
+        return "Salesforce Web Service Connector For Java/" + VERSION + ".0";
     }
 
     public static void main(String[] args) {

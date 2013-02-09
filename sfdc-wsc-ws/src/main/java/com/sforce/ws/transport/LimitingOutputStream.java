@@ -26,47 +26,57 @@
 package com.sforce.ws.transport;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 
-import com.sforce.ws.ConnectorConfig;
+public class LimitingOutputStream extends OutputStream {
+    private int size = 0;
+    private int maxSize;
+    private OutputStream out;
 
-/**
- * This interface defines a Transport.
- *
- * @author http://cheenath.com
- * @author jesperudby
- * @version 1.0
- * @since 1.0  Nov 30, 2005
- */
-public interface Transport {
+    public LimitingOutputStream(int maxSize, OutputStream out) {
+        this.maxSize = maxSize;
+        this.out = out;
+    }
 
-    void setConfig(ConnectorConfig config);
+    public int getSize() {
+        return size;
+    }
 
-    /**
-     * Connect to the specified endpoint.
-     *
-     * @param url endpoint address
-     * @param httpHeaders HTTP headers to add to request
-     * @param enableCompression false to disable gzip compression (overrides config setting)
-     * @return output stream that can be used to send response
-     * @throws IOException failed to connect to the endpoint
-     */
-    OutputStream connect(String endpoint, Map<String, String> httpHeaders, boolean enableCompression) throws IOException;
+    @Override
+    public void write(int b) throws IOException {
+        size++;
+        checkSizeLimit();
+        out.write(b);
+    }
 
-    /**
-     * returns the response from the endpoint. This method must be called after
-     * a connect call.
-     *
-     * @return response or error stream.
-     * @throws java.io.IOException failed to get content
-     */
-    InputStream getContent() throws IOException;
+    private void checkSizeLimit() throws IOException {
+        if (size > maxSize) {
+            throw new IOException("Exceeded max size limit of " +
+                    maxSize + " with request size " + size);
+        }
+    }
 
-    /**
-     * checks whether the response from the remote server is successful or not.
-     * @return true if the call was successful
-     */
-    boolean isSuccessful();
+    @Override
+    public void write(byte b[]) throws IOException {
+        size += b.length;
+        checkSizeLimit();
+        out.write(b);
+    }
+
+    @Override
+    public void write(byte b[], int off, int len) throws IOException {
+        size += len;
+        checkSizeLimit();
+        out.write(b, off, len);
+    }
+
+    @Override
+    public void flush() throws IOException {
+        out.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+        out.close();
+    }
 }

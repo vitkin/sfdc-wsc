@@ -25,17 +25,27 @@
  */
 package com.sforce.ws;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.sforce.ws.transport.JdkHttpTransport;
+import com.sforce.ws.transport.Transport;
 import com.sforce.ws.util.Verbose;
 
 /**
  * This class contains a set of configuration properties
  *
  * @author http://cheenath.com
+ * @author jesperudby
  * @version 1.0
  * @since 1.0  Dec 19, 2005
  */
@@ -57,33 +67,37 @@ public class ConnectorConfig {
     private PrintStream traceStream;
     private String proxyUsername;
     private String proxyPassword;
-    private HashMap<String, String> headers;
+    private Map<String, String> headers;
     private Proxy proxy = null;
-    private ArrayList<MessageHandler> handlers = new ArrayList<MessageHandler>();
+    private List<MessageHandler> handlers = new ArrayList<MessageHandler>();
     private int maxRequestSize;
     private int maxResponseSize;
     private boolean validateSchema = true;
-    private Class transport = JdkHttpTransport.class;
+    private Class<? extends Transport> transport = JdkHttpTransport.class;
     private SessionRenewer sessionRenewer;
+    private String ntlmDomain;
 
-    public static final ConnectorConfig DEFAULT = new ConnectorConfig();
-
-    public Class getTransport() {
+    public Class<? extends Transport> getTransport() {
         return transport;
     }
 
-    public void setTransport(Class transport) {
+    public void setTransport(Class<? extends Transport> transport) {
         this.transport = transport;
     }
 
     public void setNtlmDomain(String domain) {
+    	this.ntlmDomain = domain;
         if (System.getProperty("http.auth.ntlm.domain") == null) {
             System.setProperty("http.auth.ntlm.domain", domain);
         } else {
             Verbose.log("http.auth.ntlm.domain already set");
         }
     }
-
+    
+    public String getNtlmDomain() {
+    	return ntlmDomain;
+    }
+    
     public boolean isValidateSchema() {
         return validateSchema;
     }
@@ -177,7 +191,7 @@ public class ConnectorConfig {
     }
 
     public void setServiceEndpoint(String serviceEndpoint) {
-        if (serviceEndpoint == null || serviceEndpoint.equals("")) {
+        if (serviceEndpoint == null || serviceEndpoint.isEmpty()) {
             throw new IllegalArgumentException("illegal service endpoint " + serviceEndpoint);
         }
         this.serviceEndpoint = serviceEndpoint;
@@ -281,12 +295,12 @@ public class ConnectorConfig {
         verifyEndpoint("/services/Soap/c/");
     }
 
-    public Iterator<MessageHandler> getMessagerHandlers() {
-        return handlers.iterator();
+    public List<MessageHandler> getMessagerHandlers() {
+        return handlers;
     }
 
     public boolean hasMessageHandlers() {
-        return handlers.size() != 0;
+        return !handlers.isEmpty();
     }
 
     public void addMessageHandler(MessageHandler handler) {
@@ -338,5 +352,17 @@ public class ConnectorConfig {
     
     public void setSessionRenewer(SessionRenewer sessionRenewer) {
         this.sessionRenewer = sessionRenewer;
+    }
+
+    public Transport createTransport() throws ConnectionException {
+        try {
+            Transport t = (Transport)getTransport().newInstance();
+            t.setConfig(this);
+            return t;
+        } catch (InstantiationException e) {
+            throw new ConnectionException("Failed to create new Transport " + getTransport());
+        } catch (IllegalAccessException e) {
+            throw new ConnectionException("Failed to create new Transport " + getTransport());
+        }
     }
 }

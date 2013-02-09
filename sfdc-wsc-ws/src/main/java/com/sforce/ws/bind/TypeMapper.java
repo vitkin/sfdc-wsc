@@ -53,6 +53,7 @@ import com.sforce.ws.wsdl.Types;
  * back to xml.
  *
  * @author http://cheenath.com
+ * @author jesperudby
  * @version 1.0
  * @since 1.0  Nov 29, 2005
  */
@@ -564,8 +565,8 @@ public class TypeMapper {
         return "true".equals(nil);
     }
 
-    @SuppressWarnings("unchecked")
-    Object readSingle(XmlInputStream in, TypeInfo typeInfo, Class type)
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    Object readSingle(XmlInputStream in, TypeInfo typeInfo, Class<?> type)
             throws IOException, ConnectionException {
 
         if (isXsiNilTrue(in)) {
@@ -617,7 +618,7 @@ public class TypeMapper {
         if (type.isEnum()) {
             String value = readEnum(in, typeInfo, type);
             try {
-                return Enum.valueOf(type, value);
+                return Enum.valueOf((Class<Enum>)type, value);
             } catch (IllegalArgumentException e) {
                 throw new ConnectionException(value + "Not a valid enumeration for type: " + type );
             }
@@ -714,7 +715,8 @@ public class TypeMapper {
     }
 
     public static class PartialArrayException extends ConnectionException {
-        private Object arrayResult;
+		private static final long serialVersionUID = 1L;
+		private Object arrayResult;
 
         public PartialArrayException(String message, Throwable th, Object arrayResult) {
             super(message, th);

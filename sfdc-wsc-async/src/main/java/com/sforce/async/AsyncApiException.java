@@ -4,10 +4,11 @@ package com.sforce.async;
  * AsyncApiException --
  *
  * @author mcheenath
+ * @author jesperudby
  * @since 160
  */
-
 public class AsyncApiException extends Exception implements com.sforce.ws.bind.XMLizable {
+  private static final long serialVersionUID = 1L;
 
   /**
    * Constructor

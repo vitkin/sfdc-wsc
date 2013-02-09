@@ -8,6 +8,8 @@ package com.sforce.async;
  */
 public enum StatusCode {
 
+   ALL_OR_NONE_OPERATION_ROLLED_BACK,
+
 
   /**
    * Enumeration  : ALREADY_IN_PROCESS
@@ -434,6 +436,11 @@ public enum StatusCode {
    */
    INVALID_SETUP_OWNER,
 
+   /**
+    * Enumeration : INVALID_SIGNUP_COUNTRY
+    */
+   INVALID_SIGNUP_COUNTRY,
+   
   /**
    * Enumeration  : INVALID_STATUS
    */
@@ -733,10 +740,14 @@ public enum StatusCode {
    * Enumeration  : WEBLINK_SIZE_LIMIT_EXCEEDED
    */
    WEBLINK_SIZE_LIMIT_EXCEEDED,
+   
+   
+   WEBLINK_URL_INVALID,
 
   /**
    * Enumeration  : WRONG_CONTROLLER_TYPE
    */
    WRONG_CONTROLLER_TYPE,
+
 
 }

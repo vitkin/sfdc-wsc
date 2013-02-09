@@ -43,8 +43,8 @@ import com.sforce.ws.wsdl.Types;
  * @version 1.0
  * @since 1.0  Mar 7, 2006
  */
-public abstract class TypeGenerator {
-    protected String packageName;
+public abstract class TypeGenerator {	
+	protected String packageName;
     protected String className;
     protected File tempDir;
     protected TypeMapper mapper;
@@ -65,7 +65,7 @@ public abstract class TypeGenerator {
     public String getClassName() {
         return className;
     }
-
+ 
     protected abstract String getTemplate();
 
     public String generate() throws IOException, TemplateException {

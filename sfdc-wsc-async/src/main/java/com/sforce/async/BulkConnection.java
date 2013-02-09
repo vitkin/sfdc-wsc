@@ -3,22 +3,39 @@
  */
 package com.sforce.async;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
-import java.util.zip.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.xml.namespace.QName;
 
-import com.sforce.ws.*;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.MessageHandler;
+import com.sforce.ws.MessageHandlerWithHeaders;
 import com.sforce.ws.bind.TypeMapper;
-import com.sforce.ws.parser.*;
+import com.sforce.ws.parser.PullParserException;
+import com.sforce.ws.parser.XmlInputStream;
+import com.sforce.ws.parser.XmlOutputStream;
 import com.sforce.ws.transport.JdkHttpTransport;
+import com.sforce.ws.transport.Transport;
 import com.sforce.ws.util.FileUtil;
+import com.sforce.ws.util.XmlTraceHelper;
 
 /**
- * RestConnection
+ * BulkConnection
  * 
  * @author mcheenath
  * @since 160
@@ -74,8 +91,8 @@ public class BulkConnection {
 
     private JobInfo createOrUpdateJob(JobInfo job, String endpoint) throws AsyncApiException {
         try {
-            JdkHttpTransport transport = new JdkHttpTransport(config);
-            OutputStream out = transport.connect(endpoint, getHeaders(XML_CONTENT_TYPE));
+            Transport transport = config.createTransport();
+            OutputStream out = transport.connect(endpoint, getHeaders(XML_CONTENT_TYPE), true);
             XmlOutputStream xout = new AsyncXmlOutputStream(out, true);
             job.write(JOB_QNAME, xout, typeMapper);
             xout.close();
@@ -139,7 +156,7 @@ public class BulkConnection {
             throws AsyncApiException {
         try {
             String endpoint = getRestEndpoint();
-            JdkHttpTransport transport = new JdkHttpTransport(config);
+            Transport transport = config.createTransport();
             endpoint = endpoint + "job/" + jobInfo.getId() + "/batch";
             String contentType = getContentTypeString(jobInfo.getContentType(), isZip);
             HashMap<String, String> httpHeaders = getHeaders(contentType);
@@ -219,7 +236,7 @@ public class BulkConnection {
         try {
             String endpoint = getRestEndpoint();
             endpoint = endpoint + "job/" + jobInfo.getId() + "/batch";
-            JdkHttpTransport transport = new JdkHttpTransport(config);
+            Transport transport = config.createTransport();
             ZipOutputStream zipOut = new ZipOutputStream(transport.connect(endpoint, getHeaders(getContentTypeString(
                     jobInfo.getContentType(), true)), false));
 
@@ -289,16 +306,18 @@ public class BulkConnection {
     public BatchRequest createBatch(JobInfo job) throws AsyncApiException {
         try {
             String endpoint = getRestEndpoint();
-            JdkHttpTransport transport = new JdkHttpTransport(config);
+            Transport transport = config.createTransport();
             endpoint = endpoint + "job/" + job.getId() + "/batch";
             ContentType ct = job.getContentType();
             if (ct != null && ct != ContentType.XML) { throw new AsyncApiException(
                     "This method can only be used with xml content type", AsyncExceptionCode.ClientInputError); }
 
-            OutputStream out = transport.connect(endpoint, getHeaders(XML_CONTENT_TYPE));
+            OutputStream out = transport.connect(endpoint, getHeaders(XML_CONTENT_TYPE), true);
             return new BatchRequest(transport, out);
         } catch (IOException e) {
             throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, e);
+        } catch (ConnectionException x) {
+            throw new AsyncApiException("Failed to create batch", AsyncExceptionCode.ClientInputError, x);
         }
     }
 
@@ -344,9 +363,7 @@ public class BulkConnection {
 
     public BatchResult getBatchResult(String jobId, String batchId) throws AsyncApiException {
         try {
-            String endpoint = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/result";
-            URL url = new URL(endpoint);
-            InputStream stream = doHttpGet(url);
+            InputStream stream = doHttpGet(buildBatchResultURL(jobId, batchId));
 
             XmlInputStream xin = new XmlInputStream();
             xin.setInput(stream, "UTF-8");
@@ -372,6 +389,15 @@ public class BulkConnection {
         }
     }
 
+    public URL buildBatchResultURL(String jobId, String batchId) throws AsyncApiException {
+        try {
+            return new URL(getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/result");
+        } catch (MalformedURLException e) {
+            throw new AsyncApiException("Failed to construct URL for getting batch results: "+e.getMessage(),
+                    AsyncExceptionCode.ClientInputError, e);
+        }
+    }
+    
     public InputStream getBatchRequestInputStream(String jobId, String batchId) throws AsyncApiException {
         try {
             String endpoint = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/request";
@@ -402,14 +428,20 @@ public class BulkConnection {
 
     public InputStream getQueryResultStream(String jobId, String batchId, String resultId) throws AsyncApiException {
         try {
-            String endpoint = getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/result" + "/" + resultId;
-            URL url = new URL(endpoint);
-            return doHttpGet(url);
+            return doHttpGet(buildQueryResultURL(jobId, batchId, resultId));
         } catch (IOException e) {
             throw new AsyncApiException("Failed to get result ", AsyncExceptionCode.ClientInputError, e);
         }
     }
     
+    public URL buildQueryResultURL(String jobId, String batchId, String resultId) throws AsyncApiException {
+        try {
+            return new URL(getRestEndpoint() + "job/" + jobId + "/batch/" + batchId + "/result" + "/" + resultId);
+        } catch (MalformedURLException e) {
+            throw new AsyncApiException("Failed to construct URL for getting query result: "+e.getMessage(),
+                    AsyncExceptionCode.ClientInputError, e);
+        }
+    }
 
     private InputStream doHttpGet(URL url) throws IOException, AsyncApiException {
         HttpURLConnection connection = JdkHttpTransport.createConnection(config, url, null);
@@ -434,9 +466,7 @@ public class BulkConnection {
             in = new ByteArrayInputStream(bytes);
 
             if (config.hasMessageHandlers()) {
-                Iterator<MessageHandler> it = config.getMessagerHandlers();
-                while (it.hasNext()) {
-                    MessageHandler handler = it.next();
+            	for (MessageHandler handler : config.getMessagerHandlers()) {
                     if (handler instanceof MessageHandlerWithHeaders) {
                         ((MessageHandlerWithHeaders)handler).handleRequest(url, new byte[0], null);
                         ((MessageHandlerWithHeaders)handler).handleResponse(url, bytes, connection.getHeaderFields());
@@ -464,7 +494,7 @@ public class BulkConnection {
                     config.getTraceStream().println(entry.getKey() + ": " + sb.toString());
                 }
 
-                new JdkHttpTransport.TeeInputStream(config, bytes);
+                new XmlTraceHelper(config.getTraceStream(), config.isPrettyPrintXml()).trace(bytes);
             }
         }
 
@@ -478,7 +508,7 @@ public class BulkConnection {
     public JobInfo getJobStatus(String jobId) throws AsyncApiException {
         try {
             String endpoint = getRestEndpoint();
-            endpoint += "/job/" + jobId;
+            endpoint += "job/" + jobId;
             URL url = new URL(endpoint);
 
             InputStream in = doHttpGet(url);
@@ -512,7 +542,7 @@ public class BulkConnection {
 
     public JobInfo updateJob(JobInfo job) throws AsyncApiException {
         String endpoint = getRestEndpoint();
-        endpoint += "/job/" + job.getId();
+        endpoint += "job/" + job.getId();
         return createOrUpdateJob(job, endpoint);
     }
 

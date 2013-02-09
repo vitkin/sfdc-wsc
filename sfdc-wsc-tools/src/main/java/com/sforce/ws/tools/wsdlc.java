@@ -25,13 +25,36 @@
  */
 package com.sforce.ws.tools;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.jar.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
+
+import javax.tools.Diagnostic;
+import javax.tools.Diagnostic.Kind;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 
 import com.sforce.ws.bind.NameMapper;
 import com.sforce.ws.bind.TypeMapper;
@@ -39,17 +62,24 @@ import com.sforce.ws.template.Template;
 import com.sforce.ws.template.TemplateException;
 import com.sforce.ws.util.FileUtil;
 import com.sforce.ws.util.Verbose;
-import com.sforce.ws.wsdl.*;
+import com.sforce.ws.wsdl.ComplexType;
+import com.sforce.ws.wsdl.Definitions;
+import com.sforce.ws.wsdl.Schema;
+import com.sforce.ws.wsdl.SfdcApiType;
+import com.sforce.ws.wsdl.SimpleType;
+import com.sforce.ws.wsdl.Types;
+import com.sforce.ws.wsdl.WsdlFactory;
+import com.sforce.ws.wsdl.WsdlParseException;
 
 /**
  * wsdlc is a tool that can generate java stubs from WSDL.
  *
  * @author http://cheenath
+ * @author jesperudby
  * @version 1.0
  * @since 1.0  Nov 22, 2005
  */
 public class wsdlc {
-
     private File tempDir;
     private TypeMapper typeMapper = new TypeMapper();
     private ArrayList<String> javaFiles = new ArrayList<String>();
@@ -70,6 +100,7 @@ public class wsdlc {
 
         packagePrefix = System.getProperty(PACKAGE_PREFIX);
         laxMinOccursMode = System.getProperty(LAX_MINOCCURS) != null;
+        		
         typeMapper.setPackagePrefix(packagePrefix);
 
         Definitions definitions = WsdlFactory.create(wsdlFile);
@@ -90,9 +121,13 @@ public class wsdlc {
             generateJarFile(jarFile);
         }
 
-        if (Boolean.parseBoolean(System.getProperty("del-temp-dir", "true"))) {
+        String delTempDir = System.getProperty("del-temp-dir");
+        // only delete tempDir if specifically asked and if temp not given on cmd line
+        if ("true".equalsIgnoreCase(delTempDir) || (delTempDir == null && temp == null)) {
             Verbose.log("Delete temp dir: " + tempDir.getAbsolutePath());
-            Verbose.log("Set system property del-temp-dir=false to not delete temp dir.");
+            if (delTempDir == null) {
+            	Verbose.log("Set system property del-temp-dir=false to not delete temp dir.");
+            }
             FileUtil.deleteDir(tempDir);
         }
     }
@@ -108,8 +143,8 @@ public class wsdlc {
     }
 
     private void checkTargetFile(String jarFile) throws ToolsException {
-        if (!jarFile.endsWith(".jar")) {
-            throw new ToolsException("<jar-file> must have a .jar extension");
+        if (!jarFile.endsWith(".jar") && !jarFile.endsWith(".zip")) {
+            throw new ToolsException("<jar-file> must have a .jar/.zip extension");
         }
 
         File jf = new File(jarFile);
@@ -120,8 +155,12 @@ public class wsdlc {
 
         File parentDir = jf.getParentFile();
 
-        if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
-            throw new ToolsException("<jar-file> path does not exist");
+        // !parentDir.exists() is in here twice, before and after the mkdirs, since the mkdirs can return false in
+        // the case that some other process (typically, another parallel wsdlc process) comes in and makes the 
+        // directory between the first exists() check and the mkdirs().  We still want to catch unusual failures,
+        // other than that case, so we do a second exists() if mkdirs fails
+        if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs() && !parentDir.exists()) {
+            throw new ToolsException("<jar-file> failed while creating parent directory " + parentDir.getPath());
         }
     }
 
@@ -154,9 +193,6 @@ public class wsdlc {
             javaFiles.add(javaFile.getAbsolutePath());
         }
     }
-
-
-
 
     private void generateSObject(Definitions definitions) throws IOException, TemplateException {
         if (definitions.getApiType() == SfdcApiType.Partner || definitions.getApiType() == SfdcApiType.CrossInstance
@@ -239,7 +275,6 @@ public class wsdlc {
     }
 
     private ArrayList<String> getRuntimeClasses(ClassLoader cl) throws IOException {
-
         ArrayList<String> classes = new ArrayList<String>();
         InputStream in = cl.getResourceAsStream("com/sforce/ws/runtime-classes.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -252,16 +287,17 @@ public class wsdlc {
         return classes;
     }
 
-    private InputStream getManifest() {
+    private InputStream getManifest() throws IOException {
         String m = "Manifest-Version: 1.0\n" +
-                   "Created-By: 1.4.2_05-b04 (Sun Microsystems Inc.)\n";
+                   "Created-By: " + System.getProperty("java.runtime.version") + " ("  + System.getProperty("java.vm.specification.vendor") + ")\n" +
+                   "Built-By: " + System.getProperty("user.name") + " (WSC-" + VersionInfo.VERSION + ")\n";
 
-        return new ByteArrayInputStream(m.getBytes());
+        return new ByteArrayInputStream(m.getBytes("UTF-8"));
     }
 
     private void compileTypes() throws ToolsException {
         Compiler compiler = new Compiler();
-        compiler.compile(javaFiles.toArray(new String[javaFiles.size()]));
+        compiler.compile(javaFiles);
     }
 
     private void generateTypes(Types types) throws IOException, TemplateException {
@@ -319,112 +355,13 @@ public class wsdlc {
         }
     }
 
-    class Compiler {
-        private Object main;
-        private Method method;
 
-        public Compiler() throws ToolsException {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    static class ToolsJarClassLoader extends ClassLoader {
+        private final JarFile toolsJar;
 
-            if (loader == null) {
-                loader = getClass().getClassLoader();
-            }
-
-            try {
-                findCompiler(loader);
-            } catch (ClassNotFoundException e) {
-                findCompilerInToolsJar(loader);
-            } catch (NoSuchMethodException e) {
-                throwToolsexception(e);
-            } catch (IllegalAccessException e) {
-                throwToolsexception(e);
-            } catch (InstantiationException e) {
-                throwToolsexception(e);
-            }
-        }
-
-        private void findCompilerInToolsJar(ClassLoader loader) throws ToolsException {
-            try {
-                ToolsJarClassLoader tloader = new ToolsJarClassLoader(loader);
-                findCompiler(tloader);
-           } catch (MalformedURLException e) {
-                throwToolsexception(e);
-            } catch (NoSuchMethodException e) {
-                throwToolsexception(e);
-            } catch (IllegalAccessException e) {
-                throwToolsexception(e);
-            } catch (InstantiationException e) {
-                throwToolsexception(e);
-            } catch (ClassNotFoundException e) {
-                throwToolsexception(e);
-            } catch (IOException e) {
-                throwToolsexception(e);
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        private void findCompiler(ClassLoader loader)
-                throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-
-            Class c = loader.loadClass("com.sun.tools.javac.Main");
-            Class arg = (new String[0]).getClass();
-            main = c.newInstance();
-            method = c.getMethod("compile", arg);
-        }
-
-        private void throwToolsexception(Exception e) throws ToolsException {
-            e.printStackTrace();
-            throw new ToolsException("Unable to find compiler. Make sure that tools.jar is in your classpath: " + e);
-        }
-
-        public void compile(String[] files) throws ToolsException {
-            String target = System.getProperty("compileTarget");
-            if (target == null) {
-                target = "1.6";
-            }
-
-            Verbose.log("Compiling to target " + target + "... ");
-
-            String[] args = { "-g", /*"-verbose",*/ "-d", tempDir.getAbsolutePath(), "-sourcepath", tempDir.getAbsolutePath(),
-                    "-target", target, "-source", target};
-
-            String[] call = new String[args.length + files.length];
-
-            System.arraycopy(args, 0, call, 0, args.length);
-            System.arraycopy(files, 0, call, args.length, files.length);
-
-
-            try {
-                Integer result = (Integer) method.invoke(main, new Object[]{call});
-                if (result != 0) {
-                    throw new ToolsException("Failed to compile");
-                }
-            } catch (IllegalAccessException e) {
-                throw new ToolsException("Failed to compile: " + e);
-            } catch (InvocationTargetException e) {
-                throw new ToolsException("Failed to compile: " + e);
-            }
-
-            Verbose.log("Compiled " + files.length + " java files.");
-        }
-    }
-
-    public static class ToolsJarClassLoader extends ClassLoader {
-
-        private JarFile toolsJar;
-
-        ToolsJarClassLoader(ClassLoader parent) throws IOException {
+        ToolsJarClassLoader(ClassLoader parent, File file) throws IOException {
             super(parent);
-            String javaHome = System.getProperty("java.home");
-            if (javaHome.endsWith("jre")) {
-                javaHome = javaHome.substring(0, javaHome.length() - 3);
-            }
-            if (!javaHome.endsWith("/")) {
-                javaHome = javaHome + "/";
-            }
-            String tj = javaHome + "lib/tools.jar";
-            File tjf = new File(tj);
-            toolsJar = new JarFile(tjf);
+            toolsJar = new JarFile(file);
         }
 
         @Override
@@ -439,24 +376,136 @@ public class wsdlc {
         }
 
         private byte[] getBytes(String name) throws IOException, ClassNotFoundException {
-            name = name.replace(".", "/");
-            name += ".class";
-            JarEntry entry = toolsJar.getJarEntry(name);
-
+            String className = name.replace(".", "/") + ".class";
+            
+            JarEntry entry = toolsJar.getJarEntry(className);
             if (entry == null) {
                 throw new ClassNotFoundException(name);
             }
 
-            InputStream io = toolsJar.getInputStream(entry);
-
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            int ch;
-            while((ch=io.read()) != -1) {
-                bout.write((char)ch);
+            
+        	InputStream io = toolsJar.getInputStream(entry);
+            try {
+                int ch;
+                while((ch=io.read()) != -1) {
+                    bout.write((char)ch);
+                }
+            } finally {
+            	io.close();
             }
-            io.close();
-
+            
             return bout.toByteArray();
+        }
+    }
+
+    static class Compiler {
+        public Compiler() {
+        }
+
+        private JavaCompiler findCompiler() throws ToolsException {        	
+    		JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
+    		if (javaCompiler != null) {
+    			return javaCompiler;
+    		} else {
+    			String javaHome = System.getProperty("java.home");
+    			File dir;
+				try {
+					dir = new File(javaHome, "..").getCanonicalFile();
+				} catch (IOException e) {
+					throw new ToolsException("Cannot find JavaCompiler", e);
+				}
+				
+    			final List<File> files = new ArrayList<File>();
+    			dir.listFiles(new FileFilter() {
+    				@Override
+    				public boolean accept(File pathname) {
+    					if (pathname.isDirectory()) {
+    						pathname.listFiles(this);
+    					} else if (pathname.getName().equals("tools.jar")) {
+    						files.add(pathname);
+    					}
+    					return false;
+    				}
+    			});
+    			
+    			final String version = System.getProperty("java.version");
+    			Collections.sort(files, new Comparator<File>() {
+    				@Override
+    				public int compare(File f1, File f2) {
+    					try {
+    						return f1.getCanonicalPath().compareTo(f2.getCanonicalPath());
+    					} catch (IOException e) {
+    						throw new RuntimeException(e);
+    					}
+    				}
+    			});
+    			File candidate = null;
+    			for (File file : files) {
+    				String f;
+					try {
+						f = file.getCanonicalPath();
+					} catch (IOException e) {
+						throw new ToolsException("Cannot find JavaCompiler", e);
+					}
+    				if (f.contains(version)) {
+    					candidate = file;
+    				}
+    			}
+    			if (candidate == null) { 
+    				if (!files.isEmpty()) {
+        				candidate = files.get(files.size() - 1);
+        			} else {
+        				throw new ToolsException("Unable to find compiler. Make sure that tools.jar is in your classpath");
+        			}
+    			}
+    			try {
+    				ClassLoader cl = new ToolsJarClassLoader(JavaCompiler.class.getClassLoader(), candidate);
+    				Class<?> clazz = cl.loadClass("com.sun.tools.javac.api.JavacTool");
+    				Method m = clazz.getMethod("create");
+    				return (JavaCompiler) m.invoke(null);
+    			} catch (Exception e) {
+    				throw new ToolsException("Cannot find JavaCompiler", e);
+    			}
+    		}
+        }
+        
+        public void compile(List<String> javaFiles) throws ToolsException {
+            String target = System.getProperty("compileTarget");
+
+            Verbose.log("Compiling to target " + (target!=null ? target : "default" ) + "... ");
+
+            List<String> options = new ArrayList<String>();
+            options.add("-g");
+
+            if (target != null) {
+            	options.add("-target");
+            	options.add(target);
+            	options.add("-source");
+            	options.add(target);
+            }
+            
+			JavaCompiler compiler = findCompiler();
+
+			DiagnosticCollector<JavaFileObject> diagnosticsCollector = new DiagnosticCollector<JavaFileObject>();
+			
+			StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnosticsCollector, null, Charset.forName("UTF-8"));
+			Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromStrings(javaFiles);
+			
+			compiler.getTask(null, fileManager, diagnosticsCollector, options, null, compilationUnits).call();
+
+			List<Diagnostic<? extends JavaFileObject>> diagnostics = diagnosticsCollector.getDiagnostics();
+			boolean errors = false;
+			for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
+				if (diagnostic.getKind() == Kind.ERROR) {
+					errors = true;
+				}
+				System.out.println(diagnostic.getMessage(Locale.getDefault()));
+			}
+			if (errors) {
+				throw new ToolsException("Compilation failed");
+			}
+            Verbose.log("Compiled " + javaFiles.size() + " java files.");
         }
     }
 }

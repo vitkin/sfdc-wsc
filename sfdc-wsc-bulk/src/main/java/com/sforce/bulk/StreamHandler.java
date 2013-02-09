@@ -36,7 +36,7 @@ public class StreamHandler {
         getLogStream().println(BULK_TAG + "INFO:" + message);
     }
 
-    public void error(String message, Throwable e) throws StreamException {
+    public void error(String message, Exception e) throws StreamException {
         errorCount++;
 
         getLogStream().println(BULK_TAG + "ERROR:" + message);

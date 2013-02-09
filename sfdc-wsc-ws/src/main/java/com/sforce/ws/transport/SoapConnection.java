@@ -25,7 +25,9 @@
  */
 package com.sforce.ws.transport;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.SocketTimeoutException;
@@ -34,9 +36,16 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import com.sforce.ws.*;
-import com.sforce.ws.bind.*;
-import com.sforce.ws.parser.*;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.SessionRenewer;
+import com.sforce.ws.SoapFaultException;
+import com.sforce.ws.bind.TypeInfo;
+import com.sforce.ws.bind.TypeMapper;
+import com.sforce.ws.bind.XMLizable;
+import com.sforce.ws.parser.PullParserException;
+import com.sforce.ws.parser.XmlInputStream;
+import com.sforce.ws.parser.XmlOutputStream;
 import com.sforce.ws.util.Verbose;
 import com.sforce.ws.wsdl.Constants;
 
@@ -47,18 +56,19 @@ import com.sforce.ws.wsdl.Constants;
  * web service.
  *
  * @author http://cheenath.com
+ * @author jesperudby
  * @version 1.0
  * @since 1.0  Nov 30, 2005
  */
 public class SoapConnection {
-    private String url;
-    private TypeMapper typeMapper;
-    private String objectNamespace;
-    private HashMap<QName, Object> headers = new HashMap<QName, Object>();
-    private ConnectorConfig config;
+    private final String url;
+    private final TypeMapper typeMapper;
+    private final String objectNamespace;
+    private final HashMap<QName, Object> headers = new HashMap<QName, Object>();
+    private final ConnectorConfig config;
     private Object connection;
     
-    private Map<QName, Class> knownHeaders;
+    private Map<QName, Class<?>> knownHeaders;
 
     public SoapConnection(String url, String objectNamespace, TypeMapper typeMapper, ConnectorConfig config) {
         this.url = url;
@@ -71,75 +81,64 @@ public class SoapConnection {
         this.connection = connection;
     }
 
-    public void setKnownHeaders(Map<QName, Class> knownHeaders) {
+    public void setKnownHeaders(Map<QName, Class<?>> knownHeaders) {
         this.knownHeaders = knownHeaders;
     }
 
-    //TODO: delete this method
-    public XMLizable send(QName requestElement, XMLizable request, QName responseElement, Class responseType)
+    public XMLizable send(String soapAction, QName requestElement, XMLizable request, QName responseElement, Class<?> responseType)
             throws ConnectionException {
-        return send(null, requestElement, request, responseElement, responseType);
-    }
+        if (soapAction == null) {
+            soapAction = "";
+        }
+        
+        Map<String, String> soapHttpHeaders = new HashMap<String, String>();
 
-    public XMLizable send(String soapAction, QName requestElement, XMLizable request, QName responseElement, Class responseType)
-            throws ConnectionException {
+        soapHttpHeaders.put("SOAPAction", "\"" + soapAction + "\"");
+        soapHttpHeaders.put("Content-Type", "text/xml; charset=UTF-8");
+        soapHttpHeaders.put("Accept", "text/xml");
 
-        long startTime = System.currentTimeMillis();
-
+    	long startTime = 0;
         try {
             boolean firstTime = true;
             while(true) {
                 try {
-                    Transport transport = newTransport(config);
-                    OutputStream out = transport.connect(url, soapAction);
-                    sendRequest(out, request, requestElement);
-                    InputStream in = transport.getContent();
-                    XMLizable result;
-                    result = receive(transport, responseElement, responseType, in);
-                    return result;
-                } catch (SessionTimedOutException se) {
-                    if (config.getSessionRenewer() == null || !firstTime) {
-                        throw (ConnectionException) se.getCause();
-                    } else {
+                	startTime = System.currentTimeMillis();
+					Transport transport = config.createTransport();
+					OutputStream out = transport.connect(url, soapHttpHeaders, true);
+					sendRequest(out, request, requestElement);
+					InputStream in = transport.getContent();
+					return receive(transport, responseElement, responseType, in);
+                } catch (SoapFaultException se) {
+                    if (config.getSessionRenewer() != null && firstTime && isSessionTimedOutFault(se)) {
                     	SessionRenewer.SessionRenewalHeader sessionHeader = config.getSessionRenewer().renewSession(config);
                     	if (sessionHeader != null) {
                             addHeader(sessionHeader.name, sessionHeader.headerElement);
                     	}
+                    } else {
+                    	throw se;
                     }
                 }
                 firstTime = false;
             }
         } catch (SocketTimeoutException e) {
-            long timeTaken = System.currentTimeMillis() - startTime;
-            throw new ConnectionException("Request to " + url + " timed out. TimeTaken=" + timeTaken +
+        	long timeTaken = System.currentTimeMillis() - startTime;
+            throw new RequestTimedOutException("Request to " + url + " timed out. TimeTaken=" + timeTaken +
                     " ConnectionTimeout=" + config.getConnectionTimeout() + " ReadTimeout=" + 
                     config.getReadTimeout(), e);
-
-
         } catch (IOException e) {
             throw new ConnectionException("Failed to send request to " + url, e);
         }
     }
 
-    private Transport newTransport(ConnectorConfig config) throws ConnectionException {
-        try {
-            Transport t = (Transport) config.getTransport().newInstance();
-            t.setConfig(config);
-            return t;
-        } catch (InstantiationException e) {
-            throw new ConnectionException("Failed to create new Transport " + config.getTransport());
-        } catch (IllegalAccessException e) {
-            throw new ConnectionException("Failed to create new Transport " + config.getTransport());
-        }
-    }
+    private boolean isSessionTimedOutFault(SoapFaultException sfe) {
+		return "INVALID_SESSION_ID".equals(sfe.getFaultCode().getLocalPart()) && sfe.getMessage() != null && (sfe.getMessage().contains("Session timed out") || sfe.getMessage().contains("Session not found"));
+	}
 
     private XMLizable receive(Transport transport, QName responseElement,
-                              Class responseType, InputStream in) throws IOException, ConnectionException {
-
+                              Class<?> responseType, InputStream in) throws IOException, ConnectionException {
         XMLizable result;
 
         try {
-           
             XmlInputStream xin = new XmlInputStream();
             xin.setInput(in, "UTF-8");
 
@@ -157,7 +156,7 @@ public class SoapConnection {
         return result;
     }
 
-    private XMLizable bind(XmlInputStream xin, QName responseElement, Class responseType)
+    private XMLizable bind(XmlInputStream xin, QName responseElement, Class<?> responseType)
             throws IOException, ConnectionException {
 
         readSoapEnvelopeStart(xin);
@@ -229,9 +228,6 @@ public class SoapConnection {
             e = (ConnectionException) typeMapper.readObject(xin, info, ConnectionException.class);
             if (e instanceof SoapFaultException) {
                 ((SoapFaultException)e).setFaultCode(faultCode);
-                if (faultstring != null && (faultstring.contains("Session timed out") || faultstring.contains("Session not found")) && "INVALID_SESSION_ID".equals(faultCode.getLocalPart())) {
-                    e = new SessionTimedOutException(faultstring, e);
-                }
             }
         } catch (ConnectionException ce) {
             throw new ConnectionException("Failed to parse detail: " + xin + " due to: " + ce, ce.getCause());
@@ -268,7 +264,7 @@ public class SoapConnection {
             if (xin.getEventType() == XmlInputStream.START_TAG) {
                 QName tag = new QName(xin.getNamespace(), xin.getName());
 
-                Class headerType = (knownHeaders != null) ? knownHeaders.get(tag) : null;
+                Class<?> headerType = (knownHeaders != null) ? knownHeaders.get(tag) : null;
 
                 if (headerType != null) {
                     TypeInfo info = new TypeInfo(xin.getNamespace(), xin.getName(), null, null, 1, 1, true);
@@ -286,7 +282,7 @@ public class SoapConnection {
         }
     }
 
-    private void setHeader(QName tag, Class headerType, XMLizable result) {
+    private void setHeader(QName tag, Class<?> headerType, XMLizable result) {
         try {
             Method m = connection.getClass().getMethod("__set" + tag.getLocalPart(), new Class[]{headerType});
             m.invoke(connection, result);
@@ -363,9 +359,10 @@ public class SoapConnection {
         headers.clear();
     }
     
-    private static class SessionTimedOutException extends ConnectionException {
-        private SessionTimedOutException(String faultString, Exception e) {
-            super(faultString, e);
+    public static class RequestTimedOutException extends ConnectionException {
+		private static final long serialVersionUID = 1L;
+		private RequestTimedOutException(String message, Exception e) {
+            super(message, e);
         }
     }
 }

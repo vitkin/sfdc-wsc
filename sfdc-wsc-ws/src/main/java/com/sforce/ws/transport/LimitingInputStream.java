@@ -27,46 +27,80 @@ package com.sforce.ws.transport;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Map;
 
-import com.sforce.ws.ConnectorConfig;
+public class LimitingInputStream extends InputStream {
 
-/**
- * This interface defines a Transport.
- *
- * @author http://cheenath.com
- * @author jesperudby
- * @version 1.0
- * @since 1.0  Nov 30, 2005
- */
-public interface Transport {
+    private int maxSize;
+    private int size;
+    private InputStream in;
 
-    void setConfig(ConnectorConfig config);
+    public LimitingInputStream(int maxSize, InputStream in) {
+        this.in = in;
+        this.maxSize = maxSize;
+    }
 
-    /**
-     * Connect to the specified endpoint.
-     *
-     * @param url endpoint address
-     * @param httpHeaders HTTP headers to add to request
-     * @param enableCompression false to disable gzip compression (overrides config setting)
-     * @return output stream that can be used to send response
-     * @throws IOException failed to connect to the endpoint
-     */
-    OutputStream connect(String endpoint, Map<String, String> httpHeaders, boolean enableCompression) throws IOException;
+    private void checkSizeLimit() throws IOException {
+        if (size > maxSize) {
+            throw new IOException("Exceeded max size limit of " +
+                    maxSize + " with response size " + size);
+        }
+    }
 
-    /**
-     * returns the response from the endpoint. This method must be called after
-     * a connect call.
-     *
-     * @return response or error stream.
-     * @throws java.io.IOException failed to get content
-     */
-    InputStream getContent() throws IOException;
+    @Override
+    public int read() throws IOException {
+        int result = in.read();
+        size++;
+        checkSizeLimit();
+        return result;
+    }
 
-    /**
-     * checks whether the response from the remote server is successful or not.
-     * @return true if the call was successful
-     */
-    boolean isSuccessful();
+    @Override
+    public int read(byte b[]) throws IOException {
+        int len = in.read(b);
+        size += len;
+        checkSizeLimit();
+        return len;
+    }
+
+    @Override
+    public int read(byte b[], int off, int len) throws IOException {
+        int length = in.read(b, off, len);
+        size += length;
+        checkSizeLimit();
+        return length;
+     }
+
+    @Override
+    public long skip(long n) throws IOException {
+        long len = in.skip(n);
+        size += len;
+        checkSizeLimit();
+        return len;
+    }
+
+    @Override
+    public int available() throws IOException {
+        return in.available();
+    }
+
+    @Override
+    public void close() throws IOException {
+        in.close();
+    }
+
+    @Override
+    public synchronized void mark(int readlimit) {
+        in.mark(readlimit);
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+        in.reset();
+
+    }
+
+    @Override
+    public boolean markSupported() {
+        return in.markSupported();
+    }
 }

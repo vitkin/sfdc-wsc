@@ -86,7 +86,8 @@ public class <%=gen.className%> {
        throws com.sforce.ws.ConnectionException {
     com.sforce.ws.transport.SoapConnection __connection = newConnection();
     <%=gen.requestType(op)%> __request = new <%=gen.requestType(op)%>();
-    <%=gen.responseType(op)%> __response = new <%=gen.responseType(op)%>();
+    <% if ("void".equals(gen.returnType(op))) { %>@SuppressWarnings("unused")<% } %>
+    <%=gen.responseType(op)%> __response = null;
 
   <% for (ait = gen.argElements(op); ait.hasNext();){ ael = ait.next();%>
     __request.<%=gen.argSetMethod(ael)%>(<%=gen.argName(ael)%>);<%}/**end for argElements...*/%>
@@ -131,7 +132,7 @@ public class <%=gen.className%> {
 
 <%=gen.dumpQNames()%>
 
-  private static HashMap<QName, java.lang.Class> knownHeaders = new HashMap<QName, java.lang.Class>();
+  private static final HashMap<QName, java.lang.Class<?>> knownHeaders = new HashMap<QName, java.lang.Class<?>>();
 
   static {
 

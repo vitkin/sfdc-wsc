@@ -28,6 +28,7 @@ package com.sforce.ws.transport;
 import java.io.*;
 import java.net.URL;
 
+import java.util.Map;
 import java.util.logging.*;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
@@ -44,7 +45,6 @@ import com.google.appengine.api.urlfetch.*;
  * @version 1.0
  * @since 1.0  Jan 29 2009
  */
-
 public class GaeHttpTransport implements Transport {
 
     private static Logger log = Logger.getLogger("soapconnection send");
@@ -69,18 +69,9 @@ public class GaeHttpTransport implements Transport {
         this.config = config;
     }
 
-    public OutputStream connect(String uri, String soapAction) throws IOException {
-        // log.info( uri );   log.info( soapAction );
-
-        url = new URL(uri);
+    public OutputStream connect(String endpoint, Map<String, String> httpHeaders, boolean enableCompression) throws IOException {
+        url = new URL(endpoint);
         request = new HTTPRequest(url,HTTPMethod.POST);
-
-        if (soapAction == null) {   soapAction = ""; }
-
-        request.addHeader( new HTTPHeader("Content-Type", "text/xml; charset=UTF-8") );
-        request.addHeader( new HTTPHeader("Accept", "text/xml") );
-        request.addHeader( new HTTPHeader("User-Agent", VersionInfo.info()) );
-        request.addHeader( new HTTPHeader("SOAPAction", "\"" + soapAction + "\"") );
 
         output = new ByteArrayOutputStream();
         return output;

@@ -44,12 +44,10 @@ public class UpdateStream {
             try {
                 loginHelper.doLogin();
                 break;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 handler.error("Failed to login ", e);
             }
         }
-
-
     }
 
     public void start(String object, OperationEnum operation, ConcurrencyMode concurrencyMode, String[] fieldNames)
@@ -77,7 +75,7 @@ public class UpdateStream {
 
                 handler.info("Bulk api job created with ID : " + job.getId());
                 break;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 handler.error("Failed to create job ", e);
             }
         }
@@ -94,7 +92,7 @@ public class UpdateStream {
                 job = bulkConnection.closeJob(job.getId());
                 handler.info("Job closed");
                 break;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 handler.error("Failed to close job ", e);
             }
         }
@@ -135,7 +133,7 @@ public class UpdateStream {
                 recordCount = 0;
 
                 break;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 handler.error("Failed to close job ", e);
             }
         }

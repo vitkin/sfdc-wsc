@@ -25,24 +25,33 @@
  */
 package com.sforce.ws.transport;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import com.sforce.ws.*;
+import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.MessageHandler;
+import com.sforce.ws.MessageHandlerWithHeaders;
+import com.sforce.ws.TeeOutputStream;
 import com.sforce.ws.tools.VersionInfo;
 import com.sforce.ws.util.Base64;
 import com.sforce.ws.util.FileUtil;
+import com.sforce.ws.util.XmlTraceHelper;
 
 /**
  * This class is an implementation of Transport using the build in
  * JDK URLConnection.
  *
  * @author http://cheenath.com
+ * @author jesperudby
  * @version 1.0
  * @since 1.0  Nov 30, 2005
  */
@@ -64,35 +73,8 @@ public class JdkHttpTransport implements Transport {
         this.config = config;
     }
 
-    public OutputStream connect(String uri, HashMap<String, String> httpHeaders) throws IOException {
-        return connectLocal(uri, httpHeaders, true);
-    }
-
-    public OutputStream connect(String uri, HashMap<String, String> httpHeaders, boolean enableCompression)
-            throws IOException {
-        return connectLocal(uri, httpHeaders, enableCompression);
-    }
-
     @Override
-    public OutputStream connect(String uri, String soapAction) throws IOException {
-        if (soapAction == null) {
-            soapAction = "";
-        }
-
-        HashMap<String, String> header = new HashMap<String, String>();
-
-        header.put("SOAPAction", "\"" + soapAction + "\"");
-        header.put("Content-Type", "text/xml; charset=UTF-8");
-        header.put("Accept", "text/xml");
-
-        return connectLocal(uri, header);
-    }
-
-    private OutputStream connectLocal(String uri, HashMap<String, String> httpHeaders) throws IOException {
-        return connectLocal(uri, httpHeaders, true);
-    }
-
-    private OutputStream connectLocal(String uri, HashMap<String, String> httpHeaders, boolean enableCompression)
+    public OutputStream connect(String uri, Map<String, String> httpHeaders, boolean enableCompression)
             throws IOException {
         return wrapOutput(connectRaw(uri, httpHeaders, enableCompression), enableCompression);
     }
@@ -108,17 +90,17 @@ public class JdkHttpTransport implements Transport {
         }
 
         if (config.isTraceMessage()) {
-            output = new TeeOutputStream(output);
+            output = new TeeOutputStream(output, config.getTraceStream());
         }
 
         if (config.hasMessageHandlers()) {
-            output = new MessageHandlerOutputStream(output);
+            output = new MessageHandlerOutputStream(url, output, config.getMessagerHandlers());
         }
 
         return output;
     }
 
-    private OutputStream connectRaw(String uri, HashMap<String, String> httpHeaders, boolean enableCompression)
+    private OutputStream connectRaw(String uri, Map<String, String> httpHeaders, boolean enableCompression)
             throws IOException {
         url = new URL(uri);
 
@@ -133,13 +115,11 @@ public class JdkHttpTransport implements Transport {
         return connection.getOutputStream();
     }
 
-    public static HttpURLConnection createConnection(ConnectorConfig config, URL url,
-            HashMap<String, String> httpHeaders) throws IOException {
+    public static HttpURLConnection createConnection(ConnectorConfig config, URL url, Map<String, String> httpHeaders) throws IOException {
         return createConnection(config, url, httpHeaders, true);
     }
 
-    public static HttpURLConnection createConnection(ConnectorConfig config, URL url,
-            HashMap<String, String> httpHeaders, boolean enableCompression) throws IOException {
+    public static HttpURLConnection createConnection(ConnectorConfig config, URL url, Map<String, String> httpHeaders, boolean enableCompression) throws IOException {
 
         if (config.isTraceMessage()) {
             config.getTraceStream().println( "WSC: Creating a new connection to " + url + " Proxy = " +
@@ -147,7 +127,9 @@ public class JdkHttpTransport implements Transport {
         }
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection(config.getProxy());
-        connection.addRequestProperty("User-Agent", VersionInfo.info());
+        if (httpHeaders == null || (httpHeaders.get("User-Agent") == null && httpHeaders.get("user-agent") == null)) {
+            connection.addRequestProperty("User-Agent", VersionInfo.info());
+        }
 
         /*
          * Add all the client specific headers here
@@ -192,16 +174,16 @@ public class JdkHttpTransport implements Transport {
         InputStream in;
 
         try {
-            successful = true;
             in = connection.getInputStream();
         } catch (IOException e) {
-            successful = false;
             in = connection.getErrorStream();
             if (in == null) {
                 throw e;
             }
         }
 
+        this.successful = connection.getResponseCode() < 400;
+        
         String encoding = connection.getHeaderField("Content-Encoding");
 
         if (config.getMaxResponseSize() > 0) {
@@ -217,9 +199,7 @@ public class JdkHttpTransport implements Transport {
             in = new ByteArrayInputStream(bytes);
 
             if (config.hasMessageHandlers()) {
-                Iterator<MessageHandler> it = config.getMessagerHandlers();
-                while(it.hasNext()) {
-                    MessageHandler handler = it.next();
+                for (MessageHandler handler : config.getMessagerHandlers()) {
                     if (handler instanceof MessageHandlerWithHeaders) {
                         ((MessageHandlerWithHeaders) handler).handleResponse(url, bytes, connection.getHeaderFields());
                     } else {
@@ -230,13 +210,13 @@ public class JdkHttpTransport implements Transport {
 
             if (config.isTraceMessage()) {
                 Map<String, List<String>> headers = connection.getHeaderFields();
-                for (Map.Entry header : headers.entrySet()) {
+                for (Map.Entry<String, List<String>> header : headers.entrySet()) {
                     config.getTraceStream().print(header.getKey());
                     config.getTraceStream().print("=");
                     config.getTraceStream().println(header.getValue());
                 }
                 
-                new TeeInputStream(config, bytes);
+                new XmlTraceHelper(config.getTraceStream(), config.isPrettyPrintXml()).trace(bytes);
             }
         }
 
@@ -247,258 +227,4 @@ public class JdkHttpTransport implements Transport {
     public boolean isSuccessful() {
         return successful;
     }
-
-    public static class TeeInputStream {
-        private int level = 0;
-        private ConnectorConfig config;
-
-        public TeeInputStream(ConnectorConfig config, byte[] bytes) {
-            this.config = config;
-            config.getTraceStream().println("------------ Response start ----------");
-
-            if (config.isPrettyPrintXml()) {
-                prettyPrint(bytes);
-            } else {
-                config.getTraceStream().print(new String(bytes));
-            }
-
-            config.getTraceStream().println();
-            config.getTraceStream().println("------------ Response end   ----------");
-        }
-
-        private void prettyPrint(byte[] bytes) {
-            boolean newLine = true;
-            for (int i = 0; i < bytes.length; i++) {
-                if (bytes[i] == '<') {
-                    if (i + 1 < bytes.length) {
-                        if (bytes[i + 1] == '/') {
-                            level--;
-                        } else {
-                            level++;
-                        }
-                    }
-                    for (int j = 0; newLine && j < level; j++) {
-                        config.getTraceStream().print("  ");
-                    }
-                }
-
-                config.getTraceStream().write(bytes[i]);
-
-                if (bytes[i] == '>') {
-                    if (i + 1 < bytes.length && bytes[i + 1] == '<') {
-                        config.getTraceStream().println();
-                        newLine = true;
-                    } else {
-                        newLine = false;
-                    }
-                }
-            }
-        }
-    }
-
-    public class MessageHandlerOutputStream extends OutputStream {
-        private ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        private OutputStream output;
-
-        public MessageHandlerOutputStream(OutputStream output) {
-            this.output = output;
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            bout.write((char) b);
-            output.write(b);
-        }
-
-        @Override
-        public void write(byte b[]) throws IOException {
-            bout.write(b);
-            output.write(b);
-        }
-
-        @Override
-        public void write(byte b[], int off, int len) throws IOException {
-            bout.write(b, off, len);
-            output.write(b, off, len);
-        }
-
-        @Override
-        public void close() throws IOException {
-            bout.close();
-            output.close();
-
-            Iterator<MessageHandler> it = config.getMessagerHandlers();
-
-            while(it.hasNext()) {
-                MessageHandler handler = it.next();
-                handler.handleRequest(url, bout.toByteArray());
-            }
-        }
-    }
-
-    public static class LimitingInputStream extends InputStream {
-
-        private int maxSize;
-        private int size;
-        private InputStream in;
-
-        public LimitingInputStream(int maxSize, InputStream in) {
-            this.in = in;
-            this.maxSize = maxSize;
-        }
-
-        private void checkSizeLimit() throws IOException {
-            if (size > maxSize) {
-                throw new IOException("Exceeded max size limit of " +
-                        maxSize + " with response size " + size);
-            }
-        }
-
-        @Override
-        public int read() throws IOException {
-            int result = in.read();
-            size++;
-            checkSizeLimit();
-            return result;
-        }
-
-        @Override
-        public int read(byte b[]) throws IOException {
-            int len = in.read(b);
-            size += len;
-            checkSizeLimit();
-            return len;
-        }
-
-        @Override
-        public int read(byte b[], int off, int len) throws IOException {
-            int length = in.read(b, off, len);
-            size += length;
-            checkSizeLimit();
-            return length;
-         }
-
-        @Override
-        public long skip(long n) throws IOException {
-            long len = in.skip(n);
-            size += len;
-            checkSizeLimit();
-            return len;
-        }
-
-        @Override
-        public int available() throws IOException {
-            return in.available();
-        }
-
-        @Override
-        public void close() throws IOException {
-            in.close();
-        }
-
-        @Override
-        public synchronized void mark(int readlimit) {
-            in.mark(readlimit);
-        }
-
-        @Override
-        public synchronized void reset() throws IOException {
-            in.reset();
-
-        }
-
-        @Override
-        public boolean markSupported() {
-            return in.markSupported();
-        }
-    }
-
-    public static class LimitingOutputStream extends OutputStream {
-        private int size = 0;
-        private int maxSize;
-        private OutputStream out;
-
-        public LimitingOutputStream(int maxSize, OutputStream out) {
-            this.maxSize = maxSize;
-            this.out = out;
-        }
-
-        public int getSize() {
-            return size;
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            size++;
-            checkSizeLimit();
-            out.write(b);
-        }
-
-        private void checkSizeLimit() throws IOException {
-            if (size > maxSize) {
-                throw new IOException("Exceeded max size limit of " +
-                        maxSize + " with request size " + size);
-            }
-        }
-
-        @Override
-        public void write(byte b[]) throws IOException {
-            size += b.length;
-            checkSizeLimit();
-            out.write(b);
-        }
-
-        @Override
-        public void write(byte b[], int off, int len) throws IOException {
-            size += len;
-            checkSizeLimit();
-            out.write(b, off, len);
-        }
-
-        @Override
-        public void flush() throws IOException {
-            out.flush();
-        }
-
-        @Override
-        public void close() throws IOException {
-            out.close();
-        }
-    }
-
-    public class TeeOutputStream extends OutputStream {
-        private OutputStream out;
-
-        public TeeOutputStream(OutputStream out) {
-            config.getTraceStream().println("------------ Request start   ----------");
-            this.out = out;
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            config.getTraceStream().write((char) b);
-            out.write(b);
-        }
-
-        @Override
-        public void write(byte b[]) throws IOException {
-            config.getTraceStream().write(b);
-            out.write(b);
-        }
-
-        @Override
-        public void write(byte b[], int off, int len) throws IOException {
-            config.getTraceStream().write(b, off, len);
-            out.write(b, off, len);
-        }
-
-        @Override
-        public void close() throws IOException {
-            config.getTraceStream().println();
-            config.getTraceStream().flush();
-            out.close();
-            config.getTraceStream().println("------------ Request end   ----------");
-        }
-    }
-
 }

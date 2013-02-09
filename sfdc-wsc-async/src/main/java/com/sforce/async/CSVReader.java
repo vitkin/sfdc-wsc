@@ -281,7 +281,8 @@ public class CSVReader {
 
 
     public static class CSVParseException extends IOException {
-        final int recordNumber;
+		private static final long serialVersionUID = 1L;
+		final int recordNumber;
 
         CSVParseException(String message, int lineno) {
             super(message);

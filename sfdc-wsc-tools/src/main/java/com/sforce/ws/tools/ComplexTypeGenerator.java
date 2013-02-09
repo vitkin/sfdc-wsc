@@ -67,7 +67,7 @@ public class ComplexTypeGenerator extends TypeGenerator {
         if (complexType.getBase() == null) {
             if (complexType.isHeader()) {
                 sb.append("extends com.sforce.ws.bind.SoapHeaderObject ");
-            } else if (getClassName().endsWith("Fault")) {
+            } else if (isFault()) {
                 sb.append("extends com.sforce.ws.SoapFaultException ");
             }
             sb.append("implements com.sforce.ws.bind.XMLizable");
@@ -76,6 +76,10 @@ public class ComplexTypeGenerator extends TypeGenerator {
         }
         return sb.toString();
     }
+
+	public boolean isFault() {
+		return getClassName().endsWith("Fault");
+	}
 
     public String superWrite() {
         if (!complexType.hasBaseClass()) {

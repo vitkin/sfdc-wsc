@@ -26,14 +26,12 @@
 package <%=packageName%>;
 
 import com.sforce.ws.bind.XmlObject;
-import com.sforce.ws.wsdl.Constants;
-import com.sforce.ws.parser.XmlInputStream;
 
-import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
+ * Generated class, please do not edit.
  */
 public class SObject extends XmlObject {
 

@@ -4,7 +4,7 @@ package <%=gen.packageName%>;
  * Generated class, please do not edit.
  */
 public class <%=gen.className%> <%=gen.baseClass()%> {
-
+<% if (gen.fault) { %>  private static final long serialVersionUID = 1L;<% } %>
   /**
    * Constructor
    */

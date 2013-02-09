@@ -25,48 +25,51 @@
  */
 package com.sforce.ws.transport;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
+import java.net.URL;
+import java.util.List;
 
-import com.sforce.ws.ConnectorConfig;
+import com.sforce.ws.MessageHandler;
 
-/**
- * This interface defines a Transport.
- *
- * @author http://cheenath.com
- * @author jesperudby
- * @version 1.0
- * @since 1.0  Nov 30, 2005
- */
-public interface Transport {
+public class MessageHandlerOutputStream extends OutputStream {
+    private final ByteArrayOutputStream bout = new ByteArrayOutputStream();
+    private final OutputStream output;
+	private final URL url;
+	private final List<MessageHandler> messagerHandlers;
 
-    void setConfig(ConnectorConfig config);
+    public MessageHandlerOutputStream(URL url, OutputStream output, List<MessageHandler> messagerHandlers) {
+    	this.url = url;
+        this.output = output;
+        this.messagerHandlers = messagerHandlers;
+    }
 
-    /**
-     * Connect to the specified endpoint.
-     *
-     * @param url endpoint address
-     * @param httpHeaders HTTP headers to add to request
-     * @param enableCompression false to disable gzip compression (overrides config setting)
-     * @return output stream that can be used to send response
-     * @throws IOException failed to connect to the endpoint
-     */
-    OutputStream connect(String endpoint, Map<String, String> httpHeaders, boolean enableCompression) throws IOException;
+    @Override
+    public void write(int b) throws IOException {
+        bout.write((char) b);
+        output.write(b);
+    }
 
-    /**
-     * returns the response from the endpoint. This method must be called after
-     * a connect call.
-     *
-     * @return response or error stream.
-     * @throws java.io.IOException failed to get content
-     */
-    InputStream getContent() throws IOException;
+    @Override
+    public void write(byte b[]) throws IOException {
+        bout.write(b);
+        output.write(b);
+    }
 
-    /**
-     * checks whether the response from the remote server is successful or not.
-     * @return true if the call was successful
-     */
-    boolean isSuccessful();
+    @Override
+    public void write(byte b[], int off, int len) throws IOException {
+        bout.write(b, off, len);
+        output.write(b, off, len);
+    }
+
+    @Override
+    public void close() throws IOException {
+        bout.close();
+        output.close();
+        
+        for (MessageHandler handler : messagerHandlers) {
+            handler.handleRequest(url, bout.toByteArray());
+        }
+    }
 }
