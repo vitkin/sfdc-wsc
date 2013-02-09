@@ -21,7 +21,7 @@
 		<pathelement location="${wscclasses.dir}"/>
 	</path>
 
-	<target name="all" depends="clean,build,build.jar" />
+	<target name="all" depends="clean,build,build.jar,build.min.jar" />
 
 	<target name="clean">
 		<delete dir="${wscclasses.dir}" />
@@ -75,6 +75,35 @@
 		<jar destfile="${wsc.root}/dist/wsc-${version}.jar" manifest="${wsc.root}/dist/temp/META-INF/MANIFEST.MF">
 			<fileset dir="${wscsrc.build}" />
 			<fileset dir="${wscclasses.dir}" />
+			<fileset dir="${wsc.root}/dist/temp/" />
+		</jar>
+
+		<delete dir="${wsc.root}/dist/temp" />
+		<delete dir="${wscsrc.build}" />
+	</target>
+
+	<target name="build.min.jar">
+		<mkdir dir="${wsc.root}/dist/temp" />
+
+		<unzip src="${wsc.root}/java/ext/gson-1.6.jar"
+    		dest="${wsc.root}/dist/temp" />
+
+		<manifest file="${wsc.root}/dist/temp/META-INF/MANIFEST.MF">
+			<attribute name="Built-By" value="${user.name}"/>
+			<attribute name="Implementation-Version" value="${version}-min"/>
+			<attribute name="Built-Date" value="${NOW}"/>
+		</manifest>
+
+		<jar destfile="${wsc.root}/dist/wsc-${version}-min.jar" manifest="${wsc.root}/dist/temp/META-INF/MANIFEST.MF">
+			<fileset dir="${wscclasses.dir}">
+				<exclude name="com/sforce/ws/template/*"/>
+				<exclude name="com/sforce/ws/tools/*"/>
+				<exclude name="com/sforce/ws/wsdl/*"/>
+			</fileset>
+			<fileset dir="${wscclasses.dir}">
+				<include name="com/sforce/ws/tools/VersionInfo.class"/>
+				<include name="com/sforce/ws/wsdl/SfdcApiType.class"/>
+			</fileset>
 			<fileset dir="${wsc.root}/dist/temp/" />
 		</jar>
 
