@@ -9,7 +9,7 @@
   
   <name>sfdc-wsc</name>
   
-  <version>26.0</version>
+  <version>27.0</version>
   
   <url>http://code.google.com/p/sfdc-wsc-maven/</url>
   
@@ -130,5 +130,6 @@
     <module>sfdc-wsc-ws-enterprise</module>
     <module>sfdc-wsc-ws-metadata</module>
     <module>sfdc-wsc-ws-partner</module>
+    <module>sfdc-wsc-ws-tooling</module>
   </modules>
 </project>

@@ -4,14 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>com.sforce.sfdc-wsc</groupId>
-  <artifactId>sfdc-wsc-ws-apex</artifactId>
+  <artifactId>sfdc-wsc-ws-tooling</artifactId>
   <packaging>jar</packaging>
   
-  <name>sfdc-wsc-ws-apex</name>
+  <name>sfdc-wsc-ws-tooling</name>
   
   <parent>
-    <groupId>com.sforce</groupId>
     <artifactId>sfdc-wsc</artifactId>
+    <groupId>com.sforce</groupId>
     <version>27.0</version>
   </parent>
   
@@ -94,7 +94,7 @@
                 also adding the project build directory -->
                 <classpath/>
                 <argument>com.sforce.ws.tools.wsdlc</argument>
-                <argument>${project.basedir}/apex.wsdl</argument>
+                <argument>${project.basedir}/tooling.wsdl</argument>
                 <argument>${project.generated}/${project.artifactId}-${project.version}.jar</argument>
                 <argument>${project.generated}</argument>
               </arguments>
