@@ -1,157 +1,271 @@
-<?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-      <groupId>org.sonatype.oss</groupId>
-      <artifactId>oss-parent</artifactId>
-      <version>7</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.force.api</groupId>
-    <artifactId>force-wsc</artifactId>
-    <packaging>jar</packaging>
-    <version>28.0.0</version>
-    <name>force-wsc</name>
-    <description>Force.com Web Service Connector</description>
-    <url>http://www.force.com</url>
-    <licenses>
-      <license>
-        <name>BSD License (FreeBSD)</name>
-        <url>LICENSE.md</url>
-        <distribution>repo</distribution>
-        <comments>A business-friendly OSS license</comments>
-      </license>
-    </licenses>
-    <scm>
-      <connection>scm:git:git://github.com/forcedotcom/wsc.git</connection>
-      <developerConnection>scm:git:git://github.com/forcedotcom/wsc.git</developerConnection>
-      <url>http://github.com/forcedotcom/wsc</url>
-    </scm>
-    <developers>
-      <!-- see mailing list -->
-    </developers>
-    <mailingLists>
-      <mailingList>
-        <name>Database.com SDK for Java Issues</name>
-        <archive>https://github.com/forcedotcom/java-sdk/issues?state=closed</archive>
-        <subscribe>https://github.com/forcedotcom/java-sdk/toggle_watch</subscribe>
-        <unsubscribe>https://github.com/forcedotcom/java-sdk/toggle_watch</unsubscribe>
-        <post>https://github.com/forcedotcom/java-sdk/issues/new</post>
-      </mailingList>
-    </mailingLists>
-    <dependencies>
-      <dependency>
-        <groupId>org.antlr</groupId>
-        <artifactId>ST4</artifactId>
-        <version>4.0.7</version>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.8.2</version>
-        <scope>test</scope>
-      </dependency>
-    </dependencies>
-    <build>
-      <resources>
-        <resource>
-          <filtering>false</filtering>
-          <directory>${basedir}</directory>
-          <includes>
-            <include>LICENSE.md</include>
-          </includes>
-        </resource>
-        <resource>
-          <filtering>false</filtering>
-          <directory>${basedir}/src/main/java</directory>
-          <includes>
-            <include>**</include>
-          </includes>
-          <excludes>
-            <exclude>**/*.java</exclude>
-          </excludes>
-        </resource>
-      </resources>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>com.sforce</groupId>
+  <artifactId>sfdc-wsc</artifactId>
+  <packaging>pom</packaging>
+  
+  <name>sfdc-wsc</name>
+  
+  <version>28.0.0</version>
+  
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+  
+  <url>http://code.google.com/p/sfdc-wsc-maven/</url>
+  
+  <issueManagement>
+    <system>Google Code</system>
+    <url>http://code.google.com/p/sfdc-wsc-maven/issues/list</url>
+  </issueManagement>
+  
+  <licenses>
+    <license>
+      <name>BSD-3-Clause</name>
+      <url>file:LICENSE.txt</url>
+      <distribution>repo</distribution>
+      <comments>A business-friendly OSS license</comments>
+    </license>
+  </licenses>
+  
+  <scm>
+    <connection>scm:git:https://code.google.com/p/sfdc-wsc-maven/</connection>
+    <developerConnection>scm:git:https://code.google.com/p/sfdc-wsc-maven/</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://code.google.com/p/sfdc-wsc-maven/</url>
+  </scm>
+  
+  <developers>
+    <!-- see mailing list -->
+  </developers>
+
+  <mailingLists>
+    <mailingList>
+      <name>Database.com SDK for Java Issues</name>
+      <archive>https://github.com/forcedotcom/java-sdk/issues?state=closed</archive>
+      <subscribe>https://github.com/forcedotcom/java-sdk/toggle_watch</subscribe>
+      <unsubscribe>https://github.com/forcedotcom/java-sdk/toggle_watch</unsubscribe>
+      <post>https://github.com/forcedotcom/java-sdk/issues/new</post>
+    </mailingList>
+  </mailingLists>
+  
+  <build>
+    <pluginManagement>
       <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+        only. It has no influence on the Maven build itself. -->
         <plugin>
-          <artifactId>maven-assembly-plugin</artifactId>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
           <configuration>
-            <descriptorRefs>
-              <descriptorRef>jar-with-dependencies</descriptorRef>
-            </descriptorRefs>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <versionRange>[1.0,)</versionRange>
+                    <goals>
+                      <!--<goal>java</goal>-->
+                      <goal>exec</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.8</version>
           <executions>
             <execution>
-              <phase>package</phase>
+              <id>add-source</id>
               <goals>
-                <goal>single</goal>
+                <goal>add-source</goal>
               </goals>
+              <configuration>
+                <sources>
+                  <source>${project.generated}</source>
+                </sources>
+              </configuration>
             </execution>
           </executions>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <configuration>
-            <encoding>UTF-8</encoding>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>2.3.1</version>
-          <configuration>
-            <includes>
-              <include>**</include>
-            </includes>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.1.2</version>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.2.1</version>
           <executions>
             <execution>
-              <id>attach-source</id>
-              <phase>package</phase>
+              <id>generate-sources</id>
+              <phase>generate-sources</phase>
               <goals>
-                <goal>jar-no-fork</goal>
+                <!--<goal>java</goal>-->
+                <goal>exec</goal>  
               </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.7</version>
-          <executions>
-            <execution>
-              <id>attach-javadoc</id>
-              <phase>package</phase>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>1.2</version>
-          <executions>
-            <execution>
-              <id>sign-artifacts</id>
-              <phase>package</phase>
-              <goals>
-                <goal>sign</goal>
-              </goals>
+              <configuration>
+                <!--<mainClass>com.sforce.ws.tools.wsdlc</mainClass>-->
+                <executable>java</executable>
+                <arguments>
+                  <!--<argument>-Dstandalone-jar=true</argument>-->
+                  <argument>-DcompileTarget=1.${project.jdk.version}</argument>
+                  <argument>-Dpackage-prefix=wsc</argument>
+                  <argument>-classpath</argument>
+                  <!-- automatically creates the classpath using all project dependencies,
+                  also adding the project build directory -->
+                  <classpath/>
+                  <argument>com.sforce.ws.tools.wsdlc</argument>
+                  <argument>-nc</argument>
+                  <argument>${project.basedir}/${wsdl.name}.wsdl</argument>
+                  <argument>${project.generated}/${project.artifactId}-${project.version}.jar</argument>
+                  <argument>${project.generated}</argument>
+                </arguments>
+              </configuration>
             </execution>
           </executions>
         </plugin>
       </plugins>
-    </build>
+    </pluginManagement>
+    
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.5</version>
+        <configuration>
+          <licenseName>fwsc</licenseName>
+          <inceptionYear>2013</inceptionYear>
+          <organizationName>salesforce.com, inc.</organizationName>
+          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+          <roots>
+            <root>src</root>
+          </roots>
+          <excludes>
+            <exclude>test/java/com/sforce/ws/tools/wsdlcTest.java</exclude>
+            <exclude>test/resources/codegeneration/*</exclude>
+            <exclude>**/*.properties</exclude>  
+            <exclude>**/*.sql</exclude> 
+            <exclude>**/*.xml</exclude>  
+          </excludes>  
+        </configuration>
+        <executions>
+          <execution>
+            <id>update-file-header</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>update-project-license</id>
+            <goals>
+              <goal>update-project-license</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <source>1.${project.jdk.version}</source>
+          <target>1.${project.jdk.version}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <classifier>jdk1${project.jdk.version}</classifier>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <profiles>
+    <profile>
+      <id>attach-sources</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>attach-javadocs</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+ 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.jdk.version>6</project.jdk.version>
+    <project.generated>${basedir}/target/generated-sources/soap</project.generated>
+    <license.licenseResolver>file:${project.basedir}/src/license</license.licenseResolver>
+  </properties>
+  
+  <modules>
+    <module>sfdc-wsc-ws</module>
+    <module>sfdc-wsc-ws-gae</module>
+    <module>sfdc-wsc-async</module>
+    <module>sfdc-wsc-bulk</module>
+    <module>sfdc-wsc-tools</module>
+    <module>sfdc-wsc-ws-apex</module>
+    <module>sfdc-wsc-ws-enterprise</module>
+    <module>sfdc-wsc-ws-enterprise-email</module>
+    <module>sfdc-wsc-ws-metadata</module>
+    <module>sfdc-wsc-ws-partner</module>
+    <module>sfdc-wsc-ws-partner-email</module>
+    <module>sfdc-wsc-ws-tooling</module>
+  </modules>
 </project>
