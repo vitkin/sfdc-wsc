@@ -52,7 +52,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.7</version>
+        <version>1.8</version>
         <executions>
           <execution>
             <id>add-source</id>
@@ -109,7 +109,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>sfdc-wsc-tools</artifactId>
-      <version>${project.version}</version>
+      <version>${project.parent.version}</version>
       <classifier>jdk1${project.jdk.version}</classifier>
       <optional>true</optional>
     </dependency>

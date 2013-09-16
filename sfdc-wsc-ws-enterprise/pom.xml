@@ -117,7 +117,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>sfdc-wsc-tools</artifactId>
-      <version>${project.version}</version>
+      <version>${project.parent.version}</version>
       <classifier>jdk1${project.jdk.version}</classifier>
       <optional>true</optional>
     </dependency>

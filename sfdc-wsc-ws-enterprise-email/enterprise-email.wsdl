@@ -6,7 +6,13 @@ Generated on (Used notimestamp option).
 Copyright 1999-2013 salesforce.com, inc.
 All Rights Reserved
 -->
-<definitions targetNamespace="urn:enterprise.soap.sforce.com" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:enterprise.soap.sforce.com" xmlns:fns="urn:fault.enterprise.soap.sforce.com" xmlns:ens="urn:sobject.enterprise.soap.sforce.com">
+<definitions targetNamespace="urn:enterprise.soap.sforce.com"
+             xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:tns="urn:enterprise.soap.sforce.com"
+             xmlns:fns="urn:fault.enterprise.soap.sforce.com"
+             xmlns:ens="urn:sobject.enterprise.soap.sforce.com">
     <types>
 
         <schema elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:sobject.enterprise.soap.sforce.com">
@@ -8491,6 +8497,31 @@ All Rights Reserved
 
 
 
+            <complexType name="NameValuePair">
+                <sequence>
+                    <element name="name"           type="xsd:string" />
+                    <element name="value"          type="xsd:string" />
+                </sequence>
+            </complexType>
+
+            <complexType name="EmailAttachment">
+                <sequence>
+                    <element name="body"                nillable="true" minOccurs="0" type="xsd:base64Binary"/>
+                    <element name="contentType"         type="xsd:string" />
+                    <element name="fileName"            type="xsd:string" />
+                </sequence>
+            </complexType>
+
+            <complexType name="HandledEmailMessage">
+                <sequence>
+                    <element name="attachments"         minOccurs="0" maxOccurs="unbounded" type="tns:EmailAttachment"/>
+                    <element name="headers"             minOccurs="0" maxOccurs="unbounded" type="tns:NameValuePair"/>
+                    <element name="htmlBody"            type="xsd:string" />
+                    <element name="subject"             type="xsd:string" />
+                    <element name="textBody"            type="xsd:string" />
+                </sequence>
+            </complexType>
+
             <complexType name="EmailFileAttachment">
                 <sequence>
                     <element name="body" nillable="true" minOccurs="0" type="xsd:base64Binary"/>
@@ -8768,6 +8799,22 @@ All Rights Reserved
                 </complexType>
             </element>
 
+
+            <!-- Email Message Types -->
+            <element name="handleEmailMessage">
+                <complexType>
+                    <sequence>
+                        <element name="messages" type="tns:HandledEmailMessage" minOccurs="0" maxOccurs="10"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="handleEmailMessageResponse">
+                <complexType>
+                    <sequence>
+                        <element name="result" type="tns:SaveResult" minOccurs="0" maxOccurs="10"/>
+                    </sequence>
+                </complexType>
+            </element>
 
 
             <!-- Send Email Types -->
@@ -9928,6 +9975,13 @@ All Rights Reserved
         <part element="tns:getUserInfoResponse" name="parameters"/>
     </message>
 
+    <message name="handleEmailMessageRequest">
+        <part element="tns:handleEmailMessage" name="parameters"/>
+    </message>
+    <message name="handleEmailMessageResponse">
+        <part element="tns:handleEmailMessageResponse" name="parameters"/>
+    </message>
+
     <message name="sendEmailMessageRequest">
         <part element="tns:sendEmailMessage" name="parameters"/>
     </message>
@@ -10213,6 +10267,13 @@ All Rights Reserved
             <input message="tns:getUserInfoRequest"/>
             <output message="tns:getUserInfoResponse"/>
             <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+        </operation>
+
+        <operation name="handleEmailMessage">
+            <documentation>Handle incoming email messages</documentation>
+            <input  message="tns:handleEmailMessageRequest"/>
+            <output message="tns:handleEmailMessageResponse"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="sendEmailMessage">
@@ -10868,6 +10929,21 @@ All Rights Reserved
             <soap:operation soapAction=""/>
             <input>
                 <soap:header use="literal" message="tns:Header" part="SessionHeader"/>
+                <soap:body parts="parameters" use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="UnexpectedErrorFault">
+                <soap:fault name="UnexpectedErrorFault" use="literal"/>
+            </fault>
+        </operation>
+        <operation name="handleEmailMessage">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:header use="literal" message="tns:Header" part="SessionHeader"/>
+                <soap:header use="literal" message="tns:Header" part="AssignmentRuleHeader"/>
+                <soap:header use="literal" message="tns:Header" part="EmailHeader"/>
                 <soap:body parts="parameters" use="literal"/>
             </input>
             <output>

@@ -18,13 +18,13 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>sfdc-wsc-async</artifactId>
-      <version>${project.version}</version>
+      <version>${project.parent.version}</version>
       <classifier>jdk1${project.jdk.version}</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>sfdc-wsc-ws</artifactId>
-      <version>${project.version}</version>
+      <version>${project.parent.version}</version>
       <classifier>jdk1${project.jdk.version}</classifier>
     </dependency>
   </dependencies>
