@@ -1,0 +1,799 @@
+__NOTOC__ __NOEDITSECTION__
+[[Category:Integration]][[Category:SOAP API]][[Category:Metadata API]]
+=Introduction to the Force.com Web Services Connector=
+The Force.com Web Services Connector (WSC) is a code-generation tool and runtime library for use with Force.com Web services. WSC uses a high-performing Web services client stack implemented with a streaming parser. It is the preferred tool for working with salesforce.com APIs. You can write Java applications with WSC that utilize the Force.com SOAP API, Bulk API, and Metadata API.  There are even runtime libraries that let you access the Force.com SOAP API from applications running on Google App Engine.
+
+Using WSC, you can perform operations with a few lines of code that would take many more lines of code with other Web services clients.
+
+This article provides an introduction to WSC.  The WSC can be used to invoke any doc-literal wrapped Web service, but in this article we’ll focus on the SOAP API with both the enterprise and partner WSDLs, and the Metadata API.  Along the way, you’ll learn how to get started with WSC, and see an example of a console application that demonstrates WSC functionality.
+
+=Introduction to Force.com SOAP API and Force.com Metadata API=
+
+Force.com supports several available APIs, including the Force.com SOAP API and Force.com Metadata API.
+
+The [[SOAP_API|Force.com SOAP API]] lets you create, retrieve, update, or delete records, along with 20+ different calls, including query, search, merge, and convertLead. The SOAP API has two WSDL options:
+
+* '''Enterprise WSDL''' - This WSDL is used by developers to build client applications for a single Salesforce.com organization. It is more straightforward to use as it is strongly typed and closely represents the object model in your organization. The major drawback of the enterprise WSDL is that whenever you make a change to an object or field you must download and re-consume the WSDL to generate new client code.
+
+* '''Partner WSDL''' - This WSDL is used to create dynamic, metadata-driven client applications that work with multiple Salesforce.com organizations. The partner WSDL is more flexible and generic in nature, representing a loosely-typed data model consisting of name-value pairs instead of specific data types. The Partner WSDL is typically, but not always, used by Salesforce.com partners or ISVs to build packaged applications.
+
+The Force.com Metadata API lets you retrieve, deploy, create, update, or delete metadata information for an organization, such as custom object definitions, tabs, profiles, and page layouts. Unlike the Force.com SOAP API that is meant for managing data, the Metadata API is for managing the underlying metadata of an organization. The Metadata API is typically used to build tools to retrieve customizations for an organization or deploy changes from a sandbox to a production organization.
+
+<!--For more information about the various APIs that salesforce.com supports, see the [http://wiki.developerforce.com/page/Data_Integration Data Integration page]. -->
+
+=Preparing to Integrate Java Apps with Force.com APIs=
+
+We’ll assume that you have some experience building Java applications with Force.com APIs, so we’ll skip over some of the granular details involved in the process.
+
+To get started, we'll run through the following steps:
+
+# Generate and download WSDLs.
+# Check your version of Java.
+# Download the WSC JAR.
+# Generate client-side Java code.
+
+
+==Step 1: Generate and Download WSDLs==
+
+To get your org-specific WSDLs, log into your organization and then click '''Your Name | Setup | App Setup | Develop | API'''. We need three WSDLs to complete all of the tutorials in this article:
+
+* the enterprise WSDL (unique to your organization)
+* the partner WSDL (generic)
+* the Metadata WSDL
+
+Save each WSDL to a directory on your computer.
+
+==Step 2: Check Your Version of Java==
+
+Before moving on, make sure that you have Java installed on your computer and that you know what version it is. From a Terminal or Command Prompt window, run the following command:
+
+<pre>java -version</pre>
+
+You should see something similar to:
+
+<code>
+java version "1.6.0_35"<br>
+Java(TM) SE Runtime Environment (build 1.6.0_35-b10-428-10M3811)<br>
+Java HotSpot(TM) 64-Bit Server VM (build 20.10-b01-428, mixed mode)<br>
+</code>
+
+That output tells you that you are using Java 1.6.x, which is useful information for the next step.
+
+==Step 3: Download the WSC JAR==
+
+WSC is an open-source project hosted at Google Code. Download the version of the WSC (wsc-XX.jar) and the pre-compiled Partner library (partner-XX.jar) that are compatible with your version of Java (see previous step). Downloads are available from the [http://code.google.com/p/sfdc-wsc/downloads/list project’s download page].
+
+==Step 4: Generate Client-Side Java Code==
+
+Now return to your Terminal or Command Prompt window, change your working directory to the location where you downloaded the files in previous steps, and then generate stub client code as follows.
+
+To generate the enterprise and partner client JARs, run the following command with the enterprise WSDL you downloaded from your organization.
+
+<pre>
+java -classpath wsc-XX.jar com.sforce.ws.tools.wsdlc enterprise.wsdl enterprise.jar
+java -classpath wsc-XX.jar com.sforce.ws.tools.wsdlc partner.wsdl partner.jar
+</pre>
+
+To generate the metadata client JAR, run a similar command with the Metadata WSDL. There is a small issue with the Metadata WSDL, so see this blog post for more information.
+
+<pre>
+java -classpath wsc-XX.jar com.sforce.ws.tools.wsdlc metadata.wsdl metadata.jar
+</pre>
+
+=Creating an Enterprise WSDL Application=
+
+Now that your environment is ready to go, it's time to build a test application to see how things are working. Most developers build client applications with the enterprise WSDL, so we’ll start with that one first.
+
+In Eclipse, complete the following steps to build a Java application based on the enterprise WSDL.
+
+# Create a new Java project named “WSC - Enterprise” (click '''File | New | Java Project''').
+# Add the wsc-XX.jar and enterprise.jar to the project (click '''Project | Properties | Java Build Path | Libraries''' or '''External Libraries''', then add the JARs to the project.
+# Add a new folder, ''wsc'', to the ''src'' folder in your app (right-click '''src''' in ''Package Explorer'', then click '''New | Folder''').
+# Create a new class src/wsc/Main.java and paste in the code from the code listing that follows.
+# Replace the stub user credentials in the code with your own user name and password with security token for the appropriate static members, then save your source code.
+# Run the application.
+
+<pre>
+package wsc;
+
+import com.sforce.soap.enterprise.Connector;
+import com.sforce.soap.enterprise.DeleteResult;
+import com.sforce.soap.enterprise.EnterpriseConnection;
+import com.sforce.soap.enterprise.Error;
+import com.sforce.soap.enterprise.QueryResult;
+import com.sforce.soap.enterprise.SaveResult;
+import com.sforce.soap.enterprise.sobject.Account;
+import com.sforce.soap.enterprise.sobject.Contact;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+
+public class Main {
+
+static final String USERNAME = "YOUR-USERNAME";
+static final String PASSWORD = "YOUR-PASSWORD&SECURITY-TOKEN";
+  static EnterpriseConnection connection;
+
+  public static void main(String[] args) {
+
+    ConnectorConfig config = new ConnectorConfig();
+    config.setUsername(USERNAME);
+    config.setPassword(PASSWORD);
+    //config.setTraceMessage(true);
+
+    try {
+
+      connection = Connector.newConnection(config);
+
+      // display some current settings
+      System.out.println("Auth EndPoint: "+config.getAuthEndpoint());
+      System.out.println("Service EndPoint: "+config.getServiceEndpoint());
+      System.out.println("Username: "+config.getUsername());
+      System.out.println("SessionId: "+config.getSessionId());
+
+      // run the different examples
+      queryContacts();
+      createAccounts();
+      updateAccounts();
+      deleteAccounts();
+
+
+    } catch (ConnectionException e1) {
+        e1.printStackTrace();
+    }
+
+  }
+
+  // queries and displays the 5 newest contacts
+  private static void queryContacts() {
+
+    System.out.println("Querying for the 5 newest Contacts...");
+
+    try {
+
+      // query for the 5 newest contacts
+      QueryResult queryResults = connection.query("SELECT Id, FirstName, LastName, Account.Name " +
+      		"FROM Contact WHERE AccountId != NULL ORDER BY CreatedDate DESC LIMIT 5");
+      if (queryResults.getSize() > 0) {
+        for (int i=0;i<queryResults.getRecords().length;i++) {
+          // cast the SObject to a strongly-typed Contact
+          Contact c = (Contact)queryResults.getRecords()[i];
+          System.out.println("Id: " + c.getId() + " - Name: "+c.getFirstName()+" "+
+              c.getLastName()+" - Account: "+c.getAccount().getName());
+        }
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  // create 5 test Accounts
+  private static void createAccounts() {
+
+    System.out.println("Creating 5 new test Accounts...");
+    Account[] records = new Account[5];
+
+    try {
+
+      // create 5 test accounts
+      for (int i=0;i<5;i++) {
+        Account a = new Account();
+        a.setName("Test Account "+i);
+        records[i] = a;
+      }
+
+      // create the records in Salesforce.com
+      SaveResult[] saveResults = connection.create(records);
+
+      // check the returned results for any errors
+      for (int i=0; i< saveResults.length; i++) {
+        if (saveResults[i].isSuccess()) {
+          System.out.println(i+". Successfully created record - Id: " + saveResults[i].getId());
+        } else {
+          Error[] errors = saveResults[i].getErrors();
+          for (int j=0; j< errors.length; j++) {
+            System.out.println("ERROR creating record: " + errors[j].getMessage());
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  // updates the 5 newly created Accounts
+  private static void updateAccounts() {
+
+    System.out.println("Update the 5 new test Accounts...");
+    Account[] records = new Account[5];
+
+    try {
+
+      QueryResult queryResults = connection.query("SELECT Id, Name FROM Account ORDER BY " +
+      		"CreatedDate DESC LIMIT 5");
+      if (queryResults.getSize() > 0) {
+        for (int i=0;i<queryResults.getRecords().length;i++) {
+          // cast the SObject to a strongly-typed Account
+          Account a = (Account)queryResults.getRecords()[i];
+          System.out.println("Updating Id: " + a.getId() + " - Name: "+a.getName());
+          // modify the name of the Account
+          a.setName(a.getName()+" -- UPDATED");
+          records[i] = a;
+        }
+      }
+
+      // update the records in Salesforce.com
+      SaveResult[] saveResults = connection.update(records);
+
+      // check the returned results for any errors
+      for (int i=0; i< saveResults.length; i++) {
+        if (saveResults[i].isSuccess()) {
+          System.out.println(i+". Successfully updated record - Id: " + saveResults[i].getId());
+        } else {
+          Error[] errors = saveResults[i].getErrors();
+          for (int j=0; j< errors.length; j++) {
+            System.out.println("ERROR updating record: " + errors[j].getMessage());
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  // delete the 5 newly created Account
+  private static void deleteAccounts() {
+
+    System.out.println("Deleting the 5 new test Accounts...");
+    String[] ids = new String[5];
+
+    try {
+
+      QueryResult queryResults = connection.query("SELECT Id, Name FROM Account ORDER BY " +
+      		"CreatedDate DESC LIMIT 5");
+      if (queryResults.getSize() > 0) {
+        for (int i=0;i<queryResults.getRecords().length;i++) {
+          // cast the SObject to a strongly-typed Account
+          Account a = (Account)queryResults.getRecords()[i];
+          // add the Account Id to the array to be deleted
+          ids[i] = a.getId();
+          System.out.println("Deleting Id: " + a.getId() + " - Name: "+a.getName());
+        }
+      }
+
+      // delete the records in Salesforce.com by passing an array of Ids
+      DeleteResult[] deleteResults = connection.delete(ids);
+
+      // check the results for any errors
+      for (int i=0; i< deleteResults.length; i++) {
+        if (deleteResults[i].isSuccess()) {
+          System.out.println(i+". Successfully deleted record - Id: " + deleteResults[i].getId());
+        } else {
+          Error[] errors = deleteResults[i].getErrors();
+          for (int j=0; j< errors.length; j++) {
+            System.out.println("ERROR deleting record: " + errors[j].getMessage());
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+}
+</pre>
+
+When you successfully run the application, it queries and displays the five most recent contacts and their account names, creates five new accounts, updates them, and then finally deletes them.
+
+==Code Highlights==
+
+Let's take a look at some notable snippets from the code.
+
+A key to starting is the ConnectorConfig class. Simply create a new ConnectorConfig object, set your credentials, create a new EnterpriseConnection object, connection, and then pass in the configuration to connect to Force.com.
+
+<pre>
+ConnectorConfig config = new ConnectorConfig();
+config.setUsername(USERNAME);
+config.setPassword(PASSWORD);
+//config.setTraceMessage(true);
+</pre>
+
+A handy configuration switch to use is the setTraceMessage attribute. When setting this value to true, WSC displays the request and response XML packets in the Terminal window so you can easily see what is going across the wire.
+
+Once you have the ConnectorConfig instance, create your connection:
+
+<pre>
+connection = Connector.newConnection(config);
+</pre>
+
+With this in hand, you can query, update, delete, or insert records very easily.  Here’s a simple query:
+
+<pre>
+QueryResult queryResults = connection.query("SELECT Id, FirstName, LastName, Account.Name " +
+      		"FROM Contact WHERE AccountId != NULL ORDER BY CreatedDate DESC LIMIT 5");
+if (queryResults.getSize() > 0) {
+        for (int i=0;i<queryResults.getRecords().length;i++) {
+          // cast the SObject to a strongly typed Contact
+          Contact c = (Contact)queryResults.getRecords()[i];
+          System.out.println("Id: " + c.getId() + " - Name: "+c.getFirstName()+" "+
+              c.getLastName()+" - Account: "+c.getAccount().getName());
+        }
+ }
+</pre>
+
+So simple!  Note how we can cast the SObject to a Contact object.
+
+Creating is just as simple.  Because you have Java classes representing the SObjects, you can simply go ahead and create them like so:
+
+<pre>
+Account a = new Account();
+a.setName("Test Account”);
+Account[] records = new Account[] {a};
+SaveResult[] saveResults = connection.create(records);
+</pre>
+
+If you’ve retrieved records and updated them, you can write them back by using the update method. For example:
+
+<pre>
+SaveResult[] saveResults = connection.update(records);
+</pre>
+
+To delete records, call the delete() method with an array of IDs.  For example:
+
+<pre>
+String[] ids = new String[5];
+// set the ids
+DeleteResult[] deleteResults = connection.delete(ids);
+</pre>
+
+Most of the methods also let you handle errors that can occur when invoking the Web service. Here, for example, is how we can check for success on the delete operation:
+
+<pre>
+for (int i=0; i< deleteResults.length; i++) {
+        if (deleteResults[i].isSuccess()) {
+          System.out.println(i+". Successfully deleted record - Id: " + deleteResults[i].getId());
+        } else {
+          Error[] errors = deleteResults[i].getErrors();
+          for (int j=0; j< errors.length; j++) {
+            System.out.println("ERROR deleting record: " + errors[j].getMessage());
+          }
+        }
+ }
+</pre>
+
+If you compare this WSC code with pure SOAP-based API code, you’ll see there is significantly less code required to connect to Force.com with the WSC.
+
+=Creating a Partner WSDL Application=
+
+Applications written with the partner WSDL look and function similarly to their enterprise WSDL cousins. Your application will differ in only a few places, so we’ll just highlight those.
+
+In Eclipse, complete the following steps to build a Java application based on the enterprise WSDL.
+
+# Create a new Java project named “WSC - Partner” (click '''File | New | Java Project''').
+# Add the wsc-XX.jar and partner.jar to the project (click '''Project | Properties | Java Build Path | Libraries''' or '''External Libraries''', then add the JARs to the project.
+# Add a new folder, ''wsc'', to the ''src'' folder in your app (right-click '''src''' in ''Package Explorer'', then click '''New | Folder''').
+# Create a new class src/wsc/Main.java and paste in the code listing that follows.
+# Replace the stub user credentials in the code with your own user name and password with security token for the appropriate static members, then save your source code.
+# Run the application.
+
+<pre>
+package wsc;
+
+import com.sforce.soap.partner.Connector;
+import com.sforce.soap.partner.DeleteResult;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.QueryResult;
+import com.sforce.soap.partner.SaveResult;
+import com.sforce.soap.partner.Error;
+import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+
+public class Main {
+
+  static final String USERNAME = "YOUR-USERNAME";
+  static final String PASSWORD = "YOUR-PASSWORD&SECURITY-TOKEN";
+  static PartnerConnection connection;
+
+  public static void main(String[] args) {
+
+    ConnectorConfig config = new ConnectorConfig();
+    config.setUsername(USERNAME);
+    config.setPassword(PASSWORD);
+    //config.setTraceMessage(true);
+
+    try {
+
+      connection = Connector.newConnection(config);
+
+      // display some current settings
+      System.out.println("Auth EndPoint: "+config.getAuthEndpoint());
+      System.out.println("Service EndPoint: "+config.getServiceEndpoint());
+      System.out.println("Username: "+config.getUsername());
+      System.out.println("SessionId: "+config.getSessionId());
+
+      // run the different examples
+      queryContacts();
+      createAccounts();
+      updateAccounts();
+      deleteAccounts();
+
+
+    } catch (ConnectionException e1) {
+        e1.printStackTrace();
+    }
+
+  }
+
+  // queries and displays the 5 newest contacts
+  private static void queryContacts() {
+
+    System.out.println("Querying for the 5 newest Contacts...");
+
+    try {
+
+      // query for the 5 newest contacts
+      QueryResult queryResults = connection.query("SELECT Id, FirstName, LastName, Account.Name " +
+      		"FROM Contact WHERE AccountId != NULL ORDER BY CreatedDate DESC LIMIT 5");
+      if (queryResults.getSize() > 0) {
+    	  for (SObject s: queryResults.getRecords()) {
+    	    System.out.println("Id: " + s.getId() + " " + s.getField("FirstName") + " " +
+    	        s.getField("LastName") + " - " + s.getChild("Account").getField("Name"));
+    	  }
+    	}
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  // create 5 test Accounts
+  private static void createAccounts() {
+
+    System.out.println("Creating 5 new test Accounts...");
+    SObject[] records = new SObject[5];
+
+    try {
+
+      // create 5 test accounts
+      for (int i=0;i<5;i++) {
+        SObject so = new SObject();
+        so.setType("Account");
+        so.setField("Name", "Test Account "+i);
+        records[i] = so;
+      }
+
+
+      // create the records in Salesforce.com
+      SaveResult[] saveResults = connection.create(records);
+
+      // check the returned results for any errors
+      for (int i=0; i< saveResults.length; i++) {
+        if (saveResults[i].isSuccess()) {
+          System.out.println(i+". Successfully created record - Id: " + saveResults[i].getId());
+        } else {
+          Error[] errors = saveResults[i].getErrors();
+          for (int j=0; j< errors.length; j++) {
+            System.out.println("ERROR creating record: " + errors[j].getMessage());
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  // updates the 5 newly created Accounts
+  private static void updateAccounts() {
+
+    System.out.println("Update the 5 new test Accounts...");
+    SObject[] records = new SObject[5];
+
+    try {
+
+      QueryResult queryResults = connection.query("SELECT Id, Name FROM Account ORDER BY " +
+      		"CreatedDate DESC LIMIT 5");
+      if (queryResults.getSize() > 0) {
+    	  for (int i=0;i<queryResults.getRecords().length;i++) {
+    	    SObject so = (SObject)queryResults.getRecords()[i];
+    	    System.out.println("Updating Id: " + so.getId() + " - Name: "+so.getField("Name"));
+    	    // create an sobject and only send fields to update
+    	    SObject soUpdate = new SObject();
+    	    soUpdate.setType("Account");
+    	    soUpdate.setId(so.getId());
+    	    soUpdate.setField("Name", so.getField("Name")+" -- UPDATED");
+    	    records[i] = soUpdate;
+    	  }
+    	}
+
+
+      // update the records in Salesforce.com
+      SaveResult[] saveResults = connection.update(records);
+
+      // check the returned results for any errors
+      for (int i=0; i< saveResults.length; i++) {
+        if (saveResults[i].isSuccess()) {
+          System.out.println(i+". Successfully updated record - Id: " + saveResults[i].getId());
+        } else {
+          Error[] errors = saveResults[i].getErrors();
+          for (int j=0; j< errors.length; j++) {
+            System.out.println("ERROR updating record: " + errors[j].getMessage());
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  // delete the 5 newly created Account
+  private static void deleteAccounts() {
+
+    System.out.println("Deleting the 5 new test Accounts...");
+    String[] ids = new String[5];
+
+    try {
+
+      QueryResult queryResults = connection.query("SELECT Id, Name FROM Account ORDER BY " +
+      		"CreatedDate DESC LIMIT 5");
+      if (queryResults.getSize() > 0) {
+    	  for (int i=0;i<queryResults.getRecords().length;i++) {
+    	    SObject so = (SObject)queryResults.getRecords()[i];
+    	    ids[i] = so.getId();
+    	    System.out.println("Deleting Id: " + so.getId() + " - Name: "+so.getField("Name"));
+    	  }
+    	}
+
+
+      // delete the records in Salesforce.com by passing an array of Ids
+      DeleteResult[] deleteResults = connection.delete(ids);
+
+      // check the results for any errors
+      for (int i=0; i< deleteResults.length; i++) {
+        if (deleteResults[i].isSuccess()) {
+          System.out.println(i+". Successfully deleted record - Id: " + deleteResults[i].getId());
+        } else {
+          Error[] errors = deleteResults[i].getErrors();
+          for (int j=0; j< errors.length; j++) {
+            System.out.println("ERROR deleting record: " + errors[j].getMessage());
+          }
+        }
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+}
+</pre>
+
+Just like before, when you successfully run the application, it queries and displays the five most recent contacts and their account names, creates five new accounts, updates them, and then finally deletes them.
+
+==Code Highlights==
+
+Much of the code in this new application is identical to the previous application. However, there are many notable changes.
+
+===Lines 3-11===
+
+The application imports partner libraries rather than enterprise libraries.
+
+===Line 17===
+
+The static connection object uses the PartnerConnection (instead of the EnterpriseConnection).
+
+===Lines 59-64===
+
+Because the enterprise WSDL is typed, you get Java objects that represent the database object on the other end of the web service.  This makes it easy to program of course – just use the Java object as you would any other, as shown in the previous application.
+
+However, the partner WSDL is untyped. There is no strong correlation, meaning it’s also more flexible – an app built against the partner WSDL can probably run against multiple different environments.  Because it’s untyped, there’s no Java class, such as “Account.java,” to represent the Account type on the database. Instead, you need a more generic approach.
+
+To begin, examine Lines 59-64 in the queryContacts method of the partner application. The results from Force.com are returned as SObjects and since we are using the partner WSDL, these fields are accessible as name-value pairs instead of strongly-typed objects. You can use the getField() method to return a simple string value for a field, while related objects can be accessed using the getChild() method in conjunction with getField().
+
+<pre>
+if (queryResults.getSize() > 0) {
+  for (SObject s : queryResults.getRecords()) {
+    System.out.println("Id: " + s.getId() + " " + s.getField("FirstName") + " " +
+        s.getField("LastName") + " - " + s.getChild("Account").getField("Name"));
+  }
+}
+</pre>
+
+===Lines 76-86===
+
+Creating new objects is also slightly different when using the partner WSDL. Examine Lines 76-86 in the createAccounts method. To create records in Force.com, the code creates a new SObject object, sets the type of SObject, and then populates its fields with data by using the setField() method.
+
+<pre>
+SObject[] records = new SObject[5];
+
+try {
+
+  // create 5 test accounts
+  for (int i=0;i<5;i++) {
+    SObject so = new SObject();
+    so.setType("Account");
+    so.setField("Name", "Test Account "+i);
+    records[i] = so;
+  }
+</pre>
+
+===Lines 114-131===
+
+Updating records with the partner WSDL is slightly different as well. Look at Lines 114-131 in the updateAccounts method. Create new SObjects that only contain the fields that you want to change and pass these SObjects to Force.com.
+
+<pre>
+SObject[] records = new SObject[5];
+
+try {
+
+  QueryResult queryResults = connection.query("SELECT Id, Name FROM Account ORDER BY " +
+  		"CreatedDate DESC LIMIT 5");
+  if (queryResults.getSize() > 0) {
+	  for (int i=0;i<queryResults.getRecords().length;i++) {
+	    SObject so = (SObject)queryResults.getRecords()[i];
+	    System.out.println("Updating Id: " + so.getId() + " - Name: "+so.getField("Name"));
+	    // create an sobject and only send fields to update
+	    SObject soUpdate = new SObject();
+	    soUpdate.setType("Account");
+	    soUpdate.setId(so.getId());
+	    soUpdate.setField("Name", so.getField("Name")+" -- UPDATED");
+	    records[i] = soUpdate;
+	  }
+	}
+</pre>
+
+===Lines 165-171===
+
+Deleting records with the partner WSDL is similar to using the enterprise WSDL. Simply pass an array of IDs to be deleted. Notice the following snippet in the deleteAccounts method.
+
+<pre>
+if (queryResults.getSize() > 0) {
+  for (int i=0;i<queryResults.getRecords().length;i++) {
+    SObject so = (SObject)queryResults.getRecords()[i];
+    ids[i] = so.getId();
+    System.out.println("Deleting Id: " + so.getId() + " - Name: "+so.getField("Name"));
+  }
+}
+</pre>
+
+=Creating a Force.com Metadata API-Based Application=
+
+The Metadata API does not affect data in your org. It is used for managing customizations (typically sandbox to production deployments) and for building tools that can manage or inspect the metadata model. The Metadata API does not have a login function so you need to use the login() call in the SOAP API to establish a session with Force.com.
+
+In Eclipse, complete the following steps to build a Java application based on the metadata WSDL.
+
+# Create a new Java project named “WSC - Metadata” (click '''File | New | Java Project''').
+# Add the wsc-XX.jar, metadata.jar, and partner.jar to the project (click '''Project | Properties | Java Build Path | Libraries''' or '''External Libraries''', then add the JARs to the project.
+# Add a new folder, ''wsc'', to the ''src'' folder in your app (right-click '''src''' in ''Package Explorer'', then click '''New | Folder''').
+# Create a new class src/wsc/Main.java and paste in the code from the code listing that follows.
+# Replace the stub user credentials in the code with your own user name and password with security token for the appropriate static members, then save your source code.
+# Run the application.
+
+<pre>
+package wsc;
+
+import com.sforce.soap.metadata.*;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.ws.ConnectionException;
+import com.sforce.ws.ConnectorConfig;
+
+public class Main {
+
+  static final String USERNAME = "YOUR-USERNAME";
+  static final String PASSWORD = "YOUR-PASSWORD&SECURITY-TOKEN";
+  static PartnerConnection connection;
+
+  public static void main(String[] args) throws ConnectionException {
+
+    ConnectorConfig partnerConfig = new ConnectorConfig();
+    ConnectorConfig metadataConfig = new ConnectorConfig();
+
+    partnerConfig.setUsername(USERNAME);
+    partnerConfig.setPassword(PASSWORD);
+    //partnerConfig.setTraceMessage(true);
+
+    @SuppressWarnings("unused")
+    PartnerConnection partnerConnection = com.sforce.soap.partner.Connector.newConnection(partnerConfig);
+
+    // shove the partner's session id into the metadata configuration then connect
+    metadataConfig.setSessionId(partnerConnection.getSessionHeader().getSessionId());
+    MetadataConnection metadataConnection = com.sforce.soap.metadata.Connector.newConnection(metadataConfig);
+
+    // create a new custom object
+    String objectName = "WSCCustomObject";
+    String displayName = "WSC Custom Object";
+
+    CustomObject co = new CustomObject();
+    co.setFullName(objectName+"__c");
+    co.setDeploymentStatus(DeploymentStatus.Deployed);
+    co.setDescription("Created by the WSC using the Metadata API");
+    co.setLabel(displayName);
+    co.setPluralLabel(displayName+"s");
+    co.setSharingModel(SharingModel.ReadWrite);
+    co.setEnableActivities(true);
+
+    // create the text id field
+    CustomField field = new CustomField();
+    field.setType(FieldType.Text);
+    field.setDescription("The custom object identifier field");
+    field.setLabel(displayName);
+    field.setFullName(objectName+"__c");
+    // add the field to the custom object
+    co.setNameField(field);
+
+    try {
+      // submit the custom object to salesforce
+      AsyncResult[] ars = metadataConnection.create(new CustomObject[] { co });
+      if (ars == null) {
+          System.out.println("The object was not created successfully");
+          return;
+      }
+
+      String createdObjectId = ars[0].getId();
+      String[] ids = new String[] {createdObjectId};
+      boolean done = false;
+      long waitTimeMilliSecs = 1000;
+      AsyncResult[] arsStatus = null;
+
+      /**
+       * After the create() call completes, we must poll the results
+       * of the checkStatus() call until it indicates that the create
+       * operation is completed.
+       */
+      while (!done) {
+          arsStatus = metadataConnection.checkStatus(ids);
+          if (arsStatus == null) {
+              System.out.println("The object status cannot be retrieved");
+              return;
+          }
+          done = arsStatus[0].isDone();
+          if (arsStatus[0].getStatusCode() != null )  {
+              System.out.println("Error status code: "+arsStatus[0].getStatusCode());
+              System.out.println("Error message: "+arsStatus[0].getMessage());
+          }
+          Thread.sleep(waitTimeMilliSecs);
+          // double the wait time for the next iteration
+          waitTimeMilliSecs *= 2;
+          System.out.println("The object state is "+arsStatus[0].getState());
+      }
+
+      System.out.println("The ID for the created object is "+arsStatus[0].getId());
+    }
+    catch (Exception ex) {
+        System.out.println("\nFailed to create object, error message was: \n" +ex.getMessage());
+    }
+
+  }
+
+}
+</pre>
+
+The PartnerConnection object is used to log into Force.com and the resulting session ID is set to the metadataConfig object. When newConnection() for the MetadataConnection is called, the existing session ID is used. For this application, the partnerConnection is no longer needed after the session ID has been obtained.
+
+The remaining code creates a new Custom Object named “WSCCustomObject” and submits it to Force.com asynchronously. The metadataConnection then polls Force.com using the checkStatus method. Once the Custom Object is created successfully, you can view it by going to '''your name | Setup | App Setup | Create | Objects'''.
+
+The Metadata API is asynchronous. After you submit a create request, you must use the checkStatus() call to poll to see if the operation has completed. See the [[Documentation |Metadata API Developer’s Guide]] for more information.
+
+==Summary==
+The Force.com Web Services Connector is a great way to write code that uses the Force.com APIs.  It can generate client libraries for the SOAP API and the Metadata API. You can use these libraries to quickly build client applications.  As this article demonstrates, WSC greatly simplifies your API code.  The client libraries it generates are also very fast.
+
+==References==
+* Force.com Web Service Connector (WSC) [http://code.google.com/p/sfdc-wsc/downloads/list source code]
+* See the [[Documentation]] page for the ''SOAP API Developer's Guide'' and ''Metadata API Developer's Guide''
+* [[Integration]] Resource Page on Developer Force
+
+==About the Author==
+Jeff Douglas is a Senior Technical Consultant at Appirio where he creates cutting-edge applications on the Force.com platform for some of the best companies in the world. He is a foster and adoptive parent, and is trying to save the world one Apex line of code at a time. He actively blogs about cloud computing (especially Force.com) at http://blog.jeffdouglas.com.

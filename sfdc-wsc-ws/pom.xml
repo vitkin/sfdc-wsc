@@ -12,6 +12,10 @@
   <parent>
     <artifactId>sfdc-wsc</artifactId>
     <groupId>com.sforce</groupId>
-    <version>27.0</version>
+    <version>27.0.1</version>
   </parent>
+  
+  <properties>
+    <license.licenseResolver>file:${project.parent.basedir}/src/license</license.licenseResolver>
+  </properties>
 </project>

@@ -3864,6 +3864,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
    <xsd:complexType name="TouchMobileSettings">
     <xsd:sequence>
      <xsd:element name="enableTouchAppIPad" minOccurs="0" type="xsd:boolean"/>
+     <xsd:element name="enableTouchAppIPhone" minOccurs="0" type="xsd:boolean"/>
      <xsd:element name="enableTouchBrowserIPad" minOccurs="0" type="xsd:boolean"/>
      <xsd:element name="enableTouchIosPhone" minOccurs="0" type="xsd:boolean"/>
      <xsd:element name="enableVisualforceInTouch" minOccurs="0" type="xsd:boolean"/>

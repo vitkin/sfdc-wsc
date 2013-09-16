@@ -1430,6 +1430,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
        <xsd:element name="FeedSubscriptions" minOccurs="0" type="tns:QueryResult" nillable="true"/>
        <xsd:element name="FeedSubscriptionsForEntity" minOccurs="0" type="tns:QueryResult" nillable="true"/>
        <xsd:element name="Feeds" minOccurs="0" type="tns:QueryResult" nillable="true"/>
+       <xsd:element name="Leads__r" minOccurs="0" type="tns:QueryResult" nillable="true"/>
        <xsd:element name="Opportunities__r" minOccurs="0" type="tns:QueryResult" nillable="true"/>
        <xsd:element name="OpportunityTeams" minOccurs="0" type="tns:QueryResult" nillable="true"/>
        <xsd:element name="POCs__r" minOccurs="0" type="tns:QueryResult" nillable="true"/>
@@ -1975,7 +1976,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
    <output message="tns:retrieveResponse"/>
   </operation>
   <operation name="setPassword">
-   <documentation>Set a user's password</documentation>
+   <documentation>Set a user&apos;s password</documentation>
    <input message="tns:setPasswordRequest"/>
    <output message="tns:setPasswordResponse"/>
   </operation>
@@ -2179,7 +2180,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
   </operation>
  </binding>
  <service name="SforceServiceService">
-  <documentation/>
+  <documentation></documentation>
   <port binding="tns:SforceServiceBinding" name="SforceService">
    <soap:address location="https://na5-api.salesforce.com/services/Soap/T/27.0"/>
   </port>

@@ -9,106 +9,23 @@
   
   <name>sfdc-wsc-ws-enterprise</name>
   
+  <version>27.0.1-myorganization-YYYY-MM-DD</version>
+  
   <parent>
     <groupId>com.sforce</groupId>
     <artifactId>sfdc-wsc</artifactId>
-    <version>27.0</version>
+    <version>27.0.1</version>
   </parent>
   
   <build>
-    <pluginManagement>
-      <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings 
-        only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <versionRange>[1.0,)</versionRange>
-                    <goals>
-                      <!--<goal>java</goal>-->
-                      <goal>exec</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.7</version>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.generated}</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
-        <executions>
-          <execution>
-            <id>compile-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <!--<goal>java</goal>-->
-              <goal>exec</goal>  
-            </goals>
-            <configuration>
-              <!--<mainClass>com.sforce.ws.tools.wsdlc</mainClass>-->
-              <executable>java</executable>
-              <arguments>
-                <!--<argument>-Dstandalone-jar=true</argument>-->
-                <argument>-DcompileTarget=1.${project.jdk.version}</argument>
-                <!--<argument>-Dpackage-prefix=wsc</argument>-->
-                <argument>-Ddel-temp-dir=false</argument>
-                <argument>-Dcreate-jar=false</argument>
-                <argument>-classpath</argument>
-                <!-- automatically creates the classpath using all project dependencies,
-                also adding the project build directory -->
-                <classpath/>
-                <argument>com.sforce.ws.tools.wsdlc</argument>
-                <argument>${project.basedir}/enterprise.wsdl</argument>
-                <argument>${project.generated}/${project.artifactId}-${project.version}.jar</argument>
-                <argument>${project.generated}</argument>
-              </arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <classifier>myorganization-YYYY-MM-DD-jdk1${project.jdk.version}</classifier>
-        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -121,5 +38,16 @@
       <classifier>jdk1${project.jdk.version}</classifier>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>sfdc-wsc-ws</artifactId>
+      <version>${project.parent.version}</version>
+      <classifier>jdk1${project.jdk.version}</classifier>
+    </dependency>
   </dependencies>
+  
+  <properties>
+    <wsdl.name>enterprise</wsdl.name>
+    <license.licenseResolver>file:${project.parent.basedir}/src/license</license.licenseResolver>
+  </properties>
 </project>

@@ -6,7 +6,14 @@ Generated on (Used notimestamp option).
 Copyright 1999-2013 salesforce.com, inc.
 All Rights Reserved
 -->
-<definitions targetNamespace="urn:enterprise.soap.sforce.com" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:enterprise.soap.sforce.com" xmlns:fns="urn:fault.enterprise.soap.sforce.com" xmlns:ens="urn:sobject.enterprise.soap.sforce.com">
+
+<definitions targetNamespace="urn:enterprise.soap.sforce.com"
+             xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:tns="urn:enterprise.soap.sforce.com"
+             xmlns:fns="urn:fault.enterprise.soap.sforce.com"
+             xmlns:ens="urn:sobject.enterprise.soap.sforce.com">
     <types>
 
         <schema elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:sobject.enterprise.soap.sforce.com">
@@ -17,8 +24,8 @@ All Rights Reserved
             <!-- Base sObject (abstract) -->
             <complexType name="sObject">
                 <sequence>
-                    <element name="fieldsToNull" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="Id" type="tns:ID" nillable="true"/>
+                    <element name="fieldsToNull"       type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="Id"                 type="tns:ID" nillable="true" />
                 </sequence>
             </complexType>
 
@@ -1155,6 +1162,8 @@ All Rights Reserved
                         <element name="SuppliedName" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="SuppliedPhone" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Support_Level2__c" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="Support_Services_Manager__c" nillable="true" minOccurs="0" type="tns:ID"/>
+                        <element name="Support_Services_Manager__r" nillable="true" minOccurs="0" type="ens:Contact"/>
                         <element name="Support_Status__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Survey_Sent_T_F__c" nillable="true" minOccurs="0" type="xsd:boolean"/>
                         <element name="SystemModstamp" nillable="true" minOccurs="0" type="xsd:dateTime"/>
@@ -1960,6 +1969,7 @@ All Rights Reserved
                         <element name="Case_Feedback1__r" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Cases" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Cases1__r" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="Cases2__r" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Cases__r" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Changes__r" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Contact_Role__c" nillable="true" minOccurs="0" type="xsd:string"/>
@@ -2737,6 +2747,49 @@ All Rights Reserved
                 </complexContent>
             </complexType>
 
+            <complexType name="Daily_Log__c">
+                <complexContent>
+                    <extension base="ens:sObject">
+                        <sequence>
+                        <element name="Attachments" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="Comments__c" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="CreatedBy" nillable="true" minOccurs="0" type="ens:User"/>
+                        <element name="CreatedById" nillable="true" minOccurs="0" type="tns:ID"/>
+                        <element name="CreatedDate" nillable="true" minOccurs="0" type="xsd:dateTime"/>
+                        <element name="FeedSubscriptionsForEntity" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="How_many_Ent_leads_converted_to_Opp__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_Enterpris_follow_ups_scheduled__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_Enterprise_calls_did_you_make__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_Enterprise_conversations__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_Enterprise_emails_did_you_send__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_Enterprise_opps_advanced__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_Enterprise_quotes_sent_out__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_SQLyzer_calls_did_you_make__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_SQLyzer_conversations__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_SQLyzer_emails_did_you_send__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_SQLyzer_follow_ups_scheduled__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_SQLyzer_leads_converted_to_Opp__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_SQLyzer_quotes_sent_out__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="How_many_SQlyzer_opportunities_advanced__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="IsDeleted" nillable="true" minOccurs="0" type="xsd:boolean"/>
+                        <element name="LastModifiedBy" nillable="true" minOccurs="0" type="ens:User"/>
+                        <element name="LastModifiedById" nillable="true" minOccurs="0" type="tns:ID"/>
+                        <element name="LastModifiedDate" nillable="true" minOccurs="0" type="xsd:dateTime"/>
+                        <element name="Log_Date__c" nillable="true" minOccurs="0" type="xsd:date"/>
+                        <element name="Name" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="Notes" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="NotesAndAttachments" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="Owner" nillable="true" minOccurs="0" type="ens:Name"/>
+                        <element name="OwnerId" nillable="true" minOccurs="0" type="tns:ID"/>
+                        <element name="ProcessInstances" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="ProcessSteps" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="SystemModstamp" nillable="true" minOccurs="0" type="xsd:dateTime"/>
+                        <element name="hours_spent_on_proposals_and_acct_mgmt__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+
             <complexType name="Dashboard">
                 <complexContent>
                     <extension base="ens:sObject">
@@ -3179,6 +3232,7 @@ All Rights Reserved
                         <element name="OwnerId" nillable="true" minOccurs="0" type="tns:ID"/>
                         <element name="ProcessInstances" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="ProcessSteps" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="Product_Code__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Product__c" nillable="true" minOccurs="0" type="tns:ID"/>
                         <element name="Product__r" nillable="true" minOccurs="0" type="ens:Product2"/>
                         <element name="Quantity__c" nillable="true" minOccurs="0" type="xsd:double"/>
@@ -3971,6 +4025,7 @@ All Rights Reserved
                         <element name="ConvertedOpportunityId" nillable="true" minOccurs="0" type="tns:ID"/>
                         <element name="Countries_of_Business__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Country" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="Country__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Create_Meeting_Record__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="CreatedBy" nillable="true" minOccurs="0" type="ens:User"/>
                         <element name="CreatedById" nillable="true" minOccurs="0" type="tns:ID"/>
@@ -3979,6 +4034,10 @@ All Rights Reserved
                         <element name="Customers_Surveys__r" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="D_U_N_S__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Date_Migrated_to_MyOrganization__c" nillable="true" minOccurs="0" type="xsd:date"/>
+                        <element name="Days_from_New_to_Working__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="Days_to_Converted__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="Days_to_Junk_Dead__c" nillable="true" minOccurs="0" type="xsd:double"/>
+                        <element name="Days_to_Qualifying__c" nillable="true" minOccurs="0" type="xsd:double"/>
                         <element name="Deal_Registration_ID__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Deployed__c" nillable="true" minOccurs="0" type="xsd:boolean"/>
                         <element name="Description" nillable="true" minOccurs="0" type="xsd:string"/>
@@ -4006,11 +4065,15 @@ All Rights Reserved
                         <element name="IsUnreadByOwner" nillable="true" minOccurs="0" type="xsd:boolean"/>
                         <element name="Jigsaw" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="JigsawContactId" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="Junk_Dead_Date__c" nillable="true" minOccurs="0" type="xsd:dateTime"/>
                         <element name="LastActivityDate" nillable="true" minOccurs="0" type="xsd:date"/>
                         <element name="LastModifiedBy" nillable="true" minOccurs="0" type="ens:User"/>
                         <element name="LastModifiedById" nillable="true" minOccurs="0" type="tns:ID"/>
                         <element name="LastModifiedDate" nillable="true" minOccurs="0" type="xsd:dateTime"/>
                         <element name="LastName" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="Last_Owner_ID__c" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="Last_Owner__c" nillable="true" minOccurs="0" type="tns:ID"/>
+                        <element name="Last_Owner__r" nillable="true" minOccurs="0" type="ens:User"/>
                         <element name="LeadSource" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="LeadSourceDetail__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Lead_Created_Date__c" nillable="true" minOccurs="0" type="xsd:date"/>
@@ -4029,6 +4092,7 @@ All Rights Reserved
                         <element name="Notes__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="NumberOfEmployees" nillable="true" minOccurs="0" type="xsd:int"/>
                         <element name="Number_of_Employees__c" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="Number_of_SQL_Server_Instances__c" nillable="true" minOccurs="0" type="xsd:double"/>
                         <element name="OpenActivities" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Opportunity_Amount__c" nillable="true" minOccurs="0" type="xsd:double"/>
                         <element name="Owner" nillable="true" minOccurs="0" type="ens:Name"/>
@@ -4047,12 +4111,14 @@ All Rights Reserved
                         <element name="ProcessInstances" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="ProcessSteps" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Product__c" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="Qualifying_Date__c" nillable="true" minOccurs="0" type="xsd:dateTime"/>
                         <element name="R00N70000001ZQnnEAG__r" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Rating" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="RecordType" nillable="true" minOccurs="0" type="ens:RecordType"/>
                         <element name="RecordTypeId" nillable="true" minOccurs="0" type="tns:ID"/>
                         <element name="Region__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Registered__c" nillable="true" minOccurs="0" type="xsd:boolean"/>
+                        <element name="SQLyzer_trial_agreement__c" nillable="true" minOccurs="0" type="xsd:boolean"/>
                         <element name="Salutation" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Shares" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Size_of_Application__c" nillable="true" minOccurs="0" type="xsd:string"/>
@@ -4071,6 +4137,7 @@ All Rights Reserved
                         <element name="Title" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Trial_Software_Deployed__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Type__c" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="US_State__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="VM_Password__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="VM_Username__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Web_Roles__c" nillable="true" minOccurs="0" type="xsd:string"/>
@@ -4078,6 +4145,7 @@ All Rights Reserved
                         <element name="Website_Contact_Comments__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Website_Contact_Routing__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Who_is_Affected__c" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="Working_Date__c" nillable="true" minOccurs="0" type="xsd:dateTime"/>
                         <element name="Worldwide_Leads_Snapshots__r" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="X2nd_Tier_Partner__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="iSell__OSKeyID__c" nillable="true" minOccurs="0" type="xsd:string"/>
@@ -4504,6 +4572,7 @@ All Rights Reserved
                         <element name="CreatedDate" nillable="true" minOccurs="0" type="xsd:dateTime"/>
                         <element name="Current_Problem_Pain__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Date_Migrated_to_MyOrganization__c" nillable="true" minOccurs="0" type="xsd:date"/>
+                        <element name="Days_from_Lead_to_Opportunity__c" nillable="true" minOccurs="0" type="xsd:double"/>
                         <element name="Deal_Registration_ID__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Deal_Size__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Deployed__c" nillable="true" minOccurs="0" type="xsd:boolean"/>
@@ -4513,6 +4582,7 @@ All Rights Reserved
                         <element name="Est_Services__c" nillable="true" minOccurs="0" type="xsd:double"/>
                         <element name="Evaluation_Effort__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Events" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="Expenses__c" nillable="true" minOccurs="0" type="xsd:double"/>
                         <element name="FeedSubscriptionsForEntity" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Feeds" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Fiscal" nillable="true" minOccurs="0" type="xsd:string"/>
@@ -4597,6 +4667,7 @@ All Rights Reserved
                         <element name="Renewal_Agent__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Revenue_Bucket__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="SO_Number__c" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="SQLyzer_Opportunity__c" nillable="true" minOccurs="0" type="xsd:boolean"/>
                         <element name="Shares" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="Size_of_Application__c" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Special_Instructions__c" nillable="true" minOccurs="0" type="xsd:string"/>
@@ -7033,6 +7104,7 @@ All Rights Reserved
                         <element name="LastModifiedDate" nillable="true" minOccurs="0" type="xsd:dateTime"/>
                         <element name="LastName" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="LastPasswordChangeDate" nillable="true" minOccurs="0" type="xsd:dateTime"/>
+                        <element name="Leads__r" nillable="true" minOccurs="0" type="tns:QueryResult"/>
                         <element name="LocaleSidKey" nillable="true" minOccurs="0" type="xsd:string"/>
                         <element name="Manager" nillable="true" minOccurs="0" type="ens:User"/>
                         <element name="ManagerId" nillable="true" minOccurs="0" type="tns:ID"/>
@@ -7548,6 +7620,32 @@ All Rights Reserved
                 </complexContent>
             </complexType>
 
+            <complexType name="abc__c">
+                <complexContent>
+                    <extension base="ens:sObject">
+                        <sequence>
+                        <element name="Attachments" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="CreatedBy" nillable="true" minOccurs="0" type="ens:User"/>
+                        <element name="CreatedById" nillable="true" minOccurs="0" type="tns:ID"/>
+                        <element name="CreatedDate" nillable="true" minOccurs="0" type="xsd:dateTime"/>
+                        <element name="FeedSubscriptionsForEntity" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="IsDeleted" nillable="true" minOccurs="0" type="xsd:boolean"/>
+                        <element name="LastModifiedBy" nillable="true" minOccurs="0" type="ens:User"/>
+                        <element name="LastModifiedById" nillable="true" minOccurs="0" type="tns:ID"/>
+                        <element name="LastModifiedDate" nillable="true" minOccurs="0" type="xsd:dateTime"/>
+                        <element name="Name" nillable="true" minOccurs="0" type="xsd:string"/>
+                        <element name="Notes" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="NotesAndAttachments" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="Owner" nillable="true" minOccurs="0" type="ens:Name"/>
+                        <element name="OwnerId" nillable="true" minOccurs="0" type="tns:ID"/>
+                        <element name="ProcessInstances" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="ProcessSteps" nillable="true" minOccurs="0" type="tns:QueryResult"/>
+                        <element name="SystemModstamp" nillable="true" minOccurs="0" type="xsd:dateTime"/>
+                        </sequence>
+                    </extension>
+                </complexContent>
+            </complexType>
+
             <complexType name="mkto_si__Marketo_Sales_Insight_Config__History">
                 <complexContent>
                     <extension base="ens:sObject">
@@ -7640,7 +7738,7 @@ All Rights Reserved
             <simpleType name="ID">
                 <restriction base="xsd:string">
                     <length value="18"/>
-                    <pattern value="[a-zA-Z0-9]{18}"/>
+                    <pattern value='[a-zA-Z0-9]{18}'/>
                 </restriction>
             </simpleType>
 
@@ -7651,10 +7749,10 @@ All Rights Reserved
             <!-- Shared Result Types -->
             <complexType name="QueryResult">
                 <sequence>
-                    <element name="done" type="xsd:boolean"/>
+                    <element name="done"         type="xsd:boolean"/>
                     <element name="queryLocator" type="tns:QueryLocator" nillable="true"/>
-                    <element name="records" type="ens:sObject" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="size" type="xsd:int"/>
+                    <element name="records"      type="ens:sObject" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="size"         type="xsd:int"/>
                 </sequence>
             </complexType>
 
@@ -7663,7 +7761,7 @@ All Rights Reserved
             <!-- Search Result -->
             <complexType name="SearchResult">
                 <sequence>
-                    <element name="searchRecords" minOccurs="0" maxOccurs="unbounded" type="tns:SearchRecord"/>
+                    <element name="searchRecords"  minOccurs="0" maxOccurs="unbounded" type="tns:SearchRecord"/>
                     <element name="sforceReserved" minOccurs="0" maxOccurs="1" type="xsd:string"/>
                 </sequence>
             </complexType>
@@ -7696,7 +7794,7 @@ All Rights Reserved
             <complexType name="DeletedRecord">
                 <sequence>
                     <element name="deletedDate" type="xsd:dateTime"/>
-                    <element name="id" type="tns:ID"/>
+                    <element name="id"          type="tns:ID"/>
                 </sequence>
             </complexType>
 
@@ -7711,8 +7809,8 @@ All Rights Reserved
             <!-- InvalidateSessions Result -->
             <complexType name="InvalidateSessionsResult">
                 <sequence>
-                    <element name="errors" type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="success" type="xsd:boolean"/>
+                    <element name="errors"  type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="success"   type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
@@ -7727,41 +7825,41 @@ All Rights Reserved
 
             <complexType name="GetUserInfoResult">
                 <sequence>
-                    <element name="accessibilityMode" type="xsd:boolean"/>
-                    <element name="currencySymbol" type="xsd:string" nillable="true"/>
+                    <element name="accessibilityMode"          type="xsd:boolean"/>
+                    <element name="currencySymbol"             type="xsd:string" nillable="true"/>
                     <element name="orgAttachmentFileSizeLimit" type="xsd:int"/>
-                    <element name="orgDefaultCurrencyIsoCode" type="xsd:string" nillable="true"/>
+                    <element name="orgDefaultCurrencyIsoCode"  type="xsd:string" nillable="true"/>
                     <element name="orgDisallowHtmlAttachments" type="xsd:boolean"/>
-                    <element name="orgHasPersonAccounts" type="xsd:boolean"/>
-                    <element name="organizationId" type="tns:ID"/>
-                    <element name="organizationMultiCurrency" type="xsd:boolean"/>
-                    <element name="organizationName" type="xsd:string"/>
-                    <element name="profileId" type="tns:ID"/>
-                    <element name="roleId" type="tns:ID" nillable="true"/>
-                    <element name="sessionSecondsValid" type="xsd:int"/>
+                    <element name="orgHasPersonAccounts"       type="xsd:boolean"/>
+                    <element name="organizationId"             type="tns:ID"/>
+                    <element name="organizationMultiCurrency"  type="xsd:boolean"/>
+                    <element name="organizationName"           type="xsd:string"/>
+                    <element name="profileId"                  type="tns:ID"/>
+                    <element name="roleId"                     type="tns:ID" nillable="true"/>
+                    <element name="sessionSecondsValid"        type="xsd:int"/>
                     <element name="userDefaultCurrencyIsoCode" type="xsd:string" nillable="true"/>
-                    <element name="userEmail" type="xsd:string"/>
-                    <element name="userFullName" type="xsd:string"/>
-                    <element name="userId" type="tns:ID"/>
-                    <element name="userLanguage" type="xsd:string"/>
-                    <element name="userLocale" type="xsd:string"/>
-                    <element name="userName" type="xsd:string"/>
-                    <element name="userTimeZone" type="xsd:string"/>
-                    <element name="userType" type="xsd:string"/>
-                    <element name="userUiSkin" type="xsd:string"/>
+                    <element name="userEmail"                  type="xsd:string"/>
+                    <element name="userFullName"               type="xsd:string"/>
+                    <element name="userId"                     type="tns:ID"/>
+                    <element name="userLanguage"               type="xsd:string"/>
+                    <element name="userLocale"                 type="xsd:string"/>
+                    <element name="userName"                   type="xsd:string"/>
+                    <element name="userTimeZone"               type="xsd:string"/>
+                    <element name="userType"                   type="xsd:string"/>
+                    <element name="userUiSkin"                 type="xsd:string"/>
                 </sequence>
             </complexType>
 
             <complexType name="LoginResult">
                 <sequence>
                     <element name="metadataServerUrl" type="xsd:string" nillable="true"/>
-                    <element name="passwordExpired" type="xsd:boolean"/>
-                    <element name="sandbox" type="xsd:boolean"/>
-                    <element name="serverUrl" type="xsd:string" nillable="true"/>
-                    <element name="sessionId" type="xsd:string" nillable="true"/>
+                    <element name="passwordExpired"   type="xsd:boolean" />
+                    <element name="sandbox"      type="xsd:boolean"/>
+                    <element name="serverUrl"         type="xsd:string" nillable="true"/>
+                    <element name="sessionId"         type="xsd:string" nillable="true"/>
 
-                    <element name="userId" type="tns:ID" nillable="true"/>
-                    <element name="userInfo" type="tns:GetUserInfoResult" minOccurs="0"/>
+                    <element name="userId"           type="tns:ID" nillable="true"/>
+                    <element name="userInfo"         type="tns:GetUserInfoResult" minOccurs="0"/>
                 </sequence>
             </complexType>
 
@@ -7952,35 +8050,35 @@ All Rights Reserved
 
             <complexType name="Error">
                 <sequence>
-                    <element name="fields" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="message" type="xsd:string"/>
+                    <element name="fields"     type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="message"    type="xsd:string"/>
                     <element name="statusCode" type="tns:StatusCode"/>
                 </sequence>
             </complexType>
 
             <complexType name="SendEmailError">
                 <sequence>
-                    <element name="fields" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="message" type="xsd:string"/>
+                    <element name="fields"     type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="message"    type="xsd:string"/>
                     <element name="statusCode" type="tns:StatusCode"/>
-                    <element name="targetObjectId" type="tns:ID" nillable="true"/>
+                    <element name="targetObjectId"     type="tns:ID"  nillable="true"/>
                 </sequence>
             </complexType>
 
             <complexType name="SaveResult">
                 <sequence>
-                    <element name="errors" type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="id" type="tns:ID" nillable="true"/>
-                    <element name="success" type="xsd:boolean"/>
+                    <element name="errors"    type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="id"        type="tns:ID" nillable="true"/>
+                    <element name="success"   type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
             <complexType name="UpsertResult">
                 <sequence>
-                    <element name="created" type="xsd:boolean"/>
-                    <element name="errors" type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="id" type="tns:ID" nillable="true"/>
-                    <element name="success" type="xsd:boolean"/>
+                    <element name="created"  type="xsd:boolean"/>
+                    <element name="errors"    type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="id"       type="tns:ID" nillable="true"/>
+                    <element name="success"   type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
@@ -7993,17 +8091,17 @@ All Rights Reserved
 
             <complexType name="MergeResult">
                 <sequence>
-                    <element name="errors" type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="id" type="tns:ID" nillable="true"/>
+                    <element name="errors"    type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="id"        type="tns:ID" nillable="true"/>
                     <element name="mergedRecordIds" type="tns:ID" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="success" type="xsd:boolean"/>
+                    <element name="success"   type="xsd:boolean"/>
                     <element name="updatedRelatedIds" type="tns:ID" minOccurs="0" maxOccurs="unbounded"/>
                 </sequence>
             </complexType>
 
             <complexType name="ProcessRequest">
                 <sequence>
-                    <element name="comments" type="xsd:string" nillable="true"/>
+                    <element name="comments"       type="xsd:string" nillable="true"/>
                     <element name="nextApproverIds" type="tns:ID" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
                 </sequence>
             </complexType>
@@ -8012,7 +8110,7 @@ All Rights Reserved
                 <complexContent>
                     <extension base="tns:ProcessRequest">
                         <sequence>
-                            <element name="objectId" type="tns:ID"/>
+                            <element name="objectId"     type="tns:ID"/>
                         </sequence>
                     </extension>
                 </complexContent>
@@ -8022,8 +8120,8 @@ All Rights Reserved
                 <complexContent>
                     <extension base="tns:ProcessRequest">
                         <sequence>
-                            <element name="action" type="xsd:string"/>
-                            <element name="workitemId" type="tns:ID"/>
+                            <element name="action"         type="xsd:string"/>
+                            <element name="workitemId"     type="tns:ID"/>
                         </sequence>
                     </extension>
                 </complexContent>
@@ -8033,13 +8131,13 @@ All Rights Reserved
 
             <complexType name="ProcessResult">
                 <sequence>
-                    <element name="actorIds" type="tns:ID" nillable="false" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="entityId" type="tns:ID" nillable="true"/>
-                    <element name="errors" type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="instanceId" type="tns:ID" nillable="true"/>
-                    <element name="instanceStatus" type="xsd:string" nillable="true"/>
-                    <element name="newWorkitemIds" type="tns:ID" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="success" type="xsd:boolean"/>
+                    <element name="actorIds"        type="tns:ID" nillable="false" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="entityId"        type="tns:ID" nillable="true"/>
+                    <element name="errors"          type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="instanceId"      type="tns:ID" nillable="true"/>
+                    <element name="instanceStatus"  type="xsd:string" nillable="true"/>
+                    <element name="newWorkitemIds"  type="tns:ID" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="success"         type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
@@ -8049,116 +8147,116 @@ All Rights Reserved
 
             <complexType name="DeleteResult">
                 <sequence>
-                    <element name="errors" type="tns:Error" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="id" type="tns:ID" nillable="true"/>
-                    <element name="success" type="xsd:boolean"/>
+                    <element name="errors"    type="tns:Error" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="id"        type="tns:ID" nillable="true"/>
+                    <element name="success"   type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
             <complexType name="UndeleteResult">
                 <sequence>
-                    <element name="errors" type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="id" type="tns:ID" nillable="true"/>
-                    <element name="success" type="xsd:boolean"/>
+                    <element name="errors"    type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="id"        type="tns:ID" nillable="true"/>
+                    <element name="success"   type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
             <complexType name="EmptyRecycleBinResult">
                 <sequence>
-                    <element name="errors" type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="id" type="tns:ID" nillable="true"/>
-                    <element name="success" type="xsd:boolean"/>
+                    <element name="errors"    type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="id"        type="tns:ID" nillable="true"/>
+                    <element name="success"   type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
             <complexType name="LeadConvert">
                 <sequence>
-                    <element name="accountId" type="tns:ID" nillable="true"/>
-                    <element name="contactId" type="tns:ID" nillable="true"/>
-                    <element name="convertedStatus" type="xsd:string"/>
+                    <element name="accountId"              type="tns:ID" nillable="true"/>
+                    <element name="contactId"              type="tns:ID" nillable="true"/>
+                    <element name="convertedStatus"        type="xsd:string"/>
                     <element name="doNotCreateOpportunity" type="xsd:boolean"/>
-                    <element name="leadId" type="tns:ID"/>
-                    <element name="opportunityName" type="xsd:string" nillable="true"/>
-                    <element name="overwriteLeadSource" type="xsd:boolean"/>
-                    <element name="ownerId" type="tns:ID" nillable="true"/>
-                    <element name="sendNotificationEmail" type="xsd:boolean"/>
+                    <element name="leadId"                 type="tns:ID"/>
+                    <element name="opportunityName"        type="xsd:string" nillable="true"/>
+                    <element name="overwriteLeadSource"    type="xsd:boolean"/>
+                    <element name="ownerId"                type="tns:ID"     nillable="true"/>
+                    <element name="sendNotificationEmail"  type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
             <complexType name="LeadConvertResult">
                 <sequence>
-                    <element name="accountId" type="tns:ID" nillable="true"/>
-                    <element name="contactId" type="tns:ID" nillable="true"/>
-                    <element name="errors" type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="leadId" type="tns:ID" nillable="true"/>
+                    <element name="accountId"     type="tns:ID" nillable="true"/>
+                    <element name="contactId"     type="tns:ID" nillable="true"/>
+                    <element name="errors"        type="tns:Error" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="leadId"        type="tns:ID" nillable="true"/>
                     <element name="opportunityId" type="tns:ID" nillable="true"/>
-                    <element name="success" type="xsd:boolean"/>
+                    <element name="success"       type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
             <complexType name="DescribeSObjectResult">
                 <sequence>
-                    <element name="activateable" type="xsd:boolean"/>
-                    <element name="childRelationships" type="tns:ChildRelationship" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="createable" type="xsd:boolean"/>
-                    <element name="custom" type="xsd:boolean"/>
-                    <element name="customSetting" type="xsd:boolean"/>
-                    <element name="deletable" type="xsd:boolean"/>
+                    <element name="activateable"        type="xsd:boolean"/>
+                    <element name="childRelationships"  type="tns:ChildRelationship" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="createable"          type="xsd:boolean"/>
+                    <element name="custom"              type="xsd:boolean"/>
+                    <element name="customSetting"       type="xsd:boolean"/>
+                    <element name="deletable"           type="xsd:boolean"/>
                     <element name="deprecatedAndHidden" type="xsd:boolean"/>
-                    <element name="feedEnabled" type="xsd:boolean"/>
-                    <element name="fields" type="tns:Field" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="keyPrefix" type="xsd:string" nillable="true"/>
-                    <element name="label" type="xsd:string"/>
-                    <element name="labelPlural" type="xsd:string"/>
-                    <element name="layoutable" type="xsd:boolean"/>
-                    <element name="mergeable" type="xsd:boolean"/>
-                    <element name="name" type="xsd:string"/>
-                    <element name="queryable" type="xsd:boolean"/>
-                    <element name="recordTypeInfos" type="tns:RecordTypeInfo" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="replicateable" type="xsd:boolean"/>
-                    <element name="retrieveable" type="xsd:boolean"/>
-                    <element name="searchable" type="xsd:boolean"/>
-                    <element name="triggerable" type="xsd:boolean" minOccurs="0"/>
-                    <element name="undeletable" type="xsd:boolean"/>
-                    <element name="updateable" type="xsd:boolean"/>
-                    <element name="urlDetail" type="xsd:string" nillable="true"/>
-                    <element name="urlEdit" type="xsd:string" nillable="true"/>
-                    <element name="urlNew" type="xsd:string" nillable="true"/>
+                    <element name="feedEnabled"         type="xsd:boolean"/>
+                    <element name="fields"              type="tns:Field" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="keyPrefix"           type="xsd:string" nillable="true"/>
+                    <element name="label"               type="xsd:string"/>
+                    <element name="labelPlural"         type="xsd:string"/>
+                    <element name="layoutable"          type="xsd:boolean"/>
+                    <element name="mergeable"           type="xsd:boolean"/>
+                    <element name="name"                type="xsd:string"/>
+                    <element name="queryable"           type="xsd:boolean"/>
+                    <element name="recordTypeInfos"     type="tns:RecordTypeInfo" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="replicateable"       type="xsd:boolean"/>
+                    <element name="retrieveable"        type="xsd:boolean"/>
+                    <element name="searchable"          type="xsd:boolean" />
+                    <element name="triggerable"         type="xsd:boolean" minOccurs="0"/>
+                    <element name="undeletable"         type="xsd:boolean"/>
+                    <element name="updateable"          type="xsd:boolean"/>
+                    <element name="urlDetail"           type="xsd:string" nillable="true"/>
+                    <element name="urlEdit"             type="xsd:string" nillable="true"/>
+                    <element name="urlNew"              type="xsd:string" nillable="true"/>
                 </sequence>
             </complexType>
 
             <!-- this is a subset of properties for each SObject that is returned by the describeGlobal call -->
             <complexType name="DescribeGlobalSObjectResult">
                 <sequence>
-                    <element name="activateable" type="xsd:boolean"/>
-                    <element name="createable" type="xsd:boolean"/>
-                    <element name="custom" type="xsd:boolean"/>
-                    <element name="customSetting" type="xsd:boolean"/>
-                    <element name="deletable" type="xsd:boolean"/>
+                    <element name="activateable"        type="xsd:boolean"/>
+                    <element name="createable"          type="xsd:boolean"/>
+                    <element name="custom"              type="xsd:boolean"/>
+                    <element name="customSetting"       type="xsd:boolean"/>
+                    <element name="deletable"           type="xsd:boolean"/>
                     <element name="deprecatedAndHidden" type="xsd:boolean"/>
-                    <element name="feedEnabled" type="xsd:boolean"/>
-                    <element name="keyPrefix" type="xsd:string" nillable="true"/>
-                    <element name="label" type="xsd:string"/>
-                    <element name="labelPlural" type="xsd:string"/>
-                    <element name="layoutable" type="xsd:boolean"/>
-                    <element name="mergeable" type="xsd:boolean"/>
-                    <element name="name" type="xsd:string"/>
-                    <element name="queryable" type="xsd:boolean"/>
-                    <element name="replicateable" type="xsd:boolean"/>
-                    <element name="retrieveable" type="xsd:boolean"/>
-                    <element name="searchable" type="xsd:boolean"/>
-                    <element name="triggerable" type="xsd:boolean"/>
-                    <element name="undeletable" type="xsd:boolean"/>
-                    <element name="updateable" type="xsd:boolean"/>
+                    <element name="feedEnabled"         type="xsd:boolean"/>
+                    <element name="keyPrefix"           type="xsd:string" nillable="true"/>
+                    <element name="label"               type="xsd:string"/>
+                    <element name="labelPlural"         type="xsd:string"/>
+                    <element name="layoutable"          type="xsd:boolean"/>
+                    <element name="mergeable"           type="xsd:boolean"/>
+                    <element name="name"                type="xsd:string"/>
+                    <element name="queryable"           type="xsd:boolean"/>
+                    <element name="replicateable"       type="xsd:boolean"/>
+                    <element name="retrieveable"        type="xsd:boolean"/>
+                    <element name="searchable"          type="xsd:boolean"/>
+                    <element name="triggerable"         type="xsd:boolean"/>
+                    <element name="undeletable"         type="xsd:boolean"/>
+                    <element name="updateable"          type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
             <complexType name="ChildRelationship">
                 <sequence>
-                    <element name="cascadeDelete" type="xsd:boolean"/>
-                    <element name="childSObject" type="xsd:string"/>
+                    <element name="cascadeDelete"    type="xsd:boolean"/>
+                    <element name="childSObject"     type="xsd:string"/>
                     <element name="deprecatedAndHidden" type="xsd:boolean"/>
-                    <element name="field" type="xsd:string"/>
+                    <element name="field"            type="xsd:string"/>
                     <element name="relationshipName" type="xsd:string" minOccurs="0"/>
                     <element name="restrictedDelete" type="xsd:boolean" minOccurs="0"/>
                 </sequence>
@@ -8166,9 +8264,9 @@ All Rights Reserved
 
             <complexType name="DescribeGlobalResult">
                 <sequence>
-                    <element name="encoding" type="xsd:string" nillable="true"/>
-                    <element name="maxBatchSize" type="xsd:int"/>
-                    <element name="sobjects" type="tns:DescribeGlobalSObjectResult" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="encoding"       type="xsd:string" nillable="true"/>
+                    <element name="maxBatchSize"   type="xsd:int"/>
+                    <element name="sobjects"       type="tns:DescribeGlobalSObjectResult" minOccurs="0" maxOccurs="unbounded"/>
                 </sequence>
             </complexType>
 
@@ -8217,77 +8315,77 @@ All Rights Reserved
 
             <complexType name="Field">
                 <sequence>
-                    <element name="autoNumber" type="xsd:boolean"/>
-                    <element name="byteLength" type="xsd:int"/>
-                    <element name="calculated" type="xsd:boolean"/>
-                    <element name="calculatedFormula" type="xsd:string" minOccurs="0"/>
-                    <element name="cascadeDelete" type="xsd:boolean" minOccurs="0"/>
-                    <element name="caseSensitive" type="xsd:boolean"/>
-                    <element name="controllerName" type="xsd:string" minOccurs="0"/>
-                    <element name="createable" type="xsd:boolean"/>
-                    <element name="custom" type="xsd:boolean"/>
-                    <element name="defaultValueFormula" type="xsd:string" minOccurs="0"/>
-                    <element name="defaultedOnCreate" type="xsd:boolean"/>
-                    <element name="dependentPicklist" type="xsd:boolean" minOccurs="0"/>
-                    <element name="deprecatedAndHidden" type="xsd:boolean"/>
-                    <element name="digits" type="xsd:int"/>
-                    <element name="displayLocationInDecimal" type="xsd:boolean" minOccurs="0"/>
-                    <element name="externalId" type="xsd:boolean" minOccurs="0"/>
-                    <element name="filterable" type="xsd:boolean"/>
-                    <element name="groupable" type="xsd:boolean"/>
-                    <element name="htmlFormatted" type="xsd:boolean" minOccurs="0"/>
-                    <element name="idLookup" type="xsd:boolean"/>
-                    <element name="inlineHelpText" type="xsd:string" minOccurs="0"/>
-                    <element name="label" type="xsd:string"/>
-                    <element name="length" type="xsd:int"/>
-                    <element name="name" type="xsd:string"/>
-                    <element name="nameField" type="xsd:boolean"/>
-                    <element name="namePointing" type="xsd:boolean" minOccurs="0"/>
-                    <element name="nillable" type="xsd:boolean"/>
-                    <element name="permissionable" type="xsd:boolean"/>
-                    <element name="picklistValues" type="tns:PicklistEntry" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="precision" type="xsd:int"/>
-                    <element name="referenceTo" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="relationshipName" type="xsd:string" minOccurs="0"/>
-                    <element name="relationshipOrder" type="xsd:int" minOccurs="0"/>
-                    <element name="restrictedDelete" type="xsd:boolean" minOccurs="0"/>
-                    <element name="restrictedPicklist" type="xsd:boolean"/>
-                    <element name="scale" type="xsd:int"/>
-                    <element name="soapType" type="tns:soapType"/>
-                    <element name="sortable" type="xsd:boolean" minOccurs="0"/>
-                    <element name="type" type="tns:fieldType"/>
-                    <element name="unique" type="xsd:boolean"/>
-                    <element name="updateable" type="xsd:boolean"/>
-                    <element name="writeRequiresMasterRead" type="xsd:boolean" minOccurs="0"/>
+                    <element name="autoNumber"                 type="xsd:boolean"/>
+                    <element name="byteLength"                 type="xsd:int"/>
+                    <element name="calculated"                 type="xsd:boolean"/>
+                    <element name="calculatedFormula"          type="xsd:string" minOccurs="0"/>
+                    <element name="cascadeDelete"              type="xsd:boolean" minOccurs="0"/>
+                    <element name="caseSensitive"              type="xsd:boolean"/>
+                    <element name="controllerName"             type="xsd:string" minOccurs="0"/>
+                    <element name="createable"                 type="xsd:boolean"/>
+                    <element name="custom"                     type="xsd:boolean"/>
+                    <element name="defaultValueFormula"        type="xsd:string" minOccurs="0"/>
+                    <element name="defaultedOnCreate"          type="xsd:boolean"/>
+                    <element name="dependentPicklist"          type="xsd:boolean" minOccurs="0"/>
+                    <element name="deprecatedAndHidden"        type="xsd:boolean"/>
+                    <element name="digits"                     type="xsd:int"/>
+                    <element name="displayLocationInDecimal"   type="xsd:boolean" minOccurs="0"/>
+                    <element name="externalId"                 type="xsd:boolean" minOccurs="0"/>
+                    <element name="filterable"                 type="xsd:boolean"/>
+                    <element name="groupable"                  type="xsd:boolean"/>
+                    <element name="htmlFormatted"              type="xsd:boolean" minOccurs="0"/>
+                    <element name="idLookup"                   type="xsd:boolean"/>
+                    <element name="inlineHelpText"             type="xsd:string" minOccurs="0"/>
+                    <element name="label"                      type="xsd:string"/>
+                    <element name="length"                     type="xsd:int"/>
+                    <element name="name"                       type="xsd:string"/>
+                    <element name="nameField"                  type="xsd:boolean"/>
+                    <element name="namePointing"               type="xsd:boolean" minOccurs="0"/>
+                    <element name="nillable"                   type="xsd:boolean"/>
+                    <element name="permissionable"             type="xsd:boolean"/>
+                    <element name="picklistValues"             type="tns:PicklistEntry" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="precision"                  type="xsd:int"/>
+                    <element name="referenceTo"                type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="relationshipName"           type="xsd:string" minOccurs="0"/>
+                    <element name="relationshipOrder"          type="xsd:int" minOccurs="0"/>
+                    <element name="restrictedDelete"           type="xsd:boolean" minOccurs="0"/>
+                    <element name="restrictedPicklist"         type="xsd:boolean"/>
+                    <element name="scale"                      type="xsd:int"/>
+                    <element name="soapType"                   type="tns:soapType"/>
+                    <element name="sortable"                   type="xsd:boolean" minOccurs="0"/>
+                    <element name="type"                       type="tns:fieldType"/>
+                    <element name="unique"                     type="xsd:boolean"/>
+                    <element name="updateable"                 type="xsd:boolean"/>
+                    <element name="writeRequiresMasterRead"    type="xsd:boolean" minOccurs="0"/>
                 </sequence>
             </complexType>
 
             <complexType name="PicklistEntry">
                 <sequence>
-                    <element name="active" type="xsd:boolean"/>
+                    <element name="active"       type="xsd:boolean"/>
                     <element name="defaultValue" type="xsd:boolean"/>
-                    <element name="label" type="xsd:string" nillable="true"/>
-                    <element name="validFor" type="xsd:base64Binary" minOccurs="0"/>
-                    <element name="value" type="xsd:string"/>
+                    <element name="label"        type="xsd:string" nillable="true"/>
+                    <element name="validFor"     type="xsd:base64Binary" minOccurs="0"/>
+                    <element name="value"        type="xsd:string"/>
                 </sequence>
             </complexType>
 
             <complexType name="DescribeDataCategoryGroupResult">
                 <sequence>
                     <element name="categoryCount" type="xsd:int"/>
-                    <element name="description" type="xsd:string"/>
-                    <element name="label" type="xsd:string"/>
-                    <element name="name" type="xsd:string"/>
-                    <element name="sobject" type="xsd:string"/>
+                    <element name="description"   type="xsd:string"/>
+                    <element name="label"         type="xsd:string"/>
+                    <element name="name"          type="xsd:string"/>
+                    <element name="sobject"       type="xsd:string"/>
                 </sequence>
             </complexType>
 
             <complexType name="DescribeDataCategoryGroupStructureResult">
                 <sequence>
-                    <element name="description" type="xsd:string"/>
-                    <element name="label" type="xsd:string"/>
-                    <element name="name" type="xsd:string"/>
-                    <element name="sobject" type="xsd:string"/>
+                    <element name="description"   type="xsd:string"/>
+                    <element name="label"         type="xsd:string"/>
+                    <element name="name"          type="xsd:string"/>
+                    <element name="sobject"       type="xsd:string"/>
                     <element name="topCategories" type="tns:DataCategory" minOccurs="0" maxOccurs="unbounded"/>
                 </sequence>
             </complexType>
@@ -8295,15 +8393,15 @@ All Rights Reserved
             <complexType name="DataCategoryGroupSobjectTypePair">
                 <sequence>
                     <element name="dataCategoryGroupName" type="xsd:string"/>
-                    <element name="sobject" type="xsd:string"/>
+                    <element name="sobject"               type="xsd:string"/>
                 </sequence>
             </complexType>
 
             <complexType name="DataCategory">
                 <sequence>
                     <element name="childCategories" type="tns:DataCategory" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="label" type="xsd:string"/>
-                    <element name="name" type="xsd:string"/>
+                    <element name="label"           type="xsd:string"/>
+                    <element name="name"            type="xsd:string"/>
                 </sequence>
             </complexType>
 
@@ -8354,72 +8452,72 @@ All Rights Reserved
 
             <complexType name="DescribeLayoutResult">
                 <sequence>
-                    <element name="layouts" type="tns:DescribeLayout" maxOccurs="unbounded"/>
+                    <element name="layouts"            type="tns:DescribeLayout" maxOccurs="unbounded"/>
                     <element name="recordTypeMappings" type="tns:RecordTypeMapping" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="recordTypeSelectorRequired" type="xsd:boolean"/>
+                    <element name="recordTypeSelectorRequired" type="xsd:boolean" />
                 </sequence>
             </complexType>
 
             <complexType name="DescribeLayout">
                 <sequence>
-                    <element name="buttonLayoutSection" type="tns:DescribeLayoutButtonSection" minOccurs="0"/>
+                    <element name="buttonLayoutSection"  type="tns:DescribeLayoutButtonSection" minOccurs="0"/>
                     <element name="detailLayoutSections" type="tns:DescribeLayoutSection" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="editLayoutSections" type="tns:DescribeLayoutSection" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="id" type="tns:ID"/>
+                    <element name="editLayoutSections"   type="tns:DescribeLayoutSection" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="id"                   type="tns:ID"/>
 
 
-                    <element name="relatedLists" type="tns:RelatedList" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="relatedLists"                type="tns:RelatedList" minOccurs="0" maxOccurs="unbounded"/>
                 </sequence>
             </complexType>
 
             <complexType name="DescribeLayoutSection">
                 <sequence>
-                    <element name="columns" type="xsd:int"/>
-                    <element name="heading" type="xsd:string"/>
-                    <element name="layoutRows" type="tns:DescribeLayoutRow" maxOccurs="unbounded"/>
-                    <element name="rows" type="xsd:int"/>
-                    <element name="useCollapsibleSection" type="xsd:boolean"/>
-                    <element name="useHeading" type="xsd:boolean"/>
+                    <element name="columns"                 type="xsd:int"/>
+                    <element name="heading"                 type="xsd:string"/>
+                    <element name="layoutRows"              type="tns:DescribeLayoutRow" maxOccurs="unbounded"/>
+                    <element name="rows"                    type="xsd:int"/>
+                    <element name="useCollapsibleSection"   type="xsd:boolean"/>
+                    <element name="useHeading"              type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
             <complexType name="DescribeLayoutButtonSection">
                 <sequence>
-                    <element name="detailButtons" type="tns:DescribeLayoutButton" maxOccurs="unbounded"/>
+                    <element name="detailButtons"         type="tns:DescribeLayoutButton" maxOccurs="unbounded"/>
                 </sequence>
             </complexType>
 
             <complexType name="DescribeLayoutRow">
                 <sequence>
-                    <element name="layoutItems" type="tns:DescribeLayoutItem" maxOccurs="unbounded"/>
-                    <element name="numItems" type="xsd:int"/>
+                    <element name="layoutItems"      type="tns:DescribeLayoutItem" maxOccurs="unbounded"/>
+                    <element name="numItems"         type="xsd:int"/>
                 </sequence>
             </complexType>
 
             <complexType name="DescribeLayoutItem">
                 <sequence>
-                    <element name="editable" type="xsd:boolean"/>
-                    <element name="label" type="xsd:string" nillable="true"/>
+                    <element name="editable"         type="xsd:boolean"/>
+                    <element name="label"            type="xsd:string" nillable="true"/>
                     <element name="layoutComponents" type="tns:DescribeLayoutComponent" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="placeholder" type="xsd:boolean"/>
-                    <element name="required" type="xsd:boolean"/>
+                    <element name="placeholder"      type="xsd:boolean"/>
+                    <element name="required"         type="xsd:boolean"/>
                 </sequence>
             </complexType>
 
             <complexType name="DescribeLayoutButton">
                 <sequence>
-                    <element name="custom" type="xsd:boolean"/>
-                    <element name="label" type="xsd:string" nillable="true"/>
-                    <element name="name" type="xsd:string" nillable="true"/>
+                    <element name="custom"           type="xsd:boolean"/>
+                    <element name="label"            type="xsd:string" nillable="true"/>
+                    <element name="name"             type="xsd:string" nillable="true"/>
                 </sequence>
             </complexType>
 
             <complexType name="DescribeLayoutComponent">
                 <sequence>
-                    <element name="displayLines" type="xsd:int"/>
-                    <element name="tabOrder" type="xsd:int"/>
-                    <element name="type" type="tns:layoutComponentType"/>
-                    <element name="value" type="xsd:string"/>
+                    <element name="displayLines"      type="xsd:int"/>
+                    <element name="tabOrder"          type="xsd:int"/>
+                    <element name="type"              type="tns:layoutComponentType"/>
+                    <element name="value"             type="xsd:string"/>
                 </sequence>
             </complexType>
 
@@ -8434,58 +8532,58 @@ All Rights Reserved
 
             <complexType name="RecordTypeInfo">
                 <sequence>
-                    <element name="available" type="xsd:boolean"/>
-                    <element name="defaultRecordTypeMapping" type="xsd:boolean"/>
-                    <element name="name" type="xsd:string"/>
-                    <element name="recordTypeId" type="tns:ID" nillable="true"/>
+                    <element name="available"                 type="xsd:boolean"/>
+                    <element name="defaultRecordTypeMapping"  type="xsd:boolean"/>
+                    <element name="name"                      type="xsd:string"/>
+                    <element name="recordTypeId"              type="tns:ID" nillable="true"/>
                 </sequence>
             </complexType>
 
             <complexType name="RecordTypeMapping">
                 <sequence>
-                    <element name="available" type="xsd:boolean"/>
-                    <element name="defaultRecordTypeMapping" type="xsd:boolean"/>
-                    <element name="layoutId" type="tns:ID"/>
-                    <element name="name" type="xsd:string"/>
-                    <element name="picklistsForRecordType" type="tns:PicklistForRecordType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-                    <element name="recordTypeId" type="tns:ID" nillable="true"/>
+                    <element name="available"                 type="xsd:boolean"/>
+                    <element name="defaultRecordTypeMapping"  type="xsd:boolean"/>
+                    <element name="layoutId"                  type="tns:ID"/>
+                    <element name="name"                      type="xsd:string"/>
+                    <element name="picklistsForRecordType"    type="tns:PicklistForRecordType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="recordTypeId"              type="tns:ID" nillable="true"/>
                 </sequence>
             </complexType>
 
             <complexType name="PicklistForRecordType">
                 <sequence>
-                    <element name="picklistName" type="xsd:string"/>
-                    <element name="picklistValues" type="tns:PicklistEntry" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="picklistName"      type="xsd:string"/>
+                    <element name="picklistValues"    type="tns:PicklistEntry" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
                 </sequence>
             </complexType>
 
             <complexType name="RelatedList">
                 <sequence>
-                    <element name="columns" type="tns:RelatedListColumn" maxOccurs="unbounded"/>
-                    <element name="custom" type="xsd:boolean"/>
-                    <element name="field" type="xsd:string" nillable="true"/>
-                    <element name="label" type="xsd:string"/>
-                    <element name="limitRows" type="xsd:int"/>
-                    <element name="name" type="xsd:string"/>
-                    <element name="sobject" type="xsd:string" nillable="true"/>
-                    <element name="sort" type="tns:RelatedListSort" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="columns"         type="tns:RelatedListColumn" maxOccurs="unbounded"/>
+                    <element name="custom"          type="xsd:boolean"/>
+                    <element name="field"           type="xsd:string" nillable="true"/>
+                    <element name="label"           type="xsd:string"/>
+                    <element name="limitRows"       type="xsd:int"/>
+                    <element name="name"            type="xsd:string"/>
+                    <element name="sobject"         type="xsd:string" nillable="true"/>
+                    <element name="sort"            type="tns:RelatedListSort" minOccurs="0" maxOccurs="unbounded"/>
                 </sequence>
             </complexType>
 
             <complexType name="RelatedListColumn">
                 <sequence>
-                    <element name="field" type="xsd:string" nillable="true"/>
-                    <element name="format" type="xsd:string" nillable="true"/>
-                    <element name="label" type="xsd:string"/>
-                    <element name="lookupId" type="xsd:string" nillable="true" minOccurs="0"/>
-                    <element name="name" type="xsd:string"/>
+                    <element name="field"           type="xsd:string" nillable="true"/>
+                    <element name="format"          type="xsd:string" nillable="true"/>
+                    <element name="label"           type="xsd:string"/>
+                    <element name="lookupId"        type="xsd:string"  nillable="true" minOccurs="0"/>
+                    <element name="name"            type="xsd:string"/>
                 </sequence>
             </complexType>
 
             <complexType name="RelatedListSort">
                 <sequence>
-                    <element name="ascending" type="xsd:boolean"/>
-                    <element name="column" type="xsd:string"/>
+                    <element name="ascending"       type="xsd:boolean"/>
+                    <element name="column"          type="xsd:string"/>
                 </sequence>
             </complexType>
 
@@ -8493,10 +8591,10 @@ All Rights Reserved
 
             <complexType name="EmailFileAttachment">
                 <sequence>
-                    <element name="body" nillable="true" minOccurs="0" type="xsd:base64Binary"/>
-                    <element name="contentType" nillable="true" minOccurs="0" type="xsd:string"/>
-                    <element name="fileName" type="xsd:string"/>
-                    <element name="inline" type="xsd:boolean" minOccurs="0"/>
+                    <element name="body"                nillable="true" minOccurs="0" type="xsd:base64Binary"/>
+                    <element name="contentType"         nillable="true" minOccurs="0" type="xsd:string" />
+                    <element name="fileName"            type="xsd:string" />
+                    <element name="inline"				type="xsd:boolean" minOccurs="0"/>
                 </sequence>
             </complexType>
             <simpleType name="EmailPriority">
@@ -8511,13 +8609,13 @@ All Rights Reserved
 
             <complexType name="Email">
                 <sequence>
-                    <element name="bccSender" type="xsd:boolean" nillable="true"/>
-                    <element name="emailPriority" type="tns:EmailPriority" nillable="true"/>
-                    <element name="replyTo" type="xsd:string" nillable="true"/>
-                    <element name="saveAsActivity" type="xsd:boolean" nillable="true"/>
-                    <element name="senderDisplayName" type="xsd:string" nillable="true"/>
-                    <element name="subject" type="xsd:string" nillable="true"/>
-                    <element name="useSignature" type="xsd:boolean" nillable="true"/>
+                    <element name="bccSender"         type="xsd:boolean" nillable="true"/>
+                    <element name="emailPriority"      type="tns:EmailPriority" nillable="true"/>
+                    <element name="replyTo"            type="xsd:string" nillable="true"/>
+                    <element name="saveAsActivity"     type="xsd:boolean" nillable="true"/>
+                    <element name="senderDisplayName"  type="xsd:string" nillable="true"/>
+                    <element name="subject"            type="xsd:string" nillable="true"/>
+                    <element name="useSignature"       type="xsd:boolean" nillable="true"/>
                 </sequence>
             </complexType>
 
@@ -8525,10 +8623,10 @@ All Rights Reserved
                 <complexContent>
                     <extension base="tns:Email">
                         <sequence>
-                            <element name="description" type="xsd:string" nillable="true"/>
-                            <element name="targetObjectIds" minOccurs="0" maxOccurs="250" type="tns:ID"/>
-                            <element name="templateId" type="tns:ID"/>
-                            <element name="whatIds" minOccurs="0" maxOccurs="250" type="tns:ID"/>
+                            <element name="description"  type="xsd:string" nillable="true"/>
+                            <element name="targetObjectIds"     minOccurs="0" maxOccurs="250" type="tns:ID" />
+                            <element name="templateId"          type="tns:ID"/>
+                            <element name="whatIds"             minOccurs="0" maxOccurs="250" type="tns:ID" />
                         </sequence>
                     </extension>
                 </complexContent>
@@ -8538,20 +8636,20 @@ All Rights Reserved
                 <complexContent>
                     <extension base="tns:Email">
                         <sequence>
-                            <element name="bccAddresses" minOccurs="0" maxOccurs="25" type="xsd:string" nillable="true"/>
-                            <element name="ccAddresses" minOccurs="0" maxOccurs="25" type="xsd:string" nillable="true"/>
-                            <element name="charset" type="xsd:string" nillable="true"/>
-                            <element name="documentAttachments" minOccurs="0" maxOccurs="unbounded" type="tns:ID"/>
-                            <element name="htmlBody" type="xsd:string" nillable="true"/>
-                            <element name="inReplyTo" minOccurs="0" type="xsd:string" nillable="true"/>
-                            <element name="fileAttachments" minOccurs="0" maxOccurs="unbounded" type="tns:EmailFileAttachment"/>
+                            <element name="bccAddresses"        minOccurs="0" maxOccurs="25" type="xsd:string" nillable="true"/>
+                            <element name="ccAddresses"         minOccurs="0" maxOccurs="25" type="xsd:string" nillable="true"/>
+                            <element name="charset"             type="xsd:string" nillable="true"/>
+                            <element name="documentAttachments" minOccurs="0" maxOccurs="unbounded" type="tns:ID" />
+                            <element name="htmlBody"       type="xsd:string" nillable="true"/>
+                            <element name="inReplyTo"           minOccurs="0" type="xsd:string" nillable="true"/>
+                            <element name="fileAttachments"     minOccurs="0" maxOccurs="unbounded" type="tns:EmailFileAttachment"/>
                             <element name="orgWideEmailAddressId" minOccurs="0" maxOccurs="1" type="tns:ID" nillable="true"/>
-                            <element name="plainTextBody" type="xsd:string" nillable="true"/>
-                            <element name="references" minOccurs="0" type="xsd:string" nillable="true"/>
-                            <element name="targetObjectId" type="tns:ID" nillable="true"/>
-                            <element name="templateId" type="tns:ID" nillable="true"/>
-                            <element name="toAddresses" minOccurs="0" maxOccurs="100" type="xsd:string" nillable="true"/>
-                            <element name="whatId" type="tns:ID" nillable="true"/>
+                            <element name="plainTextBody"       type="xsd:string" nillable="true"/>
+                            <element name="references"          minOccurs="0" type="xsd:string" nillable="true"/>
+                            <element name="targetObjectId"      type="tns:ID" nillable="true"/>
+                            <element name="templateId"          type="tns:ID" nillable="true"/>
+                            <element name="toAddresses"         minOccurs="0" maxOccurs="100" type="xsd:string" nillable="true"/>
+                            <element name="whatId"              type="tns:ID" nillable="true"/>
                         </sequence>
                     </extension>
                 </complexContent>
@@ -8559,8 +8657,8 @@ All Rights Reserved
 
             <complexType name="SendEmailResult">
                 <sequence>
-                    <element name="errors" minOccurs="0" maxOccurs="unbounded" type="tns:SendEmailError"/>
-                    <element name="success" type="xsd:boolean"/>
+                    <element name="errors"              minOccurs="0" maxOccurs="unbounded" type="tns:SendEmailError" />
+                    <element name="success"             type="xsd:boolean" />
                 </sequence>
             </complexType>
 
@@ -8569,30 +8667,30 @@ All Rights Reserved
 
             <complexType name="DescribeSearchScopeOrderResult">
                 <sequence>
-                    <element name="keyPrefix" type="xsd:string"/>
-                    <element name="name" type="xsd:string"/>
+                    <element name="keyPrefix"       type="xsd:string" />
+                    <element name="name"            type="xsd:string"/>
                 </sequence>
             </complexType>
 
 
             <complexType name="DescribeTabSetResult">
                 <sequence>
-                    <element name="label" type="xsd:string"/>
-                    <element name="logoUrl" type="xsd:string"/>
-                    <element name="namespace" type="xsd:string" minOccurs="0"/>
-                    <element name="selected" type="xsd:boolean"/>
-                    <element name="tabs" type="tns:DescribeTab" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="label"           type="xsd:string" />
+                    <element name="logoUrl"         type="xsd:string" />
+                    <element name="namespace"       type="xsd:string" minOccurs="0"/>
+                    <element name="selected"        type="xsd:boolean" />
+                    <element name="tabs"            type="tns:DescribeTab" minOccurs="0" maxOccurs="unbounded"/>
                 </sequence>
             </complexType>
 
             <complexType name="DescribeTab">
                 <sequence>
-                    <element name="custom" type="xsd:boolean"/>
-                    <element name="iconUrl" type="xsd:string"/>
-                    <element name="label" type="xsd:string"/>
-                    <element name="miniIconUrl" type="xsd:string"/>
-                    <element name="sobjectName" type="xsd:string" nillable="true"/>
-                    <element name="url" type="xsd:string"/>
+                    <element name="custom"           type="xsd:boolean" />
+                    <element name="iconUrl"          type="xsd:string" />
+                    <element name="label"            type="xsd:string" />
+                    <element name="miniIconUrl"      type="xsd:string" />
+                    <element name="sobjectName"      type="xsd:string" nillable="true" />
+                    <element name="url"              type="xsd:string" />
                 </sequence>
             </complexType>
 
@@ -8637,14 +8735,14 @@ All Rights Reserved
             <element name="describeSObjects">
                 <complexType>
                     <sequence>
-                        <element name="sObjectType" type="xsd:string" minOccurs="0" maxOccurs="100"/>
+                        <element name="sObjectType" type="xsd:string" minOccurs='0' maxOccurs='100' />
                     </sequence>
                 </complexType>
             </element>
             <element name="describeSObjectsResponse">
                 <complexType>
                     <sequence>
-                        <element name="result" type="tns:DescribeSObjectResult" nillable="true" minOccurs="0" maxOccurs="100"/>
+                        <element name="result" type="tns:DescribeSObjectResult" nillable="true" minOccurs='0' maxOccurs='100'/>
                     </sequence>
                 </complexType>
             </element>
@@ -8667,21 +8765,21 @@ All Rights Reserved
             <element name="describeDataCategoryGroups">
                 <complexType>
                     <sequence>
-                        <element name="sObjectType" type="xsd:string" minOccurs="0" maxOccurs="10"/>
+                        <element name="sObjectType" type="xsd:string" minOccurs='0' maxOccurs='10' />
                     </sequence>
                 </complexType>
             </element>
             <element name="describeDataCategoryGroupsResponse">
                 <complexType>
                     <sequence>
-                        <element name="result" type="tns:DescribeDataCategoryGroupResult" minOccurs="0" maxOccurs="100"/>
+                        <element name="result" type="tns:DescribeDataCategoryGroupResult" minOccurs='0' maxOccurs='100'/>
                     </sequence>
                 </complexType>
             </element>
             <element name="describeDataCategoryGroupStructures">
                 <complexType>
                     <sequence>
-                        <element name="pairs" type="tns:DataCategoryGroupSobjectTypePair" minOccurs="0" maxOccurs="100"/>
+                        <element name="pairs" type="tns:DataCategoryGroupSobjectTypePair" minOccurs='0' maxOccurs='100' />
                         <element name="topCategoriesOnly" type="xsd:boolean"/>
                     </sequence>
                 </complexType>
@@ -8689,7 +8787,7 @@ All Rights Reserved
             <element name="describeDataCategoryGroupStructuresResponse">
                 <complexType>
                     <sequence>
-                        <element name="result" type="tns:DescribeDataCategoryGroupStructureResult" minOccurs="0" maxOccurs="100"/>
+                        <element name="result" type="tns:DescribeDataCategoryGroupStructureResult" minOccurs='0' maxOccurs='100'/>
                     </sequence>
                 </complexType>
             </element>
@@ -8922,9 +9020,9 @@ All Rights Reserved
             <element name="retrieve">
                 <complexType>
                     <sequence>
-                        <element name="fieldList" type="xsd:string"/>
+                        <element name="fieldList"   type="xsd:string"/>
                         <element name="sObjectType" type="xsd:string"/>
-                        <element name="ids" type="tns:ID" minOccurs="0" maxOccurs="unbounded"/>
+                        <element name="ids"         type="tns:ID" minOccurs="0" maxOccurs="unbounded"/>
                     </sequence>
                 </complexType>
             </element>
@@ -9167,7 +9265,7 @@ All Rights Reserved
             <element name="QueryOptions">
                 <complexType>
                     <sequence>
-                        <element name="batchSize" type="xsd:int" minOccurs="0"/>
+                        <element name="batchSize"       type="xsd:int" minOccurs="0"/>
 
                     </sequence>
                 </complexType>
@@ -9214,7 +9312,7 @@ All Rights Reserved
             <element name="AllowFieldTruncationHeader">
                 <complexType>
                     <sequence>
-                        <element name="allowFieldTruncation" type="xsd:boolean"/>
+                        <element name="allowFieldTruncation" type="xsd:boolean" />
                     </sequence>
                 </complexType>
             </element>
@@ -9223,7 +9321,7 @@ All Rights Reserved
             <element name="DisableFeedTrackingHeader">
                 <complexType>
                     <sequence>
-                        <element name="disableFeedTracking" type="xsd:boolean"/>
+                        <element name="disableFeedTracking" type="xsd:boolean" />
                     </sequence>
                 </complexType>
             </element>
@@ -9233,7 +9331,7 @@ All Rights Reserved
             <element name="StreamingEnabledHeader">
                 <complexType>
                     <sequence>
-                        <element name="streamingEnabled" type="xsd:boolean"/>
+                        <element name="streamingEnabled" type="xsd:boolean" />
                     </sequence>
                 </complexType>
             </element>
@@ -9243,7 +9341,7 @@ All Rights Reserved
         <element name="AllOrNoneHeader">
             <complexType>
                 <sequence>
-                    <element name="allOrNone" type="xsd:boolean"/>
+                    <element name="allOrNone" type="xsd:boolean" />
                 </sequence>
             </complexType>
         </element>
@@ -9254,7 +9352,7 @@ All Rights Reserved
             <element name="MruHeader">
                 <complexType>
                     <sequence>
-                        <element name="updateMru" type="xsd:boolean"/>
+                        <element name="updateMru" type="xsd:boolean" />
                     </sequence>
                 </complexType>
             </element>
@@ -9262,9 +9360,9 @@ All Rights Reserved
             <element name="EmailHeader">
                 <complexType>
                     <sequence>
-                        <element name="triggerAutoResponseEmail" type="xsd:boolean"/>
-                        <element name="triggerOtherEmail" type="xsd:boolean"/>
-                        <element name="triggerUserEmail" type="xsd:boolean"/>
+                        <element name="triggerAutoResponseEmail"    type="xsd:boolean"/>
+                        <element name="triggerOtherEmail"           type="xsd:boolean"/>
+                        <element name="triggerUserEmail"            type="xsd:boolean"/>
                     </sequence>
                 </complexType>
             </element>
@@ -9272,8 +9370,8 @@ All Rights Reserved
             <element name="AssignmentRuleHeader">
                 <complexType>
                     <sequence>
-                        <element name="assignmentRuleId" type="tns:ID" nillable="true"/>
-                        <element name="useDefaultRule" type="xsd:boolean" nillable="true"/>
+                        <element name="assignmentRuleId"    type="tns:ID"  nillable="true" />
+                        <element name="useDefaultRule"      type="xsd:boolean" nillable="true" />
                     </sequence>
                 </complexType>
             </element>
@@ -9291,7 +9389,7 @@ All Rights Reserved
             <element name="LocaleOptions">
                 <complexType>
                     <sequence>
-                        <element name="language" type="xsd:string" minOccurs="0"/>
+                        <element name="language"  type="xsd:string" minOccurs="0"/>
                     </sequence>
                 </complexType>
             </element>
@@ -9551,13 +9649,13 @@ All Rights Reserved
             <!-- Fault -->
             <complexType name="ApiFault">
                 <sequence>
-                    <element name="exceptionCode" type="fns:ExceptionCode"/>
+                    <element name="exceptionCode"    type="fns:ExceptionCode"/>
                     <element name="exceptionMessage" type="xsd:string"/>
 
                 </sequence>
             </complexType>
 
-            <element name="fault" type="fns:ApiFault"/>
+            <element name="fault" type="fns:ApiFault" />
 
             <complexType name="ApiQueryFault">
                 <complexContent>
@@ -9639,32 +9737,32 @@ All Rights Reserved
 
     <!-- Header Message -->
     <message name="Header">
-        <part element="tns:LoginScopeHeader" name="LoginScopeHeader"/>
-        <part element="tns:SessionHeader" name="SessionHeader"/>
+        <part element="tns:LoginScopeHeader"             name="LoginScopeHeader"/>
+        <part element="tns:SessionHeader"                name="SessionHeader"/>
 
-        <part element="tns:QueryOptions" name="QueryOptions"/>
-        <part element="tns:AssignmentRuleHeader" name="AssignmentRuleHeader"/>
-        <part element="tns:AllowFieldTruncationHeader" name="AllowFieldTruncationHeader"/>
+        <part element="tns:QueryOptions"                 name="QueryOptions"/>
+        <part element="tns:AssignmentRuleHeader"         name="AssignmentRuleHeader"/>
+        <part element="tns:AllowFieldTruncationHeader"   name="AllowFieldTruncationHeader"/>
 
-        <part element="tns:AllOrNoneHeader" name="AllOrNoneHeader"/>
-
-
-        <part element="tns:DisableFeedTrackingHeader" name="DisableFeedTrackingHeader"/>
+        <part element="tns:AllOrNoneHeader"              name="AllOrNoneHeader"/>
 
 
-        <part element="tns:StreamingEnabledHeader" name="StreamingEnabledHeader"/>
+        <part element="tns:DisableFeedTrackingHeader"    name="DisableFeedTrackingHeader"/>
 
-        <part element="tns:MruHeader" name="MruHeader"/>
-        <part element="tns:EmailHeader" name="EmailHeader"/>
 
-        <part element="tns:UserTerritoryDeleteHeader" name="UserTerritoryDeleteHeader"/>
+        <part element="tns:StreamingEnabledHeader"       name="StreamingEnabledHeader"/>
 
-        <part element="tns:DebuggingHeader" name="DebuggingHeader"/>
-        <part element="tns:PackageVersionHeader" name="PackageVersionHeader"/>
-        <part element="tns:DebuggingInfo" name="DebuggingInfo"/>
-        <part element="tns:LocaleOptions" name="LocaleOptions"/>
+        <part element="tns:MruHeader"                    name="MruHeader"/>
+        <part element="tns:EmailHeader"                  name="EmailHeader"/>
 
-        <part element="tns:OwnerChangeOptions" name="OwnerChangeOptions"/>
+        <part element="tns:UserTerritoryDeleteHeader"    name="UserTerritoryDeleteHeader"/>
+
+        <part element="tns:DebuggingHeader"              name="DebuggingHeader"/>
+        <part element="tns:PackageVersionHeader"         name="PackageVersionHeader"/>
+        <part element="tns:DebuggingInfo"                name="DebuggingInfo"/>
+        <part element="tns:LocaleOptions"                name="LocaleOptions"/>
+
+        <part element="tns:OwnerChangeOptions"           name="OwnerChangeOptions"/>
 
     </message>
 
@@ -9948,285 +10046,285 @@ All Rights Reserved
     <portType name="Soap">
         <operation name="login">
             <documentation>Login to the Salesforce.com SOAP Api</documentation>
-            <input message="tns:loginRequest"/>
+            <input  message="tns:loginRequest"/>
             <output message="tns:loginResponse"/>
-            <fault message="tns:LoginFault" name="LoginFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:LoginFault" name="LoginFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
         </operation>
 
         <operation name="describeSObject">
             <documentation>Describe an sObject</documentation>
-            <input message="tns:describeSObjectRequest"/>
+            <input  message="tns:describeSObjectRequest"/>
             <output message="tns:describeSObjectResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="describeSObjects">
             <documentation>Describe a number sObjects</documentation>
-            <input message="tns:describeSObjectsRequest"/>
+            <input  message="tns:describeSObjectsRequest"/>
             <output message="tns:describeSObjectsResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="describeGlobal">
             <documentation>Describe the Global state</documentation>
-            <input message="tns:describeGlobalRequest"/>
+            <input  message="tns:describeGlobalRequest"/>
             <output message="tns:describeGlobalResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="describeDataCategoryGroups">
             <documentation>Describe all the data category groups available for a given set of types</documentation>
-            <input message="tns:describeDataCategoryGroupsRequest"/>
+            <input  message="tns:describeDataCategoryGroupsRequest"/>
             <output message="tns:describeDataCategoryGroupsResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="describeDataCategoryGroupStructures">
             <documentation>Describe the data category group structures for a given set of pair of types and data category group name</documentation>
-            <input message="tns:describeDataCategoryGroupStructuresRequest"/>
+            <input  message="tns:describeDataCategoryGroupStructuresRequest"/>
             <output message="tns:describeDataCategoryGroupStructuresResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="describeLayout">
             <documentation>Describe the layout of an sObject</documentation>
-            <input message="tns:describeLayoutRequest"/>
+            <input  message="tns:describeLayoutRequest"/>
             <output message="tns:describeLayoutResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
         </operation>
 
         <operation name="describeSoftphoneLayout">
             <documentation>Describe the layout of the SoftPhone</documentation>
-            <input message="tns:describeSoftphoneLayoutRequest"/>
+            <input  message="tns:describeSoftphoneLayoutRequest"/>
             <output message="tns:describeSoftphoneLayoutResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="describeSearchScopeOrder">
             <documentation>Describe a list of objects representing the order and scope of objects on a users search result page</documentation>
-            <input message="tns:describeSearchScopeOrderRequest"/>
+            <input  message="tns:describeSearchScopeOrderRequest"/>
             <output message="tns:describeSearchScopeOrderResponse"/>
         </operation>
 
         <operation name="describeTabs">
             <documentation>Describe the tabs that appear on a users page</documentation>
-            <input message="tns:describeTabsRequest"/>
+            <input  message="tns:describeTabsRequest"/>
             <output message="tns:describeTabsResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="create">
             <documentation>Create a set of new sObjects</documentation>
-            <input message="tns:createRequest"/>
+            <input  message="tns:createRequest"/>
             <output message="tns:createResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
-            <fault message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
         </operation>
 
         <operation name="update">
             <documentation>Update a set of sObjects</documentation>
-            <input message="tns:updateRequest"/>
+            <input  message="tns:updateRequest"/>
             <output message="tns:updateResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
-            <fault message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
         </operation>
 
         <operation name="upsert">
             <documentation>Update or insert a set of sObjects based on object id</documentation>
-            <input message="tns:upsertRequest"/>
+            <input  message="tns:upsertRequest"/>
             <output message="tns:upsertResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
-            <fault message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
         </operation>
 
         <operation name="merge">
             <documentation>Merge and update a set of sObjects based on object id</documentation>
-            <input message="tns:mergeRequest"/>
+            <input  message="tns:mergeRequest"/>
             <output message="tns:mergeResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
-            <fault message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
         </operation>
 
         <operation name="delete">
             <documentation>Delete a set of sObjects</documentation>
-            <input message="tns:deleteRequest"/>
+            <input  message="tns:deleteRequest"/>
             <output message="tns:deleteResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="undelete">
             <documentation>Undelete a set of sObjects</documentation>
-            <input message="tns:undeleteRequest"/>
+            <input  message="tns:undeleteRequest"/>
             <output message="tns:undeleteResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="emptyRecycleBin">
             <documentation>Empty a set of sObjects from the recycle bin</documentation>
-            <input message="tns:emptyRecycleBinRequest"/>
+            <input  message="tns:emptyRecycleBinRequest"/>
             <output message="tns:emptyRecycleBinResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="retrieve">
             <documentation>Get a set of sObjects</documentation>
-            <input message="tns:retrieveRequest"/>
+            <input  message="tns:retrieveRequest"/>
             <output message="tns:retrieveResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
-            <fault message="tns:MalformedQueryFault" name="MalformedQueryFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
+            <fault  message="tns:MalformedQueryFault" name="MalformedQueryFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
         </operation>
 
         <operation name="process">
             <documentation>Submit an entity to a workflow process or process a workitem</documentation>
-            <input message="tns:processRequest"/>
+            <input  message="tns:processRequest"/>
             <output message="tns:processResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
         </operation>
 
         <operation name="convertLead">
             <documentation>convert a set of leads</documentation>
-            <input message="tns:convertLeadRequest"/>
+            <input  message="tns:convertLeadRequest"/>
             <output message="tns:convertLeadResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="logout">
             <documentation>Logout the current user, invalidating the current session.</documentation>
-            <input message="tns:logoutRequest"/>
+            <input  message="tns:logoutRequest"/>
             <output message="tns:logoutResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="invalidateSessions">
             <documentation>Logs out and invalidates session ids</documentation>
-            <input message="tns:invalidateSessionsRequest"/>
+            <input  message="tns:invalidateSessionsRequest"/>
             <output message="tns:invalidateSessionsResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="getDeleted">
             <documentation>Get the IDs for deleted sObjects</documentation>
-            <input message="tns:getDeletedRequest"/>
+            <input  message="tns:getDeletedRequest"/>
             <output message="tns:getDeletedResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="getUpdated">
             <documentation>Get the IDs for updated sObjects</documentation>
-            <input message="tns:getUpdatedRequest"/>
+            <input  message="tns:getUpdatedRequest"/>
             <output message="tns:getUpdatedResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="query">
             <documentation>Create a Query Cursor</documentation>
-            <input message="tns:queryRequest"/>
+            <input  message="tns:queryRequest"/>
             <output message="tns:queryResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
-            <fault message="tns:MalformedQueryFault" name="MalformedQueryFault"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidQueryLocatorFault" name="InvalidQueryLocatorFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
+            <fault  message="tns:MalformedQueryFault" name="MalformedQueryFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidQueryLocatorFault" name="InvalidQueryLocatorFault"/>
         </operation>
 
         <operation name="queryAll">
             <documentation>Create a Query Cursor, including deleted sObjects</documentation>
-            <input message="tns:queryAllRequest"/>
+            <input  message="tns:queryAllRequest"/>
             <output message="tns:queryAllResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
-            <fault message="tns:MalformedQueryFault" name="MalformedQueryFault"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidQueryLocatorFault" name="InvalidQueryLocatorFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
+            <fault  message="tns:MalformedQueryFault" name="MalformedQueryFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidQueryLocatorFault" name="InvalidQueryLocatorFault"/>
         </operation>
 
         <operation name="queryMore">
             <documentation>Gets the next batch of sObjects from a query</documentation>
-            <input message="tns:queryMoreRequest"/>
+            <input  message="tns:queryMoreRequest"/>
             <output message="tns:queryMoreResponse"/>
-            <fault message="tns:InvalidQueryLocatorFault" name="InvalidQueryLocatorFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
-            <fault message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
-            <fault message="tns:MalformedQueryFault" name="MalformedQueryFault"/>
+            <fault  message="tns:InvalidQueryLocatorFault" name="InvalidQueryLocatorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
+            <fault  message="tns:MalformedQueryFault" name="MalformedQueryFault"/>
         </operation>
 
         <operation name="search">
             <documentation>Search for sObjects</documentation>
-            <input message="tns:searchRequest"/>
+            <input  message="tns:searchRequest"/>
             <output message="tns:searchResponse"/>
-            <fault message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
-            <fault message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
-            <fault message="tns:MalformedSearchFault" name="MalformedSearchFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidSObjectFault" name="InvalidSObjectFault"/>
+            <fault  message="tns:InvalidFieldFault" name="InvalidFieldFault"/>
+            <fault  message="tns:MalformedSearchFault" name="MalformedSearchFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="getServerTimestamp">
             <documentation>Gets server timestamp</documentation>
-            <input message="tns:getServerTimestampRequest"/>
+            <input  message="tns:getServerTimestampRequest"/>
             <output message="tns:getServerTimestampResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="setPassword">
             <documentation>Set a user's password</documentation>
-            <input message="tns:setPasswordRequest"/>
+            <input  message="tns:setPasswordRequest"/>
             <output message="tns:setPasswordResponse"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
-            <fault message="tns:InvalidNewPasswordFault" name="InvalidNewPasswordFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:InvalidNewPasswordFault" name="InvalidNewPasswordFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="resetPassword">
             <documentation>Reset a user's password</documentation>
-            <input message="tns:resetPasswordRequest"/>
+            <input  message="tns:resetPasswordRequest"/>
             <output message="tns:resetPasswordResponse"/>
-            <fault message="tns:InvalidIdFault" name="InvalidIdFault"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:InvalidIdFault" name="InvalidIdFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="getUserInfo">
             <documentation>Returns standard information relevant to the current user</documentation>
-            <input message="tns:getUserInfoRequest"/>
+            <input  message="tns:getUserInfoRequest"/>
             <output message="tns:getUserInfoResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="sendEmailMessage">
             <documentation>Send existing draft EmailMessage</documentation>
-            <input message="tns:sendEmailMessageRequest"/>
+            <input  message="tns:sendEmailMessageRequest"/>
             <output message="tns:sendEmailMessageResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
         <operation name="sendEmail">
             <documentation>Send outbound email</documentation>
-            <input message="tns:sendEmailRequest"/>
+            <input  message="tns:sendEmailRequest"/>
             <output message="tns:sendEmailResponse"/>
-            <fault message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
+            <fault  message="tns:UnexpectedErrorFault" name="UnexpectedErrorFault"/>
         </operation>
 
     </portType>
