@@ -7,7 +7,7 @@ The Force.com Web Service Connector (WSC) is a high performing web service clien
     mvn clean package
 
 ## Generating Stubs From WSDLs
-    Use or replace the WSDL files located under the sub-modules folders `sfdc-wsc-ws-*` and build those sub-modules or the rebuild the entire project.
+Use or replace the WSDL files located under the sub-modules folders `sfdc-wsc-ws-*` and build those sub-modules or the rebuild the entire project.
 
 ## Write Application Code
 The following sample illustrates creating a connection and creating a new Account SObject.  Login is automatically handled by the Connector.

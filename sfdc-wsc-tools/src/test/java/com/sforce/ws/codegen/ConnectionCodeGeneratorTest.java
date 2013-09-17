@@ -40,7 +40,6 @@ import junit.framework.TestCase;
 import com.sforce.ws.codegen.metadata.*;
 import com.sforce.ws.codegen.metadata.HeaderMetadata.HeaderElementMetadata;
 import com.sforce.ws.tools.wsdlc;
-import java.io.FileWriter;
 
 public class ConnectionCodeGeneratorTest extends TestCase {
 
@@ -161,7 +160,7 @@ public class ConnectionCodeGeneratorTest extends TestCase {
         STGroupDir templates = new STGroupDir(wsdlc.TEMPLATE_DIR, '$', '$');
         ST template = templates.getInstanceOf(wsdlc.CONNECTION);
         assertNotNull(template);
-        template.add("gen", connectionClassMetadata);        
+        template.add("gen", connectionClassMetadata);
         assertEquals(expectedSource, template.render());
     }
 }

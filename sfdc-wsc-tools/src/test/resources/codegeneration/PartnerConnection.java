@@ -46,9 +46,7 @@ public class PartnerConnection {
   public void setEmailHeader(boolean triggerAutoResponseEmail,boolean triggerOtherEmail,boolean triggerUserEmail) {
     __EmailHeader = new com.sforce.soap.partner.wsc130.EmailHeader_element();
     __EmailHeader.setTriggerAutoResponseEmail(triggerAutoResponseEmail);
-
     __EmailHeader.setTriggerOtherEmail(triggerOtherEmail);
-
     __EmailHeader.setTriggerUserEmail(triggerUserEmail);
   }
 
@@ -107,7 +105,6 @@ public class PartnerConnection {
   public void setCallOptions(java.lang.String client,java.lang.String defaultNamespace) {
     __CallOptions = new com.sforce.soap.partner.wsc130.CallOptions_element();
     __CallOptions.setClient(client);
-
     __CallOptions.setDefaultNamespace(defaultNamespace);
   }
 
@@ -166,7 +163,6 @@ public class PartnerConnection {
   public void setLoginScopeHeader(java.lang.String organizationId,java.lang.String portalId) {
     __LoginScopeHeader = new com.sforce.soap.partner.wsc130.LoginScopeHeader_element();
     __LoginScopeHeader.setOrganizationId(organizationId);
-
     __LoginScopeHeader.setPortalId(portalId);
   }
 
@@ -225,7 +221,6 @@ public class PartnerConnection {
   public void setAssignmentRuleHeader(java.lang.String assignmentRuleId,java.lang.Boolean useDefaultRule) {
     __AssignmentRuleHeader = new com.sforce.soap.partner.wsc130.AssignmentRuleHeader_element();
     __AssignmentRuleHeader.setAssignmentRuleId(assignmentRuleId);
-
     __AssignmentRuleHeader.setUseDefaultRule(useDefaultRule);
   }
 
@@ -282,17 +277,12 @@ public class PartnerConnection {
     com.sforce.soap.partner.wsc130.RetrieveResponse_element __response = new com.sforce.soap.partner.wsc130.RetrieveResponse_element();
 
     __request.setFieldList(fieldList);
-
     __request.setSObjectType(sObjectType);
-
     __request.setIds(ids);
 
     if (__SessionHeader != null) __connection.addHeader(SessionHeader_qname, __SessionHeader);
-
     if (__CallOptions != null) __connection.addHeader(CallOptions_qname, __CallOptions);
-
     if (__QueryOptions != null) __connection.addHeader(QueryOptions_qname, __QueryOptions);
-
     if (__MruHeader != null) __connection.addHeader(MruHeader_qname, __MruHeader);
 
     addHeaders(__connection);
