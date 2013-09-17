@@ -9,7 +9,7 @@
   
   <name>sfdc-wsc</name>
   
-  <version>28.0.0</version>
+  <version>29.0.0</version>
   
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -26,7 +26,7 @@
   
   <licenses>
     <license>
-      <name>BSD-3-Clause</name>
+      <name>BSD 3-Clause</name>
       <url>file:LICENSE.txt</url>
       <distribution>repo</distribution>
       <comments>A business-friendly OSS license</comments>
@@ -34,8 +34,8 @@
   </licenses>
   
   <scm>
-    <connection>scm:git:https://code.google.com/p/sfdc-wsc-maven/</connection>
-    <developerConnection>scm:git:https://code.google.com/p/sfdc-wsc-maven/</developerConnection>
+    <connection>scm:git:https://github.com/vitkin/sfdc-wsc.git</connection>
+    <developerConnection>scm:git:git@github.com:vitkin/sfdc-wsc.git</developerConnection>
     <tag>HEAD</tag>
     <url>https://code.google.com/p/sfdc-wsc-maven/</url>
   </scm>
@@ -152,7 +152,6 @@
             <root>src</root>
           </roots>
           <excludes>
-            <exclude>test/java/com/sforce/ws/tools/wsdlcTest.java</exclude>
             <exclude>test/resources/codegeneration/*</exclude>
             <exclude>**/*.properties</exclude>  
             <exclude>**/*.sql</exclude> 

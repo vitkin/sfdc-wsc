@@ -9,13 +9,13 @@
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided
  * that the following conditions are met:
  * 
- *    Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ * 1) Redistributions of source code must retain the above copyright notice, this list of conditions and the
  *    following disclaimer.
  * 
- *    Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ * 2) Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
  *    the following disclaimer in the documentation and/or other materials provided with the distribution.
  * 
- *    Neither the name of salesforce.com, inc. nor the names of its contributors may be used to endorse or
+ * 3) Neither the name of salesforce.com, inc. nor the names of its contributors may be used to endorse or
  *    promote products derived from this software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
@@ -84,9 +84,14 @@ public class wsdlc extends Generator {
             if (!destJar.delete()) { throw new ToolsException(String.format(
                     "Output Jar file exists and cannot be deleted: %s", destJar.getAbsolutePath())); }
         }
-        if (!destJar.getParentFile().exists()) {
-            if (!destJar.getParentFile().mkdirs()) { throw new ToolsException(String.format(
-                    "Cannot create jar file directory: %s", destJar.getParentFile().getAbsolutePath())); }
+
+        
+        if (destJar.getParentFile()!= null && !destJar.getParentFile().exists()) {
+            if (!destJar.getParentFile().mkdirs() && !destJar.getParentFile().exists()) { 
+                // only throw exception if mkdirs returns false and directory does not exist to 
+                // prevent build failures when multiple instances of wsdlc are invoked in parallel
+                throw new ToolsException(String.format(
+                        "Cannot create jar file directory: %s", destJar.getParentFile().getAbsolutePath())); }
         }
         URL wsdl;
         try {

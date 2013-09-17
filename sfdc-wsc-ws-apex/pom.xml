@@ -9,10 +9,12 @@
   
   <name>sfdc-wsc-ws-apex</name>
   
+  <version>28.0.1</version>
+  
   <parent>
     <groupId>com.sforce</groupId>
     <artifactId>sfdc-wsc</artifactId>
-    <version>28.0.0</version>
+    <version>29.0.0</version>
   </parent>
   
   <build>   

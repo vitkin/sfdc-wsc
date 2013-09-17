@@ -11,7 +11,7 @@
   <parent>
     <artifactId>sfdc-wsc</artifactId>
     <groupId>com.sforce</groupId>
-    <version>28.0.0</version>
+    <version>29.0.0</version>
   </parent>
   
   <dependencies>
