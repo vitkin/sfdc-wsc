@@ -9,8 +9,6 @@
   
   <name>sfdc-wsc-ws-partner</name>
   
-  <version>28.0.1</version>
-  
   <parent>
     <artifactId>sfdc-wsc</artifactId>
     <groupId>com.sforce</groupId>

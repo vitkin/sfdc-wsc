@@ -9,7 +9,7 @@
   
   <name>sfdc-wsc-ws-enterprise</name>
   
-  <version>28.0.1-myorganization-YYYY-MM-DD</version>
+  <version>29.0.0-myorganization-YYYY-MM-DD</version>
   
   <parent>
     <groupId>com.sforce</groupId>

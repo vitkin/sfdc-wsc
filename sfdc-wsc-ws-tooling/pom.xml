@@ -9,8 +9,6 @@
   
   <name>sfdc-wsc-ws-tooling</name>
   
-  <version>27.0.3</version>
-  
   <parent>
     <artifactId>sfdc-wsc</artifactId>
     <groupId>com.sforce</groupId>

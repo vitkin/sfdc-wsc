@@ -9,8 +9,6 @@
   
   <name>sfdc-wsc-ws-metadata</name>
   
-  <version>28.0.1</version>
-  
   <parent>
     <groupId>com.sforce</groupId>
     <artifactId>sfdc-wsc</artifactId>

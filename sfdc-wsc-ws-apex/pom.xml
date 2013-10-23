@@ -9,7 +9,7 @@
   
   <name>sfdc-wsc-ws-apex</name>
   
-  <version>28.0.1</version>
+  <version>29.0.0</version>
   
   <parent>
     <groupId>com.sforce</groupId>
