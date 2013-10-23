@@ -27,11 +27,15 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
+ * 
+ * This file incorporates work covered by the following copyright and permission notice:
+ *
+ *   XMLPULL API License.
+ *   For license please see accompanying LICENSE.xmlpull.txt file
+ *   or LICENSE.txt available at http://www.xmlpull.org/
  */
-package com.sforce.ws.parser;
-
 /* -*-             c-basic-offset: 4; indent-tabs-mode: nil; -*-  //------100-columns-wide------>|*/
-// for license please see accompanying LICENSE.txt file (available also at http://www.xmlpull.org/)
+package com.sforce.ws.parser;
 
 import java.io.InputStream;
 import java.io.IOException;

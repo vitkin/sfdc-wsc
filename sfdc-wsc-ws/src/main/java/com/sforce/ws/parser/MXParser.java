@@ -27,11 +27,12 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
- */
-/*
- * Copyright (c) 2003 Extreme! Lab, Indiana University. All rights reserved.
  *
- * This software is open source. See the bottom of this file for the license.
+ * This file incorporates work covered by the following copyright and permission notice:
+ *
+ *   Copyright (c) 2003 Extreme! Lab, Indiana University. All rights reserved.
+ *
+ *   This software is open source. See the bottom of this file for the license.
  *
  * $Id: MXParser.java,v 1.48 2005/08/11 22:39:54 aslom Exp $
  */
