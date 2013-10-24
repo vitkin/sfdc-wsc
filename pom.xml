@@ -127,7 +127,7 @@
                   <classpath/>
                   <argument>com.sforce.ws.tools.wsdlc</argument>
                   <argument>-nc</argument>
-                  <argument>${project.basedir}/${wsdl.name}.wsdl</argument>
+                  <argument>${project.basedir}/src/main/wsdl/${wsdl.name}.wsdl</argument>
                   <argument>${project.generated}/${project.artifactId}-${project.version}.jar</argument>
                   <argument>${project.generated}</argument>
                 </arguments>
