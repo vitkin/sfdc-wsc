@@ -1,20 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  
+
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>com.sforce.sfdc-wsc</groupId>
   <artifactId>sfdc-wsc-ws-partner</artifactId>
   <packaging>jar</packaging>
-  
+
   <name>sfdc-wsc-ws-partner</name>
-  
+
   <parent>
     <artifactId>sfdc-wsc</artifactId>
     <groupId>com.sforce</groupId>
     <version>29.0.0</version>
   </parent>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -27,23 +27,21 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>sfdc-wsc-tools</artifactId>
       <version>${project.parent.version}</version>
-      <classifier>jdk1${project.jdk.version}</classifier>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>sfdc-wsc-ws</artifactId>
       <version>${project.parent.version}</version>
-      <classifier>jdk1${project.jdk.version}</classifier>
     </dependency>
   </dependencies>
-  
+
   <properties>
     <wsdl.name>partner</wsdl.name>
     <license.licenseResolver>file:${project.parent.basedir}/src/license</license.licenseResolver>
