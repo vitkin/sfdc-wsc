@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.sforce.sfdc-wsc</groupId>
-  <artifactId>sfdc-wsc-ws-gae</artifactId>
+  <artifactId>sfdc-wsc-gae</artifactId>
   <packaging>jar</packaging>
 
-  <name>sfdc-wsc-ws-gae</name>
+  <name>sfdc-wsc-gae</name>
 
   <parent>
     <groupId>com.sforce</groupId>

@@ -542,7 +542,6 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
    <xsd:complexType name="Coverage">
     <xsd:sequence>
      <xsd:element name="coveredLines" minOccurs="0" maxOccurs="unbounded" type="xsd:int"/>
-     <xsd:element name="namespace" type="xsd:string"/>
      <xsd:element name="uncoveredLines" minOccurs="0" maxOccurs="unbounded" type="xsd:int"/>
     </xsd:sequence>
    </xsd:complexType>
@@ -1528,7 +1527,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
     <xsd:complexContent>
      <xsd:extension base="tns:sObject">
       <xsd:sequence>
-       <xsd:element name="ApexClassOrTrigger" minOccurs="0" type="tns:Name" nillable="true"/>
+       <xsd:element name="ApexClassOrTrigger" minOccurs="0" type="tns:sObject" nillable="true"/>
        <xsd:element name="ApexClassOrTriggerId" minOccurs="0" type="tns:ID" nillable="true"/>
        <xsd:element name="ApexTestClass" minOccurs="0" type="tns:ApexClass" nillable="true"/>
        <xsd:element name="ApexTestClassId" minOccurs="0" type="tns:ID" nillable="true"/>
@@ -1552,7 +1551,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
     <xsd:complexContent>
      <xsd:extension base="tns:sObject">
       <xsd:sequence>
-       <xsd:element name="ApexClassOrTrigger" minOccurs="0" type="tns:Name" nillable="true"/>
+       <xsd:element name="ApexClassOrTrigger" minOccurs="0" type="tns:sObject" nillable="true"/>
        <xsd:element name="ApexClassOrTriggerId" minOccurs="0" type="tns:ID" nillable="true"/>
        <xsd:element name="Coverage" minOccurs="0" type="tns:Coverage" nillable="true"/>
        <xsd:element name="CoverageLastModifiedDate" minOccurs="0" type="xsd:dateTime" nillable="true"/>
@@ -1626,7 +1625,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
        <xsd:element name="CreatedBy" minOccurs="0" type="tns:User" nillable="true"/>
        <xsd:element name="CreatedById" minOccurs="0" type="tns:ID" nillable="true"/>
        <xsd:element name="CreatedDate" minOccurs="0" type="xsd:dateTime" nillable="true"/>
-       <xsd:element name="ExecutableEntity" minOccurs="0" type="tns:Name" nillable="true"/>
+       <xsd:element name="ExecutableEntity" minOccurs="0" type="tns:sObject" nillable="true"/>
        <xsd:element name="ExecutableEntityId" minOccurs="0" type="tns:ID" nillable="true"/>
        <xsd:element name="ExpirationDate" minOccurs="0" type="xsd:dateTime" nillable="true"/>
        <xsd:element name="IsDeleted" minOccurs="0" type="xsd:boolean" nillable="true"/>
@@ -1669,7 +1668,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
        <xsd:element name="RequestedById" minOccurs="0" type="tns:ID" nillable="true"/>
        <xsd:element name="SOQLResult" minOccurs="0" type="tns:SOQLResult" nillable="true"/>
        <xsd:element name="SystemModstamp" minOccurs="0" type="xsd:dateTime" nillable="true"/>
-       <xsd:element name="User" minOccurs="0" type="tns:Name" nillable="true"/>
+       <xsd:element name="User" minOccurs="0" type="tns:sObject" nillable="true"/>
        <xsd:element name="UserId" minOccurs="0" type="tns:ID" nillable="true"/>
       </xsd:sequence>
      </xsd:extension>
@@ -1684,7 +1683,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
        <xsd:element name="LastModifiedDate" minOccurs="0" type="xsd:dateTime" nillable="true"/>
        <xsd:element name="Location" minOccurs="0" type="xsd:string" nillable="true"/>
        <xsd:element name="LogLength" minOccurs="0" type="xsd:int" nillable="true"/>
-       <xsd:element name="LogUser" minOccurs="0" type="tns:Name" nillable="true"/>
+       <xsd:element name="LogUser" minOccurs="0" type="tns:sObject" nillable="true"/>
        <xsd:element name="LogUserId" minOccurs="0" type="tns:ID" nillable="true"/>
        <xsd:element name="Operation" minOccurs="0" type="xsd:string" nillable="true"/>
        <xsd:element name="Request" minOccurs="0" type="xsd:string" nillable="true"/>
@@ -1992,7 +1991,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
      <xsd:extension base="tns:sObject">
       <xsd:sequence>
        <xsd:element name="Content" minOccurs="0" type="xsd:string" nillable="true"/>
-       <xsd:element name="ContentEntity" minOccurs="0" type="tns:Name" nillable="true"/>
+       <xsd:element name="ContentEntity" minOccurs="0" type="tns:sObject" nillable="true"/>
        <xsd:element name="ContentEntityId" minOccurs="0" type="tns:ID" nillable="true"/>
        <xsd:element name="LastSyncDate" minOccurs="0" type="xsd:dateTime" nillable="true"/>
        <xsd:element name="MetadataContainer" minOccurs="0" type="tns:MetadataContainer" nillable="true"/>
@@ -2066,7 +2065,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
        <xsd:element name="ScopeId" minOccurs="0" type="tns:ID" nillable="true"/>
        <xsd:element name="System" minOccurs="0" type="xsd:string" nillable="true"/>
        <xsd:element name="SystemModstamp" minOccurs="0" type="xsd:dateTime" nillable="true"/>
-       <xsd:element name="TracedEntity" minOccurs="0" type="tns:Name" nillable="true"/>
+       <xsd:element name="TracedEntity" minOccurs="0" type="tns:sObject" nillable="true"/>
        <xsd:element name="TracedEntityId" minOccurs="0" type="tns:ID" nillable="true"/>
        <xsd:element name="Validation" minOccurs="0" type="xsd:string" nillable="true"/>
        <xsd:element name="Visualforce" minOccurs="0" type="xsd:string" nillable="true"/>
@@ -2847,7 +2846,7 @@ Copyright 2006-2013 Salesforce.com, inc. All Rights Reserved
  <service name="SforceServiceService">
   <documentation></documentation>
   <port binding="tns:SforceServiceBinding" name="SforceService">
-   <soap:address location="https://www.salesforce.com/services/Soap/T/29.0"/>
+   <soap:address location="https://na1.salesforce.com/services/Soap/T/29.0"/>
   </port>
  </service>
 </definitions>
