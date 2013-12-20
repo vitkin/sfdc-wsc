@@ -1,5 +1,9 @@
 # Created by http://gitignore.io
 
+### Custom ###
+build.properties
+cookies/
+
 ### Maven ###
 target/
 

@@ -1,0 +1,168 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.sforce.sfdc-wsc</groupId>
+  <artifactId>sfdc-wsc-client</artifactId>
+  <packaging>pom</packaging>
+  
+  <version>29.0.0</version>
+
+  <parent>
+    <groupId>com.sforce</groupId>
+    <artifactId>sfdc-wsc</artifactId>
+    <version>30.0.0</version>
+  </parent>
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.8</version>
+          <executions>
+            <execution>
+              <id>add-source</id>
+              <goals>
+                <goal>add-source</goal>
+              </goals>
+              <configuration>
+                <sources>
+                  <source>${project.generated}</source>
+                </sources>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.2.1</version>
+          <executions>
+            <execution>
+              <id>generate-sources</id>
+              <phase>generate-sources</phase>
+              <goals>
+                <!--<goal>java</goal>-->
+                <goal>exec</goal>
+              </goals>
+              <configuration>
+                <!--<mainClass>com.sforce.ws.tools.wsdlc</mainClass>-->
+                <executable>java</executable>
+                <arguments>
+                  <!--<argument>-Dstandalone-jar=true</argument>-->
+                  <!--<argument>-DcompileTarget=1.6</argument>-->
+                  <argument>-Dpackage-prefix=wsc</argument>
+                  <argument>-classpath</argument>
+                  <!-- automatically creates the classpath using all project dependencies,
+                  also adding the project build directory -->
+                  <classpath/>
+                  <argument>com.sforce.ws.tools.wsdlc</argument>
+                  <argument>-nc</argument>
+                  <argument>${project.basedir}/src/main/wsdl/${wsdl.name}.wsdl</argument>
+                  <argument>${project.generated}/${project.artifactId}-${project.version}.jar</argument>
+                  <argument>${project.generated}</argument>
+                </arguments>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.sforce.sfdc-wsc</groupId>
+      <artifactId>sfdc-wsc-tools</artifactId>
+      <version>30.0.0</version>
+      <optional>true</optional>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.sforce.sfdc-wsc</groupId>
+      <artifactId>sfdc-wsc-ws</artifactId>
+      <version>30.0.0</version>
+    </dependency>
+  </dependencies>
+  
+  <profiles>
+    <profile>
+      <id>download-wsdl</id>
+      
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>properties-maven-plugin</artifactId>
+              <version>1.0-alpha-2</version>
+              <configuration>
+                <files>
+                  <file>${project.parent.basedir}/build.properties</file>
+                </files>
+              </configuration>
+              <executions>
+                <execution>
+                  <phase>initialize</phase>
+                  <goals>
+                    <goal>read-project-properties</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+      
+            <plugin>
+              <groupId>vitkin.sfdc</groupId>
+              <artifactId>wsdl-maven-plugin</artifactId>
+              <version>1.0</version>
+              <configuration>
+                <cookiesDirectory>${project.parent.basedir}/cookies</cookiesDirectory>
+                <filename>${wsdl.name}.wsdl</filename>
+              </configuration>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>download</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+      
+      <pluginRepositories>
+        <pluginRepository>
+          <id>bintray-plugins</id>
+          <name>bintray-plugins</name>
+          <url>http://dl.bintray.com/vitkin/maven</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  
+  <properties>
+    <project.generated>${basedir}/target/generated-sources/soap</project.generated>
+    <license.licenseResolver>file:${project.parent.basedir}/src/license</license.licenseResolver>
+  </properties>
+
+  <modules>
+    <module>sfdc-wsc-client-apex</module>
+    <module>sfdc-wsc-client-metadata</module>
+    <module>sfdc-wsc-client-tooling</module>
+    <module>sfdc-wsc-client-enterprise</module>
+    <module>sfdc-wsc-client-enterprise-email</module>
+    <module>sfdc-wsc-client-enterprise-email-extended</module>
+    <module>sfdc-wsc-client-enterprise-extended</module>
+    <module>sfdc-wsc-client-partner</module>
+    <module>sfdc-wsc-client-partner-email</module>
+    <module>sfdc-wsc-client-partner-email-extended</module>
+    <module>sfdc-wsc-client-partner-extended</module>
+  </modules>
+</project>

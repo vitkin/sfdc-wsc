@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.sforce.sfdc-wsc</groupId>
+  <artifactId>sfdc-wsc-client-tooling</artifactId>
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>com.sforce.sfdc-wsc</groupId>
+    <artifactId>sfdc-wsc-client</artifactId>
+    <version>29.0.0</version>
+  </parent>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <profiles>
+    <profile>
+      <id>download-wsdl</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>vitkin.sfdc</groupId>
+            <artifactId>wsdl-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <sfdc.wsdl.uri>services/wsdl/${wsdl.name}</sfdc.wsdl.uri>
+      </properties>
+    </profile>
+  </profiles>
+
+  <properties>
+    <wsdl.name>tooling</wsdl.name>
+    <license.licenseResolver>file:${project.parent.basedir}/../src/license</license.licenseResolver>
+  </properties>
+</project>
