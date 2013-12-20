@@ -6,12 +6,10 @@
   <artifactId>sfdc-wsc-async</artifactId>
   <packaging>jar</packaging>
 
-  <name>sfdc-wsc-async</name>
-
   <parent>
-    <artifactId>sfdc-wsc</artifactId>
     <groupId>com.sforce</groupId>
-    <version>29.0.0</version>
+    <artifactId>sfdc-wsc</artifactId>
+    <version>30.0.0</version>
   </parent>
 
   <dependencies>

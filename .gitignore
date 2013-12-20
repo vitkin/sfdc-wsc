@@ -1,9 +1,32 @@
-target
-.classpath
+# Created by http://gitignore.io
+
+### Maven ###
+target/
+
+### Eclipse ###
+*.pydevproject
 .project
-.settings
-*.iml
-*.ipr
-*.iws
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
 *.swp
-.DS_Store
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+.cproject
+
+# PDT-specific
+.buildpath

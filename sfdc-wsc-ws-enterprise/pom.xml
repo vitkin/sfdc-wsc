@@ -7,14 +7,12 @@
   <artifactId>sfdc-wsc-ws-enterprise</artifactId>
   <packaging>jar</packaging>
 
-  <name>sfdc-wsc-ws-enterprise</name>
-
-  <version>29.0.0-myorganization-YYYY.MM.DD</version>
+  <version>29.1.0</version>
 
   <parent>
     <groupId>com.sforce</groupId>
     <artifactId>sfdc-wsc</artifactId>
-    <version>29.0.0</version>
+    <version>30.0.0</version>
   </parent>
 
   <build>

@@ -7,12 +7,12 @@
   <artifactId>sfdc-wsc-ws-tooling</artifactId>
   <packaging>jar</packaging>
 
-  <name>sfdc-wsc-ws-tooling</name>
-
+  <version>29.1.0</version>
+  
   <parent>
-    <artifactId>sfdc-wsc</artifactId>
     <groupId>com.sforce</groupId>
-    <version>29.0.0</version>
+    <artifactId>sfdc-wsc</artifactId>
+    <version>30.0.0</version>
   </parent>
 
   <build>
@@ -35,7 +35,7 @@
       <version>${project.parent.version}</version>
       <optional>true</optional>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>sfdc-wsc-ws</artifactId>
       <version>${project.parent.version}</version>

@@ -6,13 +6,13 @@
   <groupId>com.sforce.sfdc-wsc</groupId>
   <artifactId>sfdc-wsc-ws-partner-email</artifactId>
   <packaging>jar</packaging>
-
-  <name>sfdc-wsc-ws-partner-email</name>
+  
+  <version>29.1.0</version>
 
   <parent>
-    <artifactId>sfdc-wsc</artifactId>
     <groupId>com.sforce</groupId>
-    <version>29.0.0</version>
+    <artifactId>sfdc-wsc</artifactId>
+    <version>30.0.0</version>
   </parent>
 
   <build>
