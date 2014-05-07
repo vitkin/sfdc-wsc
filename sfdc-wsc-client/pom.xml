@@ -6,12 +6,12 @@
   <artifactId>sfdc-wsc-client</artifactId>
   <packaging>pom</packaging>
   
-  <version>29.0.0</version>
+  <version>30.0.0</version>
 
   <parent>
     <groupId>com.sforce</groupId>
     <artifactId>sfdc-wsc</artifactId>
-    <version>30.0.0</version>
+    <version>31.0.0</version>
   </parent>
   
   <build>
@@ -39,7 +39,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>1.2.1</version>
+          <version>1.3</version>
           <executions>
             <execution>
               <id>generate-sources</id>
@@ -77,14 +77,14 @@
     <dependency>
       <groupId>com.sforce.sfdc-wsc</groupId>
       <artifactId>sfdc-wsc-tools</artifactId>
-      <version>30.0.0</version>
+      <version>31.0.0</version>
       <optional>true</optional>
     </dependency>
     
     <dependency>
       <groupId>com.sforce.sfdc-wsc</groupId>
       <artifactId>sfdc-wsc-ws</artifactId>
-      <version>30.0.0</version>
+      <version>31.0.0</version>
     </dependency>
   </dependencies>
   
